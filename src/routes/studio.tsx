@@ -3,6 +3,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { ArrowDown, ArrowUp, Download, FilePlus2, RotateCcw, RotateCw, Upload, X } from 'lucide-react'
 import sample from '@/studio/fixtures/illustrative-portfolio.json'
 import { StudioView } from '@/studio/StudioView'
+import { StudioSimplePanel } from '@/studio/StudioSimplePanel'
 import { STUDIO_DRAFT_KEY, STUDIO_MOODS, type Project, type ProjectLens, type StudioBlock, type StudioDocument, type StudioMood } from '@/studio/document'
 import { parseStudioArchive, validateStudioDocument } from '@/studio/validate'
 import '@/studio/studio.css'
@@ -34,7 +35,9 @@ function blankDocument(): StudioDocument {
 function StudioRoute() {
   const [history, setHistory] = useState<History>(start)
   const [hydrated, setHydrated] = useState(false)
-  const [editing, setEditing] = useState(false)
+  const [mode, setMode] = useState<'simple' | 'studio' | 'preview'>('simple')
+  const editing = mode === 'studio'
+  const simple = mode === 'simple'
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [lenses, setLenses] = useState<Record<string, ProjectLens>>({})
   const [status, setStatus] = useState('Local preview · not published')
@@ -109,7 +112,7 @@ function StudioRoute() {
         page.blocks.push({ id: blockId, type: 'project', projectId: id, defaultLens: 'story', style })
       }
     })
-    setSelectedId(blockId); setEditing(true)
+    setSelectedId(blockId); setMode('studio')
   }
   const move = (id: string, offset: number) => commit(next => {
     const list = next.pages[0]?.blocks
@@ -143,28 +146,41 @@ function StudioRoute() {
     setStatus('Imported. Saved locally; not published.')
     setSelectedId(null)
   }
+  const startBlank = () => {
+    if (!window.confirm('Start a new Studio document? Export a backup first if you want to keep the current draft.')) return
+    setHistory(current => ({ past: [...current.past.slice(-39), current.present], present: blankDocument(), future: [] }))
+    setSelectedId(null)
+    setMode('simple')
+  }
   return <div className="stx-shell">
     <a className="stx-skip" href="#stx-start">Skip to portfolio</a>
+    <input ref={uploadRef} type="file" accept=".json,application/json" className="stx-hidden-input" onChange={e => {void importFile(e.target.files?.[0]);e.target.value=''}}/>
     <header className="stx-workbar">
-      <div className="stx-workbar-brand"><strong>fleed<span>.</span></strong><span>Studio / experimental</span></div>
+      <div className="stx-workbar-brand"><strong>fleed<span>.</span></strong><span>YOUR WORK, YOUR WAY</span></div>
       <div className="stx-workbar-actions">
         <button type="button" onClick={undo} disabled={!history.past.length} title="Undo"><RotateCcw size={16}/><span className="stx-desktop-only">Undo</span></button>
         <button type="button" onClick={redo} disabled={!history.future.length} title="Redo"><RotateCw size={16}/><span className="stx-desktop-only">Redo</span></button>
         <label className="stx-mood-label">Expression <select value={studioSystem} onChange={e => commit(next => {next.presentation.system = e.target.value as StudioMood})} aria-label="Choose a design expression">{STUDIO_MOODS.map(item => <option key={item.id} value={item.id}>{item.label}</option>)}</select></label>
-        <button type="button" onClick={() => setEditing(open => !open)} className="stx-primary-action" aria-pressed={editing}>{editing ? 'Preview' : 'Edit portfolio'}</button>
+        <nav className="stx-mode-nav" aria-label="Creation modes">
+          <button type="button" aria-pressed={simple} onClick={() => setMode('simple')}>Simple</button>
+          <button type="button" aria-pressed={editing} onClick={() => setMode('studio')}>Studio</button>
+          <button type="button" aria-pressed={mode === 'preview'} onClick={() => setMode('preview')}>Preview</button>
+          <a href="/" title="Original Classic Fleed editor. Its drafts remain separate until migration is tested.">Classic ↗</a>
+        </nav>
       </div>
     </header>
-    <div className="stx-statusbar" role="status">{status}<span>Changes are local to this browser. Publishing is not connected.</span></div>
-    <div className={'stx-workspace' + (editing ? ' is-editing' : '')}>
+    <div className="stx-statusbar" role="status">{status}<span>Simple and Studio share one document. Classic remains available at /, using its existing independent draft.</span></div>
+    <div className={'stx-workspace' + (editing ? ' is-editing' : '') + (simple ? ' is-simple' : '')}>
       <StudioView document={doc} editing={editing} selectedId={selected?.id} onSelect={setSelectedId}
         lenses={lenses} onLensChange={(id,lens)=>setLenses(previous => ({...previous,[id]:lens}))}/>
+      {simple && <StudioSimplePanel doc={doc} onCommit={commit} onOpenStudio={() => setMode('studio')} onExport={download} onImport={() => uploadRef.current?.click()} onNew={startBlank} />}
       {editing && <aside className="stx-editor" aria-label="Portfolio editing controls">
-        <div className="stx-editor-heading"><div><small>YOUR CANVAS</small><h2>Make it yours.</h2></div><button onClick={()=>setEditing(false)} aria-label="Close editor"><X size={18}/></button></div>
+        <div className="stx-editor-heading"><div><small>YOUR CANVAS / STUDIO</small><h2>Shape the story.</h2></div><button onClick={() => setMode('preview')} aria-label="Preview portfolio"><X size={18}/></button></div>
         <div className="stx-editor-tools">
           <button onClick={() => uploadRef.current?.click()}><Upload size={15}/> Import</button>
           <button onClick={download}><Download size={15}/> Export JSON</button>
-          <button onClick={() => { if (window.confirm('Start a new document? Your current Studio changes will be replaced. Export a backup first.')) {setHistory(current => ({past:[...current.past.slice(-39),current.present], present:blankDocument(), future:[]}));setSelectedId(null)} }}><FilePlus2 size={15}/> Start blank</button>
-          <input ref={uploadRef} type="file" accept=".json,application/json" className="stx-hidden-input" onChange={e => {void importFile(e.target.files?.[0]);e.target.value=''}}/>
+          <button onClick={startBlank}><FilePlus2 size={15}/> Start blank</button>
+          
         </div>
         <h3 className="stx-editor-label">Page structure</h3>
         <ol className="stx-block-list">{blocks.map((block,i)=><li key={block.id} className={selected?.id === block.id ? 'is-selected' : ''}>
