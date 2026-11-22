@@ -4,6 +4,7 @@ import { Toaster } from '@/components/ui/sonner'
 import { TooltipProvider } from '@/components/ui/tooltip'
 
 import '../styles.css'
+import '../styles/design-compositions.css'
 
 const siteName = 'fleed — a quiet portfolio you write yourself'
 const siteDescription =
