@@ -6,6 +6,7 @@ import { StudioView } from '@/studio/StudioView'
 import { StudioSimplePanel } from '@/studio/StudioSimplePanel'
 import { STUDIO_DRAFT_KEY, STUDIO_MOODS, type Project, type ProjectLens, type StudioBlock, type StudioDocument, type StudioMood } from '@/studio/document'
 import { parseStudioArchive, validateStudioDocument } from '@/studio/validate'
+import { updateSimpleAchievement } from '@/studio/shared-editor'
 import '@/studio/studio.css'
 
 export const Route = createFileRoute('/studio')({ component: StudioRoute })
@@ -21,7 +22,7 @@ function blankDocument(): StudioDocument {
   const doc = clone(original)
   doc.documentId = createId('doc')
   doc.identity = { displayName: 'Untitled creator', roles: [], headline: '', bio: '', location: '', availability: '', links: [] }
-  doc.content = { skills: [], projects: [], experience: [], education: [] }
+  doc.content = { skills: [], projects: [], experience: [], education: [], achievements: [] }
   doc.pages = [{ id: 'page_home', slug: '/', title: 'Home', blocks: [
     { id: createId('blk'), type: 'identity', scale: 'hero', style: { variant: 'hero', emphasis: 'normal' } },
     { id: createId('blk'), type: 'rich-text', paragraphs: [plain('Write something about the work you care about.')], style: { variant: 'lead', emphasis: 'normal' } },
@@ -90,8 +91,8 @@ function StudioRoute() {
     commit(next => { const p = next.content.projects.find(p => p.id === project?.id); if (p) p[key] = value })
   const patchBlock = (id: string, transform: (block: StudioBlock) => void) =>
     commit(next => { const b = next.pages[0]?.blocks.find(item => item.id === id); if (b) transform(b) })
-  const addBlock = (kind: 'rich-text' | 'project' | 'divider' | 'skills') => {
-    const blockId = createId('blk')
+  const addBlock = (kind: 'rich-text' | 'project' | 'divider' | 'skills' | 'achievements') => {
+    const blockId = kind === 'achievements' ? (page?.blocks.find(item => item.type === 'achievements')?.id ?? createId('blk')) : createId('blk')
     commit(next => {
       const page = next.pages[0]
       if (!page) return
@@ -99,6 +100,14 @@ function StudioRoute() {
       if (kind === 'rich-text') page.blocks.push({ id: blockId, type: 'rich-text', style, paragraphs: [plain('Your story begins here.')] })
       if (kind === 'divider') page.blocks.push({ id: blockId, type: 'divider', style, weight: 'rule' })
       if (kind === 'skills') page.blocks.push({ id: blockId, type: 'skills', style, display: 'list', skillIds: next.content.skills.map(s => s.id) })
+      if (kind === 'achievements') {
+        const recordId = createId('achievement')
+        next.content.achievements ??= []
+        next.content.achievements.push({ id: recordId, title: '', category: 'milestone', issuer: '', date: '', description: '', evidenceUrl: null })
+        const existing = page.blocks.find((item): item is Extract<StudioBlock,{type:'achievements'}> => item.type === 'achievements')
+        if (existing) existing.achievementIds.push(recordId)
+        else page.blocks.push({ id: blockId, type: 'achievements', style, achievementIds: [recordId], display: 'timeline' })
+      }
       if (kind === 'project') {
         const id = createId('proj')
         const newProject: Project = { id, title: 'A new project', summary: '', year: '', contribution: '', skillIds: [], links: [], coverAssetId: null,
@@ -152,6 +161,9 @@ function StudioRoute() {
     setSelectedId(null)
     setMode('simple')
   }
+  // Render a consistent server/client shell while the local draft is restored.
+  // Prevent editing the sample before hydration from losing the first keystrokes.
+  if (!hydrated) return <div className="stx-shell stx-initializing" role="status">Preparing your Studio draft…</div>
   return <div className="stx-shell">
     <a className="stx-skip" href="#stx-start">Skip to portfolio</a>
     <input ref={uploadRef} type="file" accept=".json,application/json" className="stx-hidden-input" onChange={e => {void importFile(e.target.files?.[0]);e.target.value=''}}/>
@@ -187,7 +199,7 @@ function StudioRoute() {
           <button onClick={()=>setSelectedId(block.id)} aria-current={selected?.id===block.id?'true':undefined}><span className="stx-order">{String(i+1).padStart(2,'0')}</span>{block.type.replaceAll('-', ' ')}</button>
           <div><button onClick={()=>move(block.id,-1)} disabled={i===0} aria-label={'Move '+block.type+' up'}><ArrowUp size={14}/></button><button onClick={()=>move(block.id,1)} disabled={i===blocks.length-1} aria-label={'Move '+block.type+' down'}><ArrowDown size={14}/></button></div>
         </li>)}</ol>
-        <div className="stx-insert"><h3 className="stx-editor-label">Add to page</h3><div>{(['rich-text','project','skills','divider'] as const).map(k=><button key={k} onClick={()=>addBlock(k)}>+ {k.replace('-',' ')}</button>)}</div></div>
+        <div className="stx-insert"><h3 className="stx-editor-label">Add to page</h3><div>{(['rich-text','project','skills','achievements','divider'] as const).map(k=><button key={k} onClick={()=>addBlock(k)}>+ {k.replace('-',' ')}</button>)}</div></div>
         <div className="stx-editor-fields">
           <h3 className="stx-editor-label">Selected / {selected?.type ?? 'none'}</h3>
           {selected?.type === 'identity' && <>
@@ -215,6 +227,28 @@ function StudioRoute() {
               <label>Problem<textarea value={project.lenses.spec.problem} onChange={e=>commit(next=>{const p=next.content.projects.find(p=>p.id===project.id);if(p)p.lenses.spec.problem=e.target.value})}/></label>
               <label>Approach<textarea value={project.lenses.spec.approach} onChange={e=>commit(next=>{const p=next.content.projects.find(p=>p.id===project.id);if(p)p.lenses.spec.approach=e.target.value})}/></label>
             </>}
+          </>}
+          {selected?.type === 'achievements' && <>
+            <label>Presentation<select value={selected.display} onChange={e => patchBlock(selected.id, block => { if (block.type === 'achievements') block.display = e.target.value as 'timeline' | 'list' | 'cards' })}>
+              <option value="timeline">Timeline</option><option value="list">Editorial list</option><option value="cards">Cards</option>
+            </select></label>
+            {selected.achievementIds.map((id, i) => {
+              const achievement = doc.content.achievements?.find(item => item.id === id)
+              if (!achievement) return null
+              return <div className="stx-quick-project" key={id}>
+                <div className="stx-quick-project-label">ACHIEVEMENT {String(i + 1).padStart(2,'0')}</div>
+                <label>Title<input value={achievement.title} maxLength={180} onChange={e => commit(next => { updateSimpleAchievement(next, id, 'title', e.target.value) })}/></label>
+                <label>Type<select value={achievement.category} onChange={e => commit(next => { updateSimpleAchievement(next, id, 'category', e.target.value) })}>
+                  <option value="award">Award</option><option value="certification">Certification</option><option value="competition">Competition</option>
+                  <option value="milestone">Milestone</option><option value="publication">Publication</option><option value="other">Other</option>
+                </select></label>
+                <label>Issuer<input value={achievement.issuer} maxLength={150} onChange={e => commit(next => { updateSimpleAchievement(next, id, 'issuer', e.target.value) })}/></label>
+                <label>Year or date<input value={achievement.date} maxLength={50} onChange={e => commit(next => { updateSimpleAchievement(next, id, 'date', e.target.value) })}/></label>
+                <label>What it means<textarea value={achievement.description} maxLength={900} onChange={e => commit(next => { updateSimpleAchievement(next, id, 'description', e.target.value) })}/></label>
+                <p className="stx-editor-hint">Evidence links can be entered in Simple mode. Your existing link is preserved.</p>
+              </div>
+            })}
+            <button type="button" className="stx-add-simple" onClick={() => addBlock('achievements')}>+ Add another achievement</button>
           </>}
           {selected?.type === 'divider' && <p className="stx-editor-hint">A meaningful pause between sections.</p>}
           {selected?.type === 'skills' && <p className="stx-editor-hint">This block references skills in the document. Detailed skill editing is a later milestone.</p>}
