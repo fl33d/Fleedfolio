@@ -175,3 +175,20 @@ test('elements library creates real portfolio content without losing existing fi
   )
   assert.equal(second.projects.length, 2)
 })
+
+test('layouts survive normalization and preserve old published portfolios', () => {
+  const legacy = blankPortfolio()
+  delete legacy.theme.layout
+  const restored = normalizePortfolio(legacy)
+  assert.equal(restored.theme.layout, 'folio')
+  assert.equal(normalizePortfolio({
+    ...legacy, theme: { ...legacy.theme, layout: 'studio' },
+  }).theme.layout, 'studio')
+  assert.equal(normalizePortfolio({
+    ...legacy, theme: { ...legacy.theme, layout: 'impossible' },
+  }).theme.layout, 'folio')
+  for (const design of DESIGN_PRESETS) {
+    const updated = applyDesignPreset(blankPortfolio(), design)
+    assert.equal(updated.theme.layout, design.layout)
+  }
+})

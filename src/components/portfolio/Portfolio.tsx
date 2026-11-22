@@ -88,6 +88,7 @@ export function Portfolio({ data, editing, onChange, onOpenCommands }: Props) {
     <div
       className="portfolio"
       data-font={data.theme.font}
+      data-layout={data.theme.layout}
       data-scale={data.theme.scale}
       data-align={data.theme.align}
       style={{ '--accent-c': data.accent } as CSSProperties}
