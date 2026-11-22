@@ -1,5 +1,10 @@
 # Resume Fleedfolio Studio development
 
+## Latest continuation — Classic workbench PR #8
+
+Current branch `feat/classic-workbench-revamp-20261122` (draft PR #8) stacks on `feat/studio-shared-editing-20261122` (draft PR #7). Read `docs/CLASSIC_WORKBENCH_VISUAL_REVIEW.md`, `src/components/portfolio/WorkbenchBar.tsx`, `ElementsShelf.tsx`, `SkillMark.tsx`, `Customize.tsx`, `src/styles/workbench-revamp.css`, and `tests/workbench-revamp.test.mjs`. Source CI [45081286577](https://github.com/fl33d/Fleedfolio/actions/runs/45081286577) passed 48 tests, TypeScript and build; browser QA [45081286571](https://github.com/fl33d/Fleedfolio/actions/runs/45081286571) passed five viewports. Continue by reviewing actual screenshots, eliminating residual microtype, testing focus/keyboard and mobile panel closing. The Classic publishing and edit-token paths are unchanged; its old data is distinct from Studio until an import adapter is proven. Live Workers.dev deployment is not authorised by this checkpoint and may overwrite the original Fleed Worker. Follow `docs/WORKERS_DEV_RELEASE_GATE.md`.
+
+
 ## PR #7 continuation checkpoint (22 November 2026)
 
 Continue from `feat/studio-shared-editing-20261122` (draft PR #7), not PR #6 alone. Read `src/studio/StudioSimplePanel.tsx`, `src/studio/shared-editor.ts`, the achievements additions to `StudioView.tsx`, the JSON schema, `tests/achievements.test.mjs`, and `docs/WORKERS_DEV_RELEASE_GATE.md`. Both Simple/Studio edit one local Studio document and preserve unsupported advanced fields; the Classic route still owns legacy credentials and drafts. The achievements collection is optional for v1 compatibility, and GitHub profile badges are user-authored with optional public HTTPS proof, not GitHub-verified or auto-imported. Check the latest GitHub CI runs and run real browser QA; a previous browser run initially failed because the pinned local workerd did not support the production compatibility date, and then because Playwright interacted before React hydration. The CI workflow now tests using a temporary test-checkout date only, without editing repository Wrangler config.
