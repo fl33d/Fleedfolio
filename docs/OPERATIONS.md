@@ -20,18 +20,24 @@ A Netlify-branded 404 means requests are still reaching Netlify or a Netlify-rel
 4. If the domain's authoritative nameservers are still elsewhere, resolve that separately. Moving the domain registrar is not required just to serve a Cloudflare Worker.
 5. Verify both the root domain and any `www` hostname you intend to support.
 
-## Personal URLs: database migration required
+## Personal URLs: no schema migration
 
-The custom URL feature uses the new `portfolio_slugs` table. **Do not merge and deploy this change until the migration is applied to the existing D1 database**, because it references a table absent from older deployments.
+The personal-link feature reuses the existing `portfolios` table. It does **not** require a new D1 table, an API token, or production database migration.
 
-1. Back up the existing D1 database `fleed-portfolios` and verify the backup.
-2. Run the non-destructive SQL migration `migrations/0002_portfolio_slugs.sql` against that exact database using the authenticated Cloudflare CLI/dashboard.
-3. Confirm the table and unique constraints were created, and verify old published `/p/{id}` pages still load.
-4. Only then merge the application change and verify the Cloudflare deployment, existing editing and new `/@yourname` links.
-5. Custom names use 3–30 lowercase letters/numbers with single hyphens and cannot be reserved or duplicate; links are published as `/@name` directly beneath the site root.
-6. Renaming removes the previous alias but does not change the underlying generated portfolio ID; old generated URLs continue working.
+1. Verify the Cloudflare deployment is connected to `fl33d/Fleedfolio` and its production branch is `main`.
+2. After GitHub CI succeeds, merge the feature branch. Confirm Cloudflare Workers Builds deploys the exact new commit.
+3. Verify an existing generated `/p/{id}` link still opens.
+4. In **Customise → Your link**, type a name and publish; verify `/@name` works on the existing `workers.dev` URL.
+5. Attempt a duplicate name from a second browser. It must not overwrite the original portfolio; test renaming and updating an existing page.
+6. Fix `fleed.online` DNS/custom-domain routing separately; its current Netlify 404 is unrelated to this feature.
 
-No production migration is performed by this pull request.
+### Implementation details
+
+- The main portfolio is still stored at its original generated `id`, with an optional internal `__fleed_slug` field.
+- A separate row in the same existing D1 table uses `id = '@' || username`, containing a small pointer to the portfolio ID. It shares a hashed publishing token with the owner row.
+- The existing primary-key constraint protects unique usernames. D1 transaction batches update portfolios and aliases together, so duplicate-name conflicts roll back.
+- This avoids changing the production schema but is temporary table overloading. A future dedicated alias table should be considered only with a reviewed migration and verified backup.
+- Old `/p/{id}` URLs remain supported. Renaming removes the old custom alias but keeps the generated ID.
 
 ## Before each release
 
