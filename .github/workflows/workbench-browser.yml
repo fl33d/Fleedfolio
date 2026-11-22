@@ -1,0 +1,87 @@
+name: Classic workbench browser QA (review only)
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/components/portfolio/**'
+      - 'src/routes/index.tsx'
+      - 'src/styles/workbench-revamp.css'
+      - 'src/lib/portfolio.ts'
+      - 'src/lib/skill-catalog.ts'
+      - 'scripts/workbench-browser-check.mjs'
+      - '.github/workflows/workbench-browser.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  workbench-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out review branch
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.10.0
+
+      - name: Set up Node 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install source dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate local Worker types
+        run: pnpm exec wrangler types
+
+      - name: Install isolated Chromium test tools
+        run: |
+          mkdir -p /tmp/fleed-browser
+          npm install --prefix /tmp/fleed-browser --no-save --no-audit --no-fund playwright@1.65.1
+          /tmp/fleed-browser/node_modules/.bin/playwright install --with-deps chromium
+
+      - name: Start local-only Fleedfolio
+        run: |
+          # CI's pinned workerd supports 2026-10-19; production declares 2026-10-21.
+          # This substitutes the date in this disposable test checkout ONLY.
+          # Neither committed wrangler.jsonc nor real Cloudflare resources are changed.
+          node -e "const f=require('fs');const p='wrangler.jsonc';const s=f.readFileSync(p,'utf8');if(!s.includes('2026-10-21'))process.exit(1);f.writeFileSync(p,s.replace('2026-10-21','2026-10-19'))"
+          pnpm dev --host 127.0.0.1 > /tmp/fleed-workbench-dev.log 2>&1 &
+          echo $! > /tmp/fleed-workbench.pid
+          for i in $(seq 1 45); do
+            if curl -fsS http://127.0.0.1:3000/ >/dev/null 2>&1; then
+              echo "Local Classic editor responding"
+              exit 0
+            fi
+            if ! kill -0 "$(cat /tmp/fleed-workbench.pid)" 2>/dev/null; then
+              cat /tmp/fleed-workbench-dev.log
+              exit 1
+            fi
+            sleep 2
+          done
+          cat /tmp/fleed-workbench-dev.log
+          exit 1
+
+      - name: Test real Canvas, Library, Inspector, Skill and Preview interactions
+        env:
+          PLAYWRIGHT_IMPORT: /tmp/fleed-browser/node_modules/playwright/index.mjs
+          WORKBENCH_BASE_URL: http://127.0.0.1:3000
+        run: node scripts/workbench-browser-check.mjs
+
+      - name: Upload review screenshots and logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fleedfolio-classic-workbench-review
+          path: |
+            artifacts/workbench-review/
+            /tmp/fleed-workbench-dev.log
+          if-no-files-found: warn
+          retention-days: 7
