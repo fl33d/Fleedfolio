@@ -6,9 +6,21 @@ import { StudioView } from '@/studio/StudioView'
 import { STUDIO_DRAFT_KEY, STUDIO_MOODS, type Project, type ProjectLens, type StudioBlock, type StudioDocument, type StudioMood } from '@/studio/document'
 import { parseStudioArchive, validateStudioDocument } from '@/studio/validate'
 import '@/studio/studio.css'
+import '@/studio/studio-refinement.css'
 
 export const Route = createFileRoute('/studio')({ component: StudioRoute })
 
+const blockLibrary = [
+  { id: 'rich-text', label: 'Writing', description: 'A flexible paragraph or story', category: 'Essentials', icon: 'Aa' },
+  { id: 'project', label: 'Project', description: 'Work with selectable perspectives', category: 'Work', icon: '◈' },
+  { id: 'project-list', label: 'Project index', description: 'An overview of your existing work', category: 'Work', icon: '↗' },
+  { id: 'skills', label: 'Skills', description: 'Show your tools and interests', category: 'Essentials', icon: '✳' },
+  { id: 'code', label: 'Code', description: 'Readable, display-only source', category: 'Work', icon: '{ }' },
+  { id: 'links', label: 'Links', description: 'Reference your saved links', category: 'Essentials', icon: '⌁' },
+  { id: 'timeline', label: 'Timeline', description: 'Experience or education', category: 'Work', icon: '≡' },
+  { id: 'divider', label: 'Divider', description: 'Give your composition breathing room', category: 'Structure', icon: '—' },
+] as const
+type LibraryKind = (typeof blockLibrary)[number]['id']
 const original = sample as unknown as StudioDocument
 type History = { past: StudioDocument[]; present: StudioDocument; future: StudioDocument[] }
 const start: History = { past: [], present: original, future: [] }
@@ -35,6 +47,8 @@ function StudioRoute() {
   const [history, setHistory] = useState<History>(start)
   const [hydrated, setHydrated] = useState(false)
   const [editing, setEditing] = useState(false)
+  const [libraryQuery, setLibraryQuery] = useState('')
+  const [libraryCategory, setLibraryCategory] = useState('All')
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [lenses, setLenses] = useState<Record<string, ProjectLens>>({})
   const [status, setStatus] = useState('Local preview · not published')
@@ -87,30 +101,36 @@ function StudioRoute() {
     commit(next => { const p = next.content.projects.find(p => p.id === project?.id); if (p) p[key] = value })
   const patchBlock = (id: string, transform: (block: StudioBlock) => void) =>
     commit(next => { const b = next.pages[0]?.blocks.find(item => item.id === id); if (b) transform(b) })
-  const addBlock = (kind: 'rich-text' | 'project' | 'divider' | 'skills') => {
+  const addBlock = (kind: LibraryKind, insertAt?: number) => {
     const blockId = createId('blk')
     commit(next => {
       const page = next.pages[0]
       if (!page) return
       const style = { variant: 'standard', emphasis: 'normal' as const }
-      if (kind === 'rich-text') page.blocks.push({ id: blockId, type: 'rich-text', style, paragraphs: [plain('Your story begins here.')] })
-      if (kind === 'divider') page.blocks.push({ id: blockId, type: 'divider', style, weight: 'rule' })
-      if (kind === 'skills') page.blocks.push({ id: blockId, type: 'skills', style, display: 'list', skillIds: next.content.skills.map(s => s.id) })
+      const insert = (block: StudioBlock) => page.blocks.splice(insertAt === undefined ? page.blocks.length : Math.max(0,Math.min(insertAt,page.blocks.length)), 0, block)
+      if (kind === 'rich-text') insert({ id:blockId,type:'rich-text',style,paragraphs:[plain('Your story begins here.')] })
+      if (kind === 'divider') insert({ id:blockId,type:'divider',style,weight:'rule' })
+      if (kind === 'skills') insert({ id:blockId,type:'skills',style,display:'list',skillIds:next.content.skills.map(x=>x.id) })
+      if (kind === 'code') insert({ id:blockId,type:'code',style,language:'text',source:'',caption:'A look inside the work' })
+      if (kind === 'project-list') insert({ id:blockId,type:'project-list',style,display:'index',projectIds:next.content.projects.map(x=>x.id) })
+      if (kind === 'links') insert({ id:blockId,type:'links',style,linkIds:next.identity.links.map(x=>x.id) })
+      if (kind === 'timeline') insert({ id:blockId,type:'timeline',style,collection:'experience',itemIds:next.content.experience.map(x=>x.id) })
       if (kind === 'project') {
-        const id = createId('proj')
-        const newProject: Project = { id, title: 'A new project', summary: '', year: '', contribution: '', skillIds: [], links: [], coverAssetId: null,
-          lenses: {
-            story: { enabled: true, sections: [{ id: createId('section'), heading: 'The idea', paragraphs: [plain('Why this project exists.')] }] },
-            spec: { enabled: false, problem: '', approach: '', decisions: [], tradeoffs: [], metrics: [], architectureAssetId: null },
-            board: { enabled: false, assetIds: [], caption: '' },
-            demo: { enabled: false, url: null, fallbackText: '', launchLabel: 'View demo' },
-          } }
+        const id=createId('proj')
+        const newProject: Project={ id,title:'A new project',summary:'',year:'',contribution:'',skillIds:[],links:[],coverAssetId:null,
+          lenses:{
+            story:{enabled:true,sections:[{id:createId('section'),heading:'The idea',paragraphs:[plain('Why this project exists.')]}]},
+            spec:{enabled:false,problem:'',approach:'',decisions:[],tradeoffs:[],metrics:[],architectureAssetId:null},
+            board:{enabled:false,assetIds:[],caption:''},
+            demo:{enabled:false,url:null,fallbackText:'',launchLabel:'View demo'}
+          }}
         next.content.projects.push(newProject)
-        page.blocks.push({ id: blockId, type: 'project', projectId: id, defaultLens: 'story', style })
+        insert({id:blockId,type:'project',projectId:id,defaultLens:'story',style})
       }
     })
-    setSelectedId(blockId); setEditing(true)
+    setSelectedId(blockId);setEditing(true)
   }
+  const filteredLibrary=blockLibrary.filter(item=>(libraryCategory==='All'||item.category===libraryCategory) && (item.label+' '+item.description).toLowerCase().includes(libraryQuery.toLowerCase().trim()))
   const move = (id: string, offset: number) => commit(next => {
     const list = next.pages[0]?.blocks
     if (!list) return
@@ -166,12 +186,21 @@ function StudioRoute() {
           <button onClick={() => { if (window.confirm('Start a new document? Your current Studio changes will be replaced. Export a backup first.')) {setHistory(current => ({past:[...current.past.slice(-39),current.present], present:blankDocument(), future:[]}));setSelectedId(null)} }}><FilePlus2 size={15}/> Start blank</button>
           <input ref={uploadRef} type="file" accept=".json,application/json" className="stx-hidden-input" onChange={e => {void importFile(e.target.files?.[0]);e.target.value=''}}/>
         </div>
+        <section className="stx-library" aria-label="Element library">
+          <header><div><small>THE ELEMENT SHELF</small><h3>Add to the page.</h3></div><span>{blockLibrary.length} elements</span></header>
+          <label className="stx-library-search">Search elements<input type="search" value={libraryQuery} onChange={e=>setLibraryQuery(e.target.value)} placeholder="Projects, writing, code..." /></label>
+          <div className="stx-library-categories">{['All','Essentials','Work','Structure'].map(cat=><button type="button" key={cat} aria-pressed={libraryCategory===cat} onClick={()=>setLibraryCategory(cat)}>{cat}</button>)}</div>
+          <div className="stx-library-grid">{filteredLibrary.map(item=><button type="button" key={item.id} data-shelf-block={item.id} draggable onClick={()=>addBlock(item.id)}
+            onDragStart={e=>{e.dataTransfer.setData('application/x-fleed-block',item.id);e.dataTransfer.effectAllowed='copy'}}>
+            <span aria-hidden="true">{item.icon}</span><strong>{item.label}</strong><small>{item.description}</small></button>)}</div>
+          {!filteredLibrary.length && <p className="stx-editor-hint">No matching elements.</p>}
+          <p className="stx-library-help">Click to add, or drag an element to a position in Page structure. Use arrows to reorder.</p>
+        </section>
         <h3 className="stx-editor-label">Page structure</h3>
-        <ol className="stx-block-list">{blocks.map((block,i)=><li key={block.id} className={selected?.id === block.id ? 'is-selected' : ''}>
+        <ol className="stx-block-list">{blocks.map((block,i)=><li key={block.id} className={selected?.id === block.id ? 'is-selected' : ''} onDragOver={e=>{if(Array.from(e.dataTransfer.types).includes('application/x-fleed-block'))e.preventDefault()}} onDrop={e=>{const kind=e.dataTransfer.getData('application/x-fleed-block') as LibraryKind;if(blockLibrary.some(item=>item.id===kind)){e.preventDefault();addBlock(kind,i)}}}>
           <button onClick={()=>setSelectedId(block.id)} aria-current={selected?.id===block.id?'true':undefined}><span className="stx-order">{String(i+1).padStart(2,'0')}</span>{block.type.replaceAll('-', ' ')}</button>
           <div><button onClick={()=>move(block.id,-1)} disabled={i===0} aria-label={'Move '+block.type+' up'}><ArrowUp size={14}/></button><button onClick={()=>move(block.id,1)} disabled={i===blocks.length-1} aria-label={'Move '+block.type+' down'}><ArrowDown size={14}/></button></div>
         </li>)}</ol>
-        <div className="stx-insert"><h3 className="stx-editor-label">Add to page</h3><div>{(['rich-text','project','skills','divider'] as const).map(k=><button key={k} onClick={()=>addBlock(k)}>+ {k.replace('-',' ')}</button>)}</div></div>
         <div className="stx-editor-fields">
           <h3 className="stx-editor-label">Selected / {selected?.type ?? 'none'}</h3>
           {selected?.type === 'identity' && <>
