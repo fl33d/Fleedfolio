@@ -23,7 +23,7 @@ import {
 const STEPS: { title: string; description: string; example: string; icon: LucideIcon }[] = [
   {
     title: 'Start with your story.',
-    description: 'Click any placeholder on the page and type right into it. Add your name, what you do, your work and anything you want people to know.',
+    description: 'Click any placeholder and write directly on the page. Add your name, what you do, and the projects you want to lead with. Use the small arrows to reorder projects.',
     example: 'Click “Your name” to begin',
     icon: MousePointer2,
   },

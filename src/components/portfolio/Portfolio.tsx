@@ -10,6 +10,7 @@ import {
   emptySocial,
   safeUrl,
   mailtoHref,
+  reorderItems,
   type Labels,
   type Portfolio as PortfolioData,
 } from '@/lib/portfolio'
@@ -45,15 +46,8 @@ export function Portfolio({ data, editing, onChange }: Props) {
   const removeItem = <K extends ListKey>(key: K, id: string) =>
     set(key, (data[key] as { id: string }[]).filter((i) => i.id !== id) as PortfolioData[K])
 
-  const moveProject = (index: number, offset: -1 | 1) => {
-    const destination = index + offset
-    if (destination < 0 || destination >= data.projects.length) return
-    const updated = [...data.projects]
-    const [item] = updated.splice(index, 1)
-    if (!item) return
-    updated.splice(destination, 0, item)
-    set('projects', updated)
-  }
+  const moveProject = (index: number, offset: -1 | 1) =>
+    set('projects', reorderItems(data.projects, index, offset))
 
   const projects = editing ? data.projects : data.projects.filter((p) => p.title || p.description)
   const experience = editing ? data.experience : data.experience.filter((e) => e.role || e.company)

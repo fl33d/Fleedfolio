@@ -142,6 +142,19 @@ const normalizeAccent = (v: unknown) => {
   return ACCENT_MAP[v.toLowerCase()] ?? v
 }
 
+/** Moves a repeated content item without changing its ID or mutating the original list. */
+export function reorderItems<T>(items: readonly T[], index: number, offset: -1 | 1): T[] {
+  const destination = index + offset
+  if (index < 0 || index >= items.length || destination < 0 || destination >= items.length) {
+    return [...items]
+  }
+  const updated = [...items]
+  const [item] = updated.splice(index, 1)
+  if (item === undefined) return [...items]
+  updated.splice(destination, 0, item)
+  return updated
+}
+
 export const uid = () => Math.random().toString(36).slice(2, 10)
 
 export const emptyProject = (): Project => ({

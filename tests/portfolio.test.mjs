@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 
-import { blankPortfolio, mailtoHref, normalizePortfolio, safeImage, safeUrl } from '../src/lib/portfolio.ts'
+import { blankPortfolio, mailtoHref, normalizePortfolio, reorderItems, safeImage, safeUrl } from '../src/lib/portfolio.ts'
 import { createPortfolioBackup, parsePortfolioBackup } from '../src/lib/portfolio-backup.ts'
 import { normalizeCustomSlug, portfolioPublicPath } from '../src/lib/portfolio-slug.ts'
 import { portfolioCvText } from '../src/lib/cv.ts'
@@ -119,4 +119,13 @@ test('CV text exports education, experience and valid links without invented det
   assert.match(text, /https:\/\/example\.com\/app/)
   assert.doesNotMatch(text, /javascript:/)
   assert.doesNotMatch(text, /No experience/)
+})
+
+test('portfolio project order can be changed without mutating the original content', () => {
+  const projects = [{ id: 'a' }, { id: 'b' }, { id: 'c' }]
+  const promoted = reorderItems(projects, 1, -1)
+  assert.deepEqual(promoted.map(p => p.id), ['b', 'a', 'c'])
+  assert.deepEqual(projects.map(p => p.id), ['a', 'b', 'c'])
+  assert.deepEqual(reorderItems(projects, 0, -1).map(p => p.id), ['a', 'b', 'c'])
+  assert.deepEqual(reorderItems(projects, 2, 1).map(p => p.id), ['a', 'b', 'c'])
 })

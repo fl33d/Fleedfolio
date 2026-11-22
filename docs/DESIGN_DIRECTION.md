@@ -77,3 +77,7 @@ A second pass across live examples looked for **repeatable interaction decisions
 - Check print output with a two-page CV: entries should not split awkwardly and no editor controls should print.
 - Compare a new user's understanding with and without the walkthrough; the guide should not become mandatory.
 - Verify a published `/@username` link, a duplicate-name error and retention of an old `/p/{id}` URL.
+
+### Implemented: control the order of work
+
+Framer's structured project lists make ordering part of authorship rather than a fixed import order. Fleedfolio now has small, accessible move-up/move-down controls directly inside editable project entries. This keeps the interface minimal (no drag library, hover-only affordance or configuration dashboard) and carries the chosen order into the public page and CV. Reference: [Framer Academy — CMS collections](https://www.framer.com/academy/lessons/getting-started-with-the-framer-cms).

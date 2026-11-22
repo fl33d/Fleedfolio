@@ -344,7 +344,13 @@ html { scroll-behavior: smooth; }
 .pf-work-body { grid-area: body; display: grid; gap: .9rem; min-width: 0; }
 .pf-work-title { font-family: var(--font-display); font-weight: 400; font-size: clamp(1.8rem, 3.25vw, 2.75rem); line-height: 1.05; transition: transform .8s var(--ease); }
 .pf-work-desc { color: var(--dim); line-height: 1.7; max-width: 40rem; }
-.pf-work-foot { display: flex; align-items: center; gap: 1rem; font-size: .9rem; }
+.pf-work-foot { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; font-size: .9rem; }
+.pf-work-actions { display: inline-flex; align-items: center; flex: none; gap: .16rem; padding: .15rem; border: 1px solid var(--hair); border-radius: 8px; }
+.pf-order-button { display: grid; place-items: center; width: 28px; height: 28px; color: var(--dim); border-radius: 6px; transition: background .2s, color .2s; }
+.pf-order-button:not(:disabled):hover { background: color-mix(in oklab, var(--ink) 8%, transparent); color: var(--ink); }
+.pf-order-button:disabled { opacity: .22; cursor: not-allowed; }
+.pf-order-button:focus-visible { outline: 2px solid var(--accent-c); outline-offset: 2px; }
+.pf-work-actions .pf-remove { border-radius: 6px; }
 .pf-work-foot:empty { display: none; }
 .mode-view .pf-work:hover .pf-work-title { transform: translateX(.25rem); }
 .mode-view .pf-work:hover .pf-work-index { color: var(--accent-c); }
