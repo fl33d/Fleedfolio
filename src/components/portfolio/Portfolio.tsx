@@ -348,7 +348,7 @@ export function Portfolio({ data, editing, onChange }: Props) {
               )
             })}
           </div>
-          {editing && (
+          {editing && data.projects.length < 24 && (
             <AddButton
               className="pf-add-inline"
               onClick={() => set('projects', [...data.projects, emptyProject()])}
@@ -411,7 +411,7 @@ export function Portfolio({ data, editing, onChange }: Props) {
               </Reveal>
             ))}
           </ul>
-          {editing && (
+          {editing && data.experience.length < 24 && (
             <AddButton
               className="pf-add-inline"
               onClick={() => set('experience', [...data.experience, emptyExperience()])}
@@ -561,7 +561,7 @@ export function Portfolio({ data, editing, onChange }: Props) {
                 )}
               </Reveal>
             ))}
-            {editing && (
+            {editing && data.socials.length < 12 && (
               <AddButton
                 className="pf-add-inline"
                 onClick={() => set('socials', [...data.socials, emptySocial()])}
