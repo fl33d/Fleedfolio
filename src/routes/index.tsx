@@ -1,17 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { Check, Copy, Eye, PenLine, RotateCcw, Send } from 'lucide-react'
+import { CircleHelp, Eye, PenLine, RotateCcw, Send } from 'lucide-react'
 import { toast } from 'sonner'
 
-import { Button } from '@/components/ui/button'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
 import { Customize } from '@/components/portfolio/Customize'
+import { ShareDialog } from '@/components/portfolio/ShareDialog'
+import { Walkthrough } from '@/components/portfolio/Walkthrough'
 import { Portfolio } from '@/components/portfolio/Portfolio'
 import { Backdrop, Enso, ScrollProgress, Wordmark } from '@/components/portfolio/effects'
 import {
@@ -22,7 +16,7 @@ import {
 } from '@/lib/portfolio'
 import { publishPortfolio } from '@/server/portfolio.functions'
 import { cn } from '@/lib/utils'
-import { normalizeCustomSlug, portfolioPublicPath } from '@/lib/portfolio-slug'
+import { normalizeCustomSlug } from '@/lib/portfolio-slug'
 
 export const Route = createFileRoute('/')({
   component: Editor,
@@ -33,6 +27,7 @@ const DRAFT_KEY = 'blank:draft'
 const PUBLISHED_KEY = 'blank:published'
 const HINT_KEY = 'blank:hint-dismissed'
 const CUSTOM_SLUG_KEY = 'fleedfolio:custom-slug'
+const TOUR_SEEN_KEY = 'fleedfolio:tour:v1'
 
 type Published = { id: string; token: string; slug?: string }
 
@@ -115,9 +110,30 @@ function Editor() {
   const [customSlug, setCustomSlug] = useState('')
   const [publishing, setPublishing] = useState(false)
   const [shareOpen, setShareOpen] = useState(false)
-  const [copied, setCopied] = useState(false)
+  const [tourOpen, setTourOpen] = useState(false)
   const loaded = useRef(false)
   const storageWarningShown = useRef(false)
+
+  useEffect(() => {
+    try {
+      if (localStorage.getItem(TOUR_SEEN_KEY) || localStorage.getItem(PUBLISHED_KEY)) return
+    } catch {
+      // Walkthrough can still be opened manually when browser storage is disabled.
+      return
+    }
+    // The opening brand animation should finish before the first-use guide appears.
+    const timer = window.setTimeout(() => setTourOpen(true), 3200)
+    return () => window.clearTimeout(timer)
+  }, [])
+
+  const closeTour = () => {
+    setTourOpen(false)
+    try {
+      localStorage.setItem(TOUR_SEEN_KEY, '1')
+    } catch {
+      // Still allow the guide to close if local storage is blocked.
+    }
+  }
 
   // Restore the in-progress draft from this browser
   useEffect(() => {
@@ -161,30 +177,26 @@ function Editor() {
   }, [customSlug])
 
   const percent = useMemo(() => completeness(data), [data])
-  const shareUrl =
-    published && typeof window !== 'undefined'
-      ? `${location.origin}${portfolioPublicPath(published.id, published.slug)}`
-      : ''
-
   const switchMode = (next: boolean) => {
     setEditing(next)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const publish = async () => {
+  const publish = async (nextSlug = customSlug): Promise<boolean> => {
+    if (publishing) return false
     if (!data.name.trim()) {
       toast.error('Add your name before publishing.')
       switchMode(true)
-      return
+      return false
     }
-    if (customSlug.trim() && !normalizeCustomSlug(customSlug)) {
+    if (nextSlug.trim() && !normalizeCustomSlug(nextSlug)) {
       toast.error('Choose 3–30 letters, numbers or single hyphens for your custom link.')
-      return
+      return false
     }
     setPublishing(true)
     try {
       const result = await publishPortfolio({
-        data: { id: published?.id, token: published?.token, slug: customSlug, portfolio: data },
+        data: { id: published?.id, token: published?.token, slug: nextSlug.trim().toLowerCase(), portfolio: data },
       })
       setPublished(result)
       setCustomSlug(result.slug ?? '')
@@ -194,9 +206,11 @@ function Editor() {
         toast.error('Published, but the editing key could not be saved. Keep this browser open.')
       }
       setShareOpen(true)
+      return true
     } catch (error) {
       const message = error instanceof Error ? error.message : ''
-      toast.error(message.includes('taken') ? 'That custom link is taken. Choose another.' : 'Publishing failed. Try again in a moment.')
+      toast.error(message.includes('taken') || message.includes('claimed') ? 'That custom link may already be taken. Choose another.' : 'Publishing failed. Try again in a moment.')
+      return false
     } finally {
       setPublishing(false)
     }
@@ -275,48 +289,28 @@ function Editor() {
           <span>{percent}</span>
         </div>
 
+        <button className="dock-icon" onClick={() => setTourOpen(true)} aria-label="How to use Fleedfolio" title="How it works">
+          <CircleHelp className="size-4" />
+        </button>
+
         <button className="dock-icon" onClick={reset} aria-label="Start over">
           <RotateCcw className="size-4" />
         </button>
 
-        <button className="dock-publish" onClick={publish} disabled={publishing}>
+        <button className="dock-publish" onClick={() => { void publish() }} disabled={publishing}>
           <Send className={cn('size-4', publishing && 'animate-pulse')} />
           {publishing ? 'Publishing…' : published ? 'Update' : 'Publish'}
         </button>
       </div>
 
-      <Dialog open={shareOpen} onOpenChange={setShareOpen}>
-        <DialogContent className="share-dialog">
-          <Enso className="share-enso" />
-          <DialogHeader>
-            <DialogTitle className="font-display text-4xl font-normal">You’re live.</DialogTitle>
-            <DialogDescription>
-              Anyone with this link sees your portfolio. Keep editing here and hit Update to
-              push changes to the same link.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex gap-2 mt-2">
-            <input readOnly value={shareUrl} className="share-input" onFocus={(e) => e.target.select()} />
-            <Button
-              onClick={async () => {
-                try {
-                  await navigator.clipboard.writeText(shareUrl)
-                  setCopied(true)
-                  setTimeout(() => setCopied(false), 1600)
-                } catch {
-                  toast.error('Copy failed. Select the link and copy it manually.')
-                }
-              }}
-            >
-              {copied ? <Check /> : <Copy />}
-              {copied ? 'Copied' : 'Copy'}
-            </Button>
-          </div>
-          <a href={shareUrl} target="_blank" rel="noreferrer" className="share-open">
-            Open live page ↗
-          </a>
-        </DialogContent>
-      </Dialog>
+      <ShareDialog
+        open={shareOpen}
+        onOpenChange={setShareOpen}
+        published={published}
+        saving={publishing}
+        onSaveAddress={publish}
+      />
+      <Walkthrough open={tourOpen} onClose={closeTour} />
     </div>
   )
 }
