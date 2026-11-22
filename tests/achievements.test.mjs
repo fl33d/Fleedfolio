@@ -70,3 +70,21 @@ test('changing visual expression keeps achievements and evidence untouched', () 
     valid(doc)
   }
 })
+
+
+test('GitHub profile achievements are creator-declared, not falsely verified', () => {
+  const doc = copy()
+  const id = addSimpleAchievement(doc, makeId, 'github')
+  const badge = doc.content.achievements.find(item => item.id === id)
+  assert.equal(badge.category, 'github')
+  assert.equal(badge.issuer, 'GitHub')
+  assert.equal(updateSimpleAchievement(doc,id,'title','Pull Shark'),true)
+  assert.equal(updateSimpleAchievement(doc,id,'evidenceUrl','https://github.com/example'),true)
+  assert.equal(updateSimpleAchievement(doc,id,'category','github'),true)
+  assert.equal(badge.evidenceUrl,'https://github.com/example')
+  assert.equal('verified' in badge,false)
+  valid(doc)
+  const tampered = copy()
+  tampered.content.achievements[0].category='github-verified'
+  assert.equal(validateStudioDocument(tampered).ok,false)
+})
