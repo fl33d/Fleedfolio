@@ -8,6 +8,7 @@ import { portfolioCvText } from '../src/lib/cv.ts'
 import { DESIGN_PRESETS, applyDesignPreset } from '../src/lib/design-presets.ts'
 import { suggestSkills } from '../src/lib/skill-catalog.ts'
 import { addPortfolioElement } from '../src/lib/portfolio-elements.ts'
+import { publicPortfolioDocument } from '../src/lib/public-data.ts'
 
 test('safeUrl rejects executable or unsupported protocols', () => {
   for (const value of ['javascript:alert(1)', 'data:text/html,x', 'vbscript:msgbox(1)', 'file:///etc/passwd']) {
@@ -191,4 +192,26 @@ test('layouts survive normalization and preserve old published portfolios', () =
     const updated = applyDesignPreset(blankPortfolio(), design)
     assert.equal(updated.theme.layout, design.layout)
   }
+})
+
+test('the read-only public view never leaks edit credentials or internal aliases', () => {
+  const data = blankPortfolio()
+  data.name = 'Example'
+  const unsafe = {
+    ...data,
+    token: 'fake-private-token',
+    editToken: 'fake-edit-token',
+    __fleed_slug: 'private-alias-internal',
+    token_hash: 'fake-hash',
+    theme: { ...data.theme, layout: 'atelier' },
+  }
+  const result = publicPortfolioDocument(unsafe)
+  const json = JSON.stringify(result)
+  assert.equal(result.schemaVersion, 1)
+  assert.equal(result.portfolio.name, 'Example')
+  assert.equal(result.portfolio.theme.layout, 'atelier')
+  assert.ok(!json.includes('fake-private-token'))
+  assert.ok(!json.includes('fake-edit-token'))
+  assert.ok(!json.includes('private-alias-internal'))
+  assert.ok(!json.includes('fake-hash'))
 })

@@ -5,18 +5,14 @@ import { toast } from 'sonner'
 
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 import { type Portfolio, themeProps } from '@/lib/portfolio'
+import { publicPortfolioDocument } from '@/lib/public-data'
 import { Backdrop, ScrollProgress, Wordmark } from './effects'
 import { Portfolio as PortfolioView } from './Portfolio'
-
-/** Never place editing credentials or internal D1 record fields into this public view. */
-function publicDocument(data: Portfolio) {
-  return { schemaVersion: 1, portfolio: data }
-}
 
 export function PublicPage({ data }: { data: Portfolio }) {
   const [inspectOpen, setInspectOpen] = useState(false)
   const [copied, setCopied] = useState(false)
-  const json = JSON.stringify(publicDocument(data), null, 2)
+  const json = JSON.stringify(publicPortfolioDocument(data), null, 2)
 
   const copy = async () => {
     try {
