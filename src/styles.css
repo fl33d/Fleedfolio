@@ -238,6 +238,7 @@ html { scroll-behavior: smooth; }
   transition: transform .7s var(--ease);
 }
 .field:focus-within .field-line { transform: scaleX(1); }
+.field-input:focus-visible { outline: 1px solid color-mix(in oklab, var(--accent-c) 45%, transparent); outline-offset: 4px; border-radius: 2px; }
 
 /* Layout */
 .portfolio { position: relative; z-index: 1; max-width: 76rem; margin: 0 auto; padding: 0 clamp(1.5rem, 5vw, 4rem) 9rem; }
@@ -258,7 +259,8 @@ html { scroll-behavior: smooth; }
 .pf-nav-link { position: relative; font-family: var(--font-mono); font-size: .7rem; letter-spacing: .14em; text-transform: uppercase; color: var(--dim); transition: color .4s; }
 .pf-nav-link::after { content: ''; position: absolute; left: 0; right: 0; bottom: -4px; height: 1px; background: var(--accent-c); transform: scaleX(0); transform-origin: right; transition: transform .6s var(--ease); }
 .pf-nav-link:hover { color: var(--ink); }
-.pf-nav-link:hover::after { transform: scaleX(1); transform-origin: left; }
+.pf-nav-link:hover::after, .pf-nav-link:focus-visible::after { transform: scaleX(1); transform-origin: left; }
+.pf-nav-link:focus-visible, .pf-mono-badge:focus-visible { outline: 2px solid var(--accent-c); outline-offset: 3px; }
 .pf-meta { display: flex; gap: 1.2rem; font-family: var(--font-mono); font-size: .68rem; letter-spacing: .1em; text-transform: uppercase; color: var(--dim); }
 
 .pf-hero { min-height: min(740px, calc(100svh - 88px)); display: flex; flex-direction: column; justify-content: center; position: relative; padding: 4rem 0 6rem; }
@@ -356,6 +358,7 @@ html { scroll-behavior: smooth; }
   color: var(--dim); transition: color .4s;
 }
 .pf-add:hover { color: var(--ink); }
+.pf-add:focus-visible, .pf-remove:focus-visible { outline: 2px solid var(--accent-c); outline-offset: 3px; }
 .pf-add-icon { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 9999px; border: 1px solid color-mix(in oklab, var(--ink) 18%, transparent); transition: border-color .4s, color .4s, transform .7s var(--ease); }
 .pf-add:hover .pf-add-icon { border-color: var(--accent-c); color: var(--accent-c); }
 .pf-add-inline { margin-top: 2rem; }
@@ -421,7 +424,8 @@ html { scroll-behavior: smooth; }
   padding: .5rem .95rem; font-size: .78rem; letter-spacing: .01em; color: var(--dim); transition: color .4s;
 }
 .dock-toggle button:hover { color: var(--ink); }
-.dock-toggle button[aria-selected='true'] { color: var(--ink); }
+.dock-toggle button[aria-pressed='true'] { color: var(--ink); }
+.dock-toggle button:focus-visible, .dock-icon:focus-visible, .dock-publish:focus-visible { outline: 2px solid var(--accent-c); outline-offset: 2px; }
 .dock-toggle-pill {
   position: absolute; top: 0; bottom: 0; left: 0; width: 50%;
   background: rgb(255 255 255 / .07); transition: transform .6s var(--ease);

@@ -105,6 +105,7 @@ export function Customize({
         className={cn('cz-trigger', open && 'is-open')}
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
+        aria-label="Customise your portfolio"
         aria-haspopup="dialog"
       >
         <SlidersHorizontal className="size-4" />

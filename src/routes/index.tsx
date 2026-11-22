@@ -183,12 +183,12 @@ function Editor() {
 
       {/* Floating dock */}
       <div className="dock chrome">
-        <div className="dock-toggle" role="tablist" aria-label="Mode">
+        <div className="dock-toggle" role="group" aria-label="Editor mode">
           <span className={cn('dock-toggle-pill', !editing && 'is-right')} />
-          <button role="tab" aria-selected={editing} onClick={() => switchMode(true)}>
+          <button type="button" aria-pressed={editing} onClick={() => switchMode(true)}>
             <PenLine className="size-4" /> Edit
           </button>
-          <button role="tab" aria-selected={!editing} onClick={() => switchMode(false)}>
+          <button type="button" aria-pressed={!editing} onClick={() => switchMode(false)}>
             <Eye className="size-4" /> Preview
           </button>
         </div>
