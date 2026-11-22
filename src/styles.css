@@ -994,3 +994,41 @@ html { scroll-behavior: smooth; }
   white-space: pre; overflow-wrap: normal;
 }
 .pf-source-note { color: #9da19c; font: .73rem/1.5 var(--font-sans); }
+
+
+/* The editing tools retain clear contrast regardless of a user's chosen page mood. */
+.dock {
+  --ink: #f2f2ed;
+  --paper: #191a19;
+  --dim: #c1c6bf;
+  --faint: #929892;
+  --hair: #414541;
+  --accent-c: #c2d5ba;
+  --accent-t: #c2d5ba;
+  color: var(--ink);
+  background: rgb(25 27 25 / .96);
+  border-color: #414641;
+}
+.dock-toggle button { color: #c0c5bd; }
+.dock-toggle button:hover, .dock-toggle button[aria-pressed='true'] { color: #f4f4ef; }
+.dock-toggle-pill { background: rgb(255 255 255 / .1); }
+.dock-icon, .cz-trigger { color: #c1c6bf; }
+.dock-icon:hover, .cz-trigger:hover { color: #f4f4ef; background: rgb(255 255 255 / .075); }
+.dock .dock-publish { background: #e9eee5; color: #181a18; }
+.dock .dock-publish:hover { background: #c2d5ba; color: #181a18; }
+.dock .dock-publish:disabled { opacity: .55; }
+@media (max-width: 640px) {
+  .dock { width: calc(100vw - 1rem); justify-content: space-between; bottom: max(.65rem, env(safe-area-inset-bottom)); gap: .16rem; padding: .3rem; }
+  .dock-toggle button { min-width: 36px; padding: .5rem; font-size: 0; }
+  .dock-toggle button svg { width: 17px; height: 17px; }
+  .dock-icon { width: 32px; height: 35px; flex: none; }
+  .dock .dock-publish { padding: .54rem .65rem; font-size: .73rem; }
+}
+@media (max-width: 385px) {
+  .dock { gap: 0; padding: .24rem; }
+  .dock-toggle button { min-width: 31px; padding: .42rem; }
+  .dock-icon { width: 29px; height: 31px; }
+  .cz-trigger { min-width: 30px; padding-inline: .24rem; }
+  .dock .dock-publish { gap: .22rem; padding: .46rem .44rem; font-size: .7rem; }
+  .dock .dock-publish svg { width: 13px; height: 13px; }
+}
