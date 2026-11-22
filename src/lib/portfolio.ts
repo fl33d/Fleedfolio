@@ -325,7 +325,7 @@ export function normalizePortfolio(input: any): Portfolio {
       backdrop: typeof t.backdrop === 'boolean' ? t.backdrop : DEFAULT_THEME.backdrop,
       skillDisplay: pick(t.skillDisplay, ['text', 'icons', 'both'], DEFAULT_THEME.skillDisplay),
       identityMode: pick(t.identityMode, ['initial', 'wordmark', 'photo', 'none'], DEFAULT_THEME.identityMode),
-    }
+    },
     labels: {
       about: label(l.about, 60, DEFAULT_LABELS.about),
       work: label(l.work, 60, DEFAULT_LABELS.work),
