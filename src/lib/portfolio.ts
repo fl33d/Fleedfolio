@@ -102,7 +102,7 @@ export const DEFAULT_THEME: Theme = {
   motion: true,
   backdrop: false,
   skillDisplay: 'text',
-  identityMode: 'initial',
+  identityMode: 'wordmark',
 }
 
 export type Portfolio = {
