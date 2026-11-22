@@ -18,7 +18,7 @@ import { cn } from '@/lib/utils'
 import { Field } from './Field'
 import { ImageSlot } from './ImageSlot'
 import { SkillAutocomplete } from './SkillAutocomplete'
-import { Reveal, SplitText } from './effects'
+import { Reveal } from './effects'
 
 type Props = {
   data: PortfolioData
@@ -146,7 +146,7 @@ export function Portfolio({ data, editing, onChange, onOpenCommands }: Props) {
               maxLength={80}
             />
           ) : data.name ? (
-            <SplitText key={data.name} text={data.name} />
+            data.name
           ) : (
             <span className="opacity-30">Untitled</span>
           )}

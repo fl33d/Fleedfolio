@@ -70,3 +70,8 @@ See [Architecture](docs/ARCHITECTURE.md), [Operations / deployment](docs/OPERATI
 ## Project principles
 
 This repository contains the **portfolio builder**, not the separate Fleed Study application. Keep the editing experience focused, preserve existing data and do not add new infrastructure or paid services without a clear reason.
+
+
+## Editorial Workbench (review branch)
+
+The workbench concept keeps guest creation free and accountless. The editor includes a calm header, curated editable design recipes, local skills autocomplete, an optional animated walkthrough, a keyboard command palette and an Elements shelf that adds structured sections by click or native drag-and-drop. These improvements are developed on a review branch; public portfolios and publishing credentials are not migrated. An account dashboard, wildcard subdomains and an arbitrary CSS editor are future features and are **not** available until securely implemented.

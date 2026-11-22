@@ -964,3 +964,21 @@ html { scroll-behavior: smooth; }
   color: var(--ink); font-weight: 600; pointer-events: none;
 }
 @media (max-width: 650px) { .element-shelf { left: .75rem; width: calc(100vw - 1.5rem); bottom: 5rem; } }
+
+
+/* Intentional motion: short, readable guided transitions—not typewriter text. */
+.reveal { transition-duration: .34s; }
+.tour-step { display: grid; gap: 1.1rem; animation: tour-step-in .24s cubic-bezier(.2, .8, .2, 1) both; }
+@keyframes tour-step-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.tour-heading { font-family: var(--font-sans); font-weight: 600; font-size: clamp(1.5rem, 4vw, 2.2rem); letter-spacing: -.055em; line-height: 1.12; }
+.tour-description { font-family: var(--font-sans); font-size: .91rem; line-height: 1.65; }
+.tour-topline { font-family: var(--font-sans); font-size: .73rem; letter-spacing: .03em; text-transform: none; }
+.tour-example { font-family: var(--font-sans); font-size: .81rem; }
+.tour-example-label { font-family: var(--font-sans); font-size: .7rem; letter-spacing: .03em; text-transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .tour-step { animation: none; }
+  .reveal { transition: none; }
+}
