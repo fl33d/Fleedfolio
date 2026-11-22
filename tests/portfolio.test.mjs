@@ -7,6 +7,7 @@ import { normalizeCustomSlug, portfolioPublicPath } from '../src/lib/portfolio-s
 import { portfolioCvText } from '../src/lib/cv.ts'
 import { DESIGN_PRESETS, applyDesignPreset } from '../src/lib/design-presets.ts'
 import { suggestSkills } from '../src/lib/skill-catalog.ts'
+import { addPortfolioElement } from '../src/lib/portfolio-elements.ts'
 
 test('safeUrl rejects executable or unsupported protocols', () => {
   for (const value of ['javascript:alert(1)', 'data:text/html,x', 'vbscript:msgbox(1)', 'file:///etc/passwd']) {
@@ -156,4 +157,21 @@ test('skills search ranks tech and creative matches while preventing duplicate s
   assert.ok(!suggestSkills('vi', ['Vite']).some(s => s.name === 'Vite'))
   assert.deepEqual(suggestSkills('', []), [])
   assert.deepEqual(suggestSkills('vi,foo', []), [])
+})
+
+test('elements library creates real portfolio content without losing existing fields', () => {
+  const original = blankPortfolio()
+  original.name = 'New Creator'
+  const added = addPortfolioElement(original, 'text')
+  assert.equal(added.extras.length, 1)
+  assert.equal(added.name, 'New Creator')
+  assert.equal(original.extras.length, 0)
+  const hidden = { ...original, hidden: ['work', 'skills'] }
+  assert.ok(!addPortfolioElement(hidden, 'project').hidden.includes('work'))
+  assert.ok(!addPortfolioElement(hidden, 'skills').hidden.includes('skills'))
+  const second = addPortfolioElement(
+    { ...original, projects: [{ ...original.projects[0], title: 'Project one' }] },
+    'project',
+  )
+  assert.equal(second.projects.length, 2)
 })

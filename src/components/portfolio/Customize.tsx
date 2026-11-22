@@ -37,6 +37,7 @@ export function Customize({
   onSlugChange,
   open: externalOpen,
   onOpenChange,
+  onReset,
 }: {
   data: Portfolio
   onChange: (fn: (d: Portfolio) => Portfolio) => void
@@ -45,6 +46,7 @@ export function Customize({
   onSlugChange: (slug: string) => void
   open?: boolean
   onOpenChange?: (open: boolean) => void
+  onReset?: () => void
 }) {
   const [localOpen, setLocalOpen] = useState(false)
   const open = externalOpen ?? localOpen
@@ -311,6 +313,12 @@ export function Customize({
               }}
             />
           </Group>
+
+          {onReset && (
+            <button className="cz-reset" type="button" onClick={onReset}>
+              Start over with a blank page
+            </button>
+          )}
 
           <button
             className="cz-reset"
