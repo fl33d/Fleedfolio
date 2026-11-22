@@ -8,6 +8,7 @@ import {
   emptyProject,
   emptySocial,
   safeUrl,
+  mailtoHref,
   type Labels,
   type Portfolio as PortfolioData,
 } from '@/lib/portfolio'
@@ -57,7 +58,8 @@ export function Portfolio({ data, editing, onChange }: Props) {
       .slice(0, 2)
       .map((w) => w[0]?.toUpperCase())
       .join('') || '○'
-  const hasContact = !!data.email || socials.length > 0
+  const emailHref = mailtoHref(data.email)
+  const hasContact = Boolean(emailHref) || socials.length > 0
 
   const showAbout = shown('about') && (editing || !!data.about || !!data.aboutImage)
   const showWork = shown('work') && (editing || projects.length > 0)
@@ -346,7 +348,7 @@ export function Portfolio({ data, editing, onChange }: Props) {
               )
             })}
           </div>
-          {editing && (
+          {editing && data.projects.length < 24 && (
             <AddButton
               className="pf-add-inline"
               onClick={() => set('projects', [...data.projects, emptyProject()])}
@@ -409,7 +411,7 @@ export function Portfolio({ data, editing, onChange }: Props) {
               </Reveal>
             ))}
           </ul>
-          {editing && (
+          {editing && data.experience.length < 24 && (
             <AddButton
               className="pf-add-inline"
               onClick={() => set('experience', [...data.experience, emptyExperience()])}
@@ -520,8 +522,8 @@ export function Portfolio({ data, editing, onChange }: Props) {
                 />
               </div>
             ) : (
-              data.email && (
-                <a href={`mailto:${data.email}`} className="pf-email">
+              emailHref && (
+                <a href={emailHref} className="pf-email">
                   <span>{data.email}</span>
                   <ArrowUpRight className="size-5" />
                 </a>
@@ -559,7 +561,7 @@ export function Portfolio({ data, editing, onChange }: Props) {
                 )}
               </Reveal>
             ))}
-            {editing && (
+            {editing && data.socials.length < 12 && (
               <AddButton
                 className="pf-add-inline"
                 onClick={() => set('socials', [...data.socials, emptySocial()])}

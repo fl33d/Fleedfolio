@@ -1,66 +1,66 @@
-# Fleed
+# Fleedfolio
 
-**A calm, considered space to build and share your portfolio.**
+**Build a portfolio directly on the page. Preview it, publish it, and keep working.**
 
-Fleed is a personal portfolio builder designed to make presenting your work feel simple. Create your portfolio directly on the page, shape it around your experience, and publish it at a shareable link — without wrestling with a complicated editor.
+[![CI](https://github.com/fl33d/Fleedfolio/actions/workflows/ci.yml/badge.svg)](https://github.com/fl33d/Fleedfolio/actions/workflows/ci.yml)
 
-**Live site:** [fleed.online](https://fleed.online/)
+Fleedfolio is an open-source portfolio editor built with React, TanStack Start and Cloudflare Workers. The editing controls live alongside the finished layout: no separate form builder or complicated setup.
 
-## What you can do
+**Website:** [fleed.online](https://fleed.online/) · **Code:** [github.com/fl33d/Fleedfolio](https://github.com/fl33d/Fleedfolio)
 
-- **Edit as you go** — update your name, role, introduction, projects, experience, skills, and contact links directly in the layout.
-- **Preview before publishing** — switch between editing and visitor views to see how your portfolio will look.
-- **Make it yours** — choose from six understated colour themes: sage, clay, mist, sand, blossom, and stone.
-- **Keep your draft** — edits are saved in your browser as you work.
-- **Publish and update** — share your portfolio through a dedicated link and return to update it later.
-- **Enjoy the details** — subtle transitions, scroll reveals, and a moving skills ticker bring the page to life without getting in the way.
+> **Domain note:** The site's custom-domain routing is being checked after a migration away from Netlify. If the link shows a Netlify 404, the GitHub project is still available here; the Cloudflare Worker and domain need to be connected correctly.
 
-## Design approach
+## What works
 
-Fleed aims to keep the focus on the person and their work. Its visual style uses restrained colour, clear typography, generous spacing, and subtle motion to make portfolios feel personal without becoming distracting.
+- Write directly into the page; locally saved drafts survive a normal refresh.
+- Switch between editing and a visitor preview.
+- Publish to a public `/p/{id}` URL, and update it again using the edit credential retained in the original browser.
+- Add projects, experience, links, skills and custom sections.
+- Choose from five page palettes, three typefaces, accents and motion settings.
+- **Export/import JSON backups** from **Customise → Your work**, so you can move a draft between browsers or recover it after clearing local data.
+- Reduced-motion support, basic accessible form controls and responsive layouts.
 
-## Built with
+## Honest limitations
 
-- React 19 and TypeScript
-- TanStack Start
-- Tailwind CSS 4
-- Cloudflare Workers
-- Cloudflare D1
+- **No accounts or cross-device sync.** Drafts and publishing credentials live in that browser. Export a backup before resetting the browser or switching devices.
+- Importing a backup restores the *draft*, not an edit credential. Publishing after importing creates a new public link.
+- Image uploads are currently disabled; `/api/upload` returns 503 and `/img/:key` is unavailable. Image hosting is not advertised as a working feature.
+- The public portfolio is stored in Cloudflare D1. Do not delete the existing database during a GitHub repository or domain migration.
 
-## Getting started
+## Run locally
 
-### Requirements
-
-Install [Node.js](https://nodejs.org/) and [pnpm](https://pnpm.io/).
-
-### Install dependencies
+Requires **Node.js 24**, **pnpm 9** and access to Cloudflare's development tooling for the Worker.
 
 ```bash
-pnpm install
-```
-
-### Start the development server
-
-```bash
+pnpm install --frozen-lockfile
+pnpm exec wrangler types
 pnpm dev
 ```
 
-### Build for production
+### Check a change
 
 ```bash
+pnpm typecheck
+pnpm test
 pnpm build
 ```
 
-Cloudflare Worker configuration is maintained in `wrangler.jsonc`.
+GitHub Actions runs type generation, type checking, unit tests and a production build on pull requests and pushes to `main`. A green GitHub check is **not** proof that the live domain points to Cloudflare.
 
-## Project structure
+## How it works
 
-- `src/components/portfolio/` — portfolio layout and editing components
-- `src/components/ui/` — reusable interface components
-- `src/routes/` — application routes and API endpoints
-- `src/lib/` — shared utilities and portfolio types
-- `wrangler.jsonc` — Cloudflare Worker and D1 configuration
+| Part | Technology |
+| --- | --- |
+| UI | React 19, TypeScript, Tailwind CSS 4 |
+| Routing and server functions | TanStack Start |
+| Build | Vite with `@cloudflare/vite-plugin` |
+| Production runtime | Existing Cloudflare Worker named `fleed` |
+| Published portfolio storage | Existing Cloudflare D1 database `fleed-portfolios` |
+| Draft storage | Browser `localStorage` |
+| Deployments | Cloudflare Workers Builds from GitHub |
 
-## Feedback
+See [Architecture](docs/ARCHITECTURE.md), [Operations / deployment](docs/OPERATIONS.md) and [Contributing](CONTRIBUTING.md).
 
-Fleed is an actively developed personal project. Feedback, ideas, and suggestions are welcome — especially from people using it to create or review a portfolio.
+## Project principles
+
+This repository contains the **portfolio builder**, not the separate Fleed Study application. Keep the editing experience focused, preserve existing data and do not add new infrastructure or paid services without a clear reason.
