@@ -69,27 +69,6 @@ export function SplitText({ text, className }: { text: string; className?: strin
   )
 }
 
-/** Slow, single-line ticker. */
-export function Marquee({ items }: { items: string[] }) {
-  const row = [...items, ...items, ...items, ...items]
-  return (
-    <div className="marquee">
-      <div className="marquee-track">
-        {[0, 1].map((copy) => (
-          <div key={copy} className="marquee-group" aria-hidden={copy === 1}>
-            {row.map((item, i) => (
-              <span key={i} className="marquee-item">
-                {item}
-                <span className="marquee-sep" />
-              </span>
-            ))}
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
 /** An open brush circle. `pathLength` lets CSS draw it with dash offsets. */
 export function Enso({ className }: { className?: string }) {
   return (
@@ -134,16 +113,4 @@ export function ScrollProgress() {
     return () => removeEventListener('scroll', onScroll)
   }, [])
   return <div ref={ref} className="scroll-progress" aria-hidden />
-}
-
-export function LiveClock() {
-  const [now, setNow] = useState<string>('')
-  useEffect(() => {
-    const fmt = () =>
-      new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
-    setNow(fmt())
-    const t = setInterval(() => setNow(fmt()), 1000)
-    return () => clearInterval(t)
-  }, [])
-  return <span className="tabular-nums">{now || '--:--:--'}</span>
 }

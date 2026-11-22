@@ -81,3 +81,9 @@ test('named links use the root-level /@name format while generated IDs stay at /
   assert.equal(portfolioPublicPath('0ea7cf64947b'), '/p/0ea7cf64947b')
   assert.equal(portfolioPublicPath('0ea7cf64947b', 'admin'), '/p/0ea7cf64947b')
 })
+
+test('new portfolios start with a calm presentation rather than a decorative backdrop', () => {
+  const blank = blankPortfolio()
+  assert.equal(blank.theme.backdrop, false)
+  assert.equal(blank.labels.ctaBottom, 'Get in touch.')
+})

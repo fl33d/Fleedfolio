@@ -7,7 +7,7 @@ import { Customize } from '@/components/portfolio/Customize'
 import { ShareDialog } from '@/components/portfolio/ShareDialog'
 import { Walkthrough } from '@/components/portfolio/Walkthrough'
 import { Portfolio } from '@/components/portfolio/Portfolio'
-import { Backdrop, Enso, ScrollProgress, Wordmark } from '@/components/portfolio/effects'
+import { Backdrop, ScrollProgress } from '@/components/portfolio/effects'
 import {
   blankPortfolio,
   normalizePortfolio,
@@ -48,8 +48,7 @@ function Editor() {
       // Walkthrough can still be opened manually when browser storage is disabled.
       return
     }
-    // The opening brand animation should finish before the first-use guide appears.
-    const timer = window.setTimeout(() => setTourOpen(true), 3200)
+    const timer = window.setTimeout(() => setTourOpen(true), 650)
     return () => window.clearTimeout(timer)
   }, [])
 
@@ -175,7 +174,6 @@ function Editor() {
 
   return (
     <div className={cn('app', editing ? 'mode-edit' : 'mode-view')} {...themeProps(data)}>
-      <Intro />
       {!editing && data.theme.backdrop && <Backdrop />}
       <ScrollProgress />
 
@@ -221,40 +219,6 @@ function Editor() {
         onSaveAddress={publish}
       />
       <Walkthrough open={tourOpen} onClose={closeTour} />
-    </div>
-  )
-}
-
-/** An ensō draws itself around the wordmark, then the whole screen fades away. */
-function Intro() {
-  const [gone, setGone] = useState(false)
-  useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      setGone(true)
-      return
-    }
-
-    try {
-      if (sessionStorage.getItem('fleed:intro-seen')) {
-        setGone(true)
-        return
-      }
-      sessionStorage.setItem('fleed:intro-seen', '1')
-    } catch {
-      // Session storage may be disabled; the intro can still finish normally.
-    }
-
-    const t = setTimeout(() => setGone(true), 2700)
-    return () => clearTimeout(t)
-  }, [])
-  if (gone) return null
-  return (
-    <div className="intro" aria-hidden>
-      <div className="intro-mark">
-        <Enso />
-        <Wordmark className="intro-word" />
-      </div>
-      <div className="intro-sub">begin with a blank page</div>
     </div>
   )
 }

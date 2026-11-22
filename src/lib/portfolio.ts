@@ -72,8 +72,8 @@ export const DEFAULT_LABELS: Labels = {
   work: 'Selected work',
   experience: 'Experience',
   contact: 'Contact',
-  ctaTop: 'Let’s make',
-  ctaBottom: 'something.',
+  ctaTop: 'Have a question?',
+  ctaBottom: 'Get in touch.',
 }
 
 export const DEFAULT_THEME: Theme = {
