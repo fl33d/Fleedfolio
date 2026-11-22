@@ -1,5 +1,10 @@
 # Resume Fleedfolio Studio development
 
+## PR #7 continuation checkpoint (22 November 2026)
+
+Continue from `feat/studio-shared-editing-20261122` (draft PR #7), not PR #6 alone. Read `src/studio/StudioSimplePanel.tsx`, `src/studio/shared-editor.ts`, the achievements additions to `StudioView.tsx`, the JSON schema, `tests/achievements.test.mjs`, and `docs/WORKERS_DEV_RELEASE_GATE.md`. Both Simple/Studio edit one local Studio document and preserve unsupported advanced fields; the Classic route still owns legacy credentials and drafts. The achievements collection is optional for v1 compatibility, and GitHub profile badges are user-authored with optional public HTTPS proof, not GitHub-verified or auto-imported. Check the latest GitHub CI runs and run real browser QA; a previous browser run initially failed because the pinned local workerd did not support the production compatibility date, and then because Playwright interacted before React hydration. The CI workflow now tests using a temporary test-checkout date only, without editing repository Wrangler config.
+
+
 **Working branch:** `feat/studio-proof-20261122` (review-only).
 **Base:** `design/editorial-workbench-2026`, originally `ca17187659aabd4e0e85723eed01e64b952282d2`. Verify all branch heads again before continuing.
 
