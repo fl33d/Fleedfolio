@@ -118,7 +118,18 @@
       }
     ],
     "experience": [],
-    "education": []
+    "education": [],
+    "achievements": [
+      {
+        "id": "achievement_sample",
+        "title": "A documented milestone — illustrative",
+        "category": "milestone",
+        "issuer": "Sample portfolio",
+        "date": "2026",
+        "description": "Example content showing how a creator can describe a meaningful achievement. This is not a verified award.",
+        "evidenceUrl": null
+      }
+    ]
   },
   "pages": [
     {
@@ -175,6 +186,18 @@
             "sk_cloudflare"
           ],
           "display": "text"
+        },
+        {
+          "id": "blk_achievements_sample",
+          "type": "achievements",
+          "style": {
+            "variant": "editorial",
+            "emphasis": "normal"
+          },
+          "achievementIds": [
+            "achievement_sample"
+          ],
+          "display": "timeline"
         },
         {
           "id": "blk_links39",
