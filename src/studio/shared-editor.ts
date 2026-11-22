@@ -1,4 +1,4 @@
-import type { Project, StudioBlock, StudioDocument } from './document'
+import type { Achievement, Project, StudioBlock, StudioDocument } from './document'
 
 type TextBlock = Extract<StudioBlock, { type: 'rich-text' }>
 type SkillBlock = Extract<StudioBlock, { type: 'skills' }>
@@ -68,4 +68,61 @@ export function hideSimpleSkill(document: StudioDocument, id: string): void {
   const block = homePage(document)?.blocks.find((item): item is SkillBlock => item.type === 'skills')
   if (block) block.skillIds = block.skillIds.filter(item => item !== id)
   // Project records and other pages can still use the canonical skill.
+}
+
+type AchievementsBlock = Extract<StudioBlock, { type: 'achievements' }>
+/** Achievements are creator-provided content, not platform-issued badges. */
+export function visibleSimpleAchievements(document: StudioDocument): Achievement[] {
+  const ids = (homePage(document)?.blocks.find((block): block is AchievementsBlock => block.type === 'achievements'))?.achievementIds ?? []
+  const lookup = new Map((document.content.achievements ?? []).map(item => [item.id, item]))
+  return ids.flatMap(id => { const item = lookup.get(id); return item ? [item] : [] })
+}
+export function addSimpleAchievement(document: StudioDocument, makeId: (prefix: string) => string): string | null {
+  const page = homePage(document)
+  if (!page || (document.content.achievements?.length ?? 0) >= 100) return null
+  const block = page.blocks.find((item): item is AchievementsBlock => item.type === 'achievements')
+  if (!block && page.blocks.length >= 120) return null
+  const id = makeId('achievement')
+  document.content.achievements ??= []
+  document.content.achievements.push({
+    id, title: '', category: 'milestone', issuer: '', date: '', description: '', evidenceUrl: null,
+  })
+  if (block) block.achievementIds.push(id)
+  else page.blocks.push({
+    id: makeId('blk'), type: 'achievements', style: { variant: 'editorial', emphasis: 'normal' },
+    achievementIds: [id], display: 'timeline',
+  })
+  return id
+}
+export function updateSimpleAchievement(
+  document: StudioDocument,
+  id: string,
+  key: 'title' | 'category' | 'issuer' | 'date' | 'description' | 'evidenceUrl',
+  value: string | null,
+): boolean {
+  const achievement = document.content.achievements?.find(item => item.id === id)
+  if (!achievement) return false
+  if (key === 'evidenceUrl') {
+    if (value !== null && value !== '') {
+      if (typeof value !== 'string' || !/^https:\/\/[^\s<>]+$/i.test(value)) return false
+      try { const parsed = new URL(value); if (parsed.protocol !== 'https:') return false }
+      catch { return false }
+    }
+    achievement.evidenceUrl = value === '' ? null : value
+    return true
+  }
+  if (typeof value !== 'string') return false
+  if (key === 'category') {
+    if (!['award','certification','competition','milestone','publication','other'].includes(value)) return false
+    achievement.category = value as Achievement['category']
+  } else if (key === 'title') achievement.title = value.slice(0,180)
+  else if (key === 'issuer') achievement.issuer = value.slice(0,150)
+  else if (key === 'date') achievement.date = value.slice(0,50)
+  else if (key === 'description') achievement.description = value.slice(0,900)
+  return true
+}
+export function hideSimpleAchievement(document: StudioDocument, id: string): void {
+  const block = homePage(document)?.blocks.find((item): item is AchievementsBlock => item.type === 'achievements')
+  if (block) block.achievementIds = block.achievementIds.filter(item => item !== id)
+  // Never delete the original record; other pages may still reference it.
 }
