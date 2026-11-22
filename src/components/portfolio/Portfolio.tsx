@@ -1,6 +1,6 @@
 import { useEffect, useState, type CSSProperties, type MouseEvent, type ReactNode } from 'react'
 import { useLocation } from '@tanstack/react-router'
-import { ArrowUpRight, Plus, X } from 'lucide-react'
+import { ArrowDown, ArrowUp, ArrowUpRight, Plus, X } from 'lucide-react'
 
 import {
   emptyCustomSection,
@@ -44,6 +44,16 @@ export function Portfolio({ data, editing, onChange }: Props) {
 
   const removeItem = <K extends ListKey>(key: K, id: string) =>
     set(key, (data[key] as { id: string }[]).filter((i) => i.id !== id) as PortfolioData[K])
+
+  const moveProject = (index: number, offset: -1 | 1) => {
+    const destination = index + offset
+    if (destination < 0 || destination >= data.projects.length) return
+    const updated = [...data.projects]
+    const [item] = updated.splice(index, 1)
+    if (!item) return
+    updated.splice(destination, 0, item)
+    set('projects', updated)
+  }
 
   const projects = editing ? data.projects : data.projects.filter((p) => p.title || p.description)
   const experience = editing ? data.experience : data.experience.filter((e) => e.role || e.company)
@@ -329,7 +339,29 @@ export function Portfolio({ data, editing, onChange }: Props) {
                               maxLength={400}
                             />
                           </span>
-                          <RemoveButton onClick={() => removeItem('projects', p.id)} />
+                          <div className="pf-work-actions" role="group" aria-label={`Order ${p.title || 'project ' + (i + 1)}`}>
+                            <button
+                              type="button"
+                              className="pf-order-button"
+                              aria-label={`Move ${p.title || 'project'} up`}
+                              title="Move up"
+                              disabled={i === 0}
+                              onClick={() => moveProject(i, -1)}
+                            >
+                              <ArrowUp className="size-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              className="pf-order-button"
+                              aria-label={`Move ${p.title || 'project'} down`}
+                              title="Move down"
+                              disabled={i === data.projects.length - 1}
+                              onClick={() => moveProject(i, 1)}
+                            >
+                              <ArrowDown className="size-3.5" />
+                            </button>
+                            <RemoveButton onClick={() => removeItem('projects', p.id)} />
+                          </div>
                         </>
                       ) : (
                         href && (
