@@ -1,5 +1,10 @@
 # Fleedfolio Studio — testing record
 
+## Classic workbench regression + actual browser gate — 2026-11-22
+
+[Source CI 45081286577](https://github.com/fl33d/Fleedfolio/actions/runs/45081286577) **PASS**: 48 tests, zero failures; strict TypeScript and both builds successful. `tests/workbench-revamp.test.mjs` checks old backup defaults, opt-in branding and skill logo preferences, malformed values and more programming autocomplete. [Chromium QA run 45081286571](https://github.com/fl33d/Fleedfolio/actions/runs/45081286571) **PASS**: inline name changed while non-modal library remained open, text section added without erasing draft, Python completion, right inspector controls, hidden header identity, visitor skill logos+name and preview; widths 320,390,768,1024,1440, zero recorded overflow or JS page exceptions. Screenshots are in GitHub Actions artifact `fleedfolio-classic-workbench-review` (7 day retention). Browser local Workerd used a **CI-only throwaway compatibility date workaround**, not the committed production config; this is not live deployment verification. Existing `blank:draft`, `blank:published`, D1 edit-token publishing, printable CV and older public URLs must still be checked on staging before any real release. The Classic branding and skill defaults remain backwards-compatible. See `docs/CLASSIC_WORKBENCH_VISUAL_REVIEW.md`.
+
+
 ## PR #7 checks — pending current CI
 
 New `tests/achievements.test.mjs` covers canonical achievements, GitHub badges, HTTPS evidence, no invented verification, and compatibility with older Studio v1 documents. Shared-editor tests preserve project skills, advanced rich text and project lenses. The separate `Studio browser QA (review only)` GitHub workflow starts local workerd with a **disposable CI-only** compatibility-date fallback, then waits for React hydration before testing editor round trips at 320, 390, 768, 1024 and 1440 px. Its actual screenshots and test outcome must be checked from the workflow run; do not infer browser acceptance from TypeScript or unit passes. This is never a production release test.
