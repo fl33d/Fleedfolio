@@ -77,7 +77,7 @@ export function visibleSimpleAchievements(document: StudioDocument): Achievement
   const lookup = new Map((document.content.achievements ?? []).map(item => [item.id, item]))
   return ids.flatMap(id => { const item = lookup.get(id); return item ? [item] : [] })
 }
-export function addSimpleAchievement(document: StudioDocument, makeId: (prefix: string) => string): string | null {
+export function addSimpleAchievement(document: StudioDocument, makeId: (prefix: string) => string, category: Achievement['category'] = 'milestone'): string | null {
   const page = homePage(document)
   if (!page || (document.content.achievements?.length ?? 0) >= 100) return null
   const block = page.blocks.find((item): item is AchievementsBlock => item.type === 'achievements')
@@ -85,7 +85,7 @@ export function addSimpleAchievement(document: StudioDocument, makeId: (prefix: 
   const id = makeId('achievement')
   document.content.achievements ??= []
   document.content.achievements.push({
-    id, title: '', category: 'milestone', issuer: '', date: '', description: '', evidenceUrl: null,
+    id, title: '', category, issuer: category === 'github' ? 'GitHub' : '', date: '', description: '', evidenceUrl: null,
   })
   if (block) block.achievementIds.push(id)
   else page.blocks.push({
@@ -113,8 +113,9 @@ export function updateSimpleAchievement(
   }
   if (typeof value !== 'string') return false
   if (key === 'category') {
-    if (!['award','certification','competition','milestone','publication','other'].includes(value)) return false
+    if (!['award','certification','competition','milestone','publication','github','other'].includes(value)) return false
     achievement.category = value as Achievement['category']
+    if (value === 'github' && !achievement.issuer) achievement.issuer = 'GitHub'
   } else if (key === 'title') achievement.title = value.slice(0,180)
   else if (key === 'issuer') achievement.issuer = value.slice(0,150)
   else if (key === 'date') achievement.date = value.slice(0,50)
