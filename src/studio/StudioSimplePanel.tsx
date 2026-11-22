@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import type { StudioDocument, Project, StudioBlock } from './document'
 
 type Update = (change: (doc: StudioDocument) => void) => void
@@ -30,6 +31,7 @@ function Field({ name, value, onChange, multiline = false, placeholder = '' }: {
  * Every change is applied through the parent editor's shared history.
  */
 export function StudioSimplePanel({ doc, onCommit, onOpenStudio, onExport, onImport, onNew }: Props) {
+  const [newSkill, setNewSkill] = useState('')
   const page = doc.pages.find(p => p.id === doc.settings.defaultPageId)
   const intro = page?.blocks.find((block): block is Extract<StudioBlock, { type: 'rich-text' }> => block.type === 'rich-text')
   const story = intro?.paragraphs.map(p => p.runs.map(run => run.text).join('')).join('\n\n') ?? ''
@@ -58,20 +60,30 @@ export function StudioSimplePanel({ doc, onCommit, onOpenStudio, onExport, onImp
     const targetPage = next.pages.find(p => p.id === next.settings.defaultPageId)
     targetPage?.blocks.push({ id: blockId, type: 'project', projectId: id, defaultLens: 'story', style: { variant: 'standard', emphasis: 'normal' } })
   })
-  const updateSkills = (value: string) => onCommit(next => {
-    const labels = value.split(',').map(s => s.trim()).filter(Boolean).slice(0, 40)
-    const matched = labels.map(label => next.content.skills.find(s => s.label.toLowerCase() === label.toLowerCase())
-      ?? { id: makeId('skill'), label, category: 'other' as const })
-    // Preserve existing skills that advanced blocks or projects may reference.
-    const known = new Set(next.content.skills.map(s => s.id))
-    for (const skill of matched) if (!known.has(skill.id)) { next.content.skills.push(skill); known.add(skill.id) }
+  const visibleIds = (page?.blocks.find(b => b.type === 'skills') as Extract<StudioBlock, { type: 'skills' }> | undefined)?.skillIds ?? []
+  const shownSkills = visibleIds.map(id => doc.content.skills.find(s => s.id === id)).filter((s): s is StudioDocument['content']['skills'][number] => !!s)
+  const addSkill = () => {
+    const label = newSkill.trim().slice(0, 70)
+    if (!label || shownSkills.some(s => s.label.toLowerCase() === label.toLowerCase())) { setNewSkill(''); return }
+    onCommit(next => {
+      let skill = next.content.skills.find(s => s.label.toLowerCase() === label.toLowerCase())
+      if (!skill) {
+        skill = { id: makeId('skill'), label, category: 'other' }
+        next.content.skills.push(skill)
+      }
+      const targetPage = next.pages.find(p => p.id === next.settings.defaultPageId)
+      const block = targetPage?.blocks.find((b): b is Extract<StudioBlock, { type: 'skills' }> => b.type === 'skills')
+      if (block && !block.skillIds.includes(skill.id)) block.skillIds.push(skill.id)
+      else if (!block) targetPage?.blocks.push({ id: makeId('blk'), type: 'skills', style: { variant: 'standard', emphasis: 'normal' }, skillIds: [skill.id], display: 'text' })
+    })
+    setNewSkill('')
+  }
+  const removeSkill = (skillId: string) => onCommit(next => {
     const targetPage = next.pages.find(p => p.id === next.settings.defaultPageId)
-    const existing = targetPage?.blocks.find((block): block is Extract<StudioBlock, { type: 'skills' }> => block.type === 'skills')
-    if (existing) existing.skillIds = matched.map(s => s.id)
-    else targetPage?.blocks.push({ id: makeId('blk'), type: 'skills', style: { variant: 'standard', emphasis: 'normal' }, skillIds: matched.map(s => s.id), display: 'text' })
+    const block = targetPage?.blocks.find((b): b is Extract<StudioBlock, { type: 'skills' }> => b.type === 'skills')
+    if (block) block.skillIds = block.skillIds.filter(id => id !== skillId)
+    // Retain canonical skill records: other pages and projects might reference them.
   })
-  const visibleSkills = (page?.blocks.find(b => b.type === 'skills') as Extract<StudioBlock, { type: 'skills' }> | undefined)?.skillIds
-    .map(id => doc.content.skills.find(skill => skill.id === id)?.label).filter((x): x is string => !!x).join(', ') ?? ''
 
   return <aside className="stx-simple-panel" aria-label="Simple portfolio editor">
     <div className="stx-simple-opening">
@@ -109,7 +121,10 @@ export function StudioSimplePanel({ doc, onCommit, onOpenStudio, onExport, onImp
     </section>
     <section className="stx-quick-section" aria-labelledby="stx-your-skills">
       <h3 id="stx-your-skills"><span>04</span> Skills & tools</h3>
-      <Field name="Separate skills with commas" value={visibleSkills} onChange={updateSkills} placeholder="Writing, Design, Python…" />
+      <div className="stx-simple-skill-list">
+        {shownSkills.map(skill => <span className="stx-simple-skill" key={skill.id}>{skill.label}<button type="button" onClick={() => removeSkill(skill.id)} aria-label={'Remove ' + skill.label + ' from page'}>×</button></span>)}
+      </div>
+      <label className="stx-quick-field"><span>Add a skill or tool</span><span className="stx-add-skill-row"><input value={newSkill} maxLength={70} placeholder="Writing, design, Python…" onChange={event => setNewSkill(event.target.value)} onKeyDown={event => { if (event.key === 'Enter') { event.preventDefault(); addSkill() } }} /><button type="button" onClick={addSkill}>Add</button></span></label>
     </section>
     <div className="stx-quick-finale">
       <div className="stx-spark" aria-hidden="true">✳</div>
