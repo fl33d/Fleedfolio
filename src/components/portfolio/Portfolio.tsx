@@ -107,7 +107,7 @@ export function Portfolio({ data, editing, onChange, onOpenCommands }: Props) {
             </ScrollLink>
           ))}
         </nav>
-        {editing && onOpenCommands ? (
+        {onOpenCommands ? (
           <button type="button" className="pf-command-trigger" onClick={onOpenCommands} aria-label="Open command menu">
             <span>Quick actions</span><kbd>Ctrl K</kbd>
           </button>

@@ -35,14 +35,24 @@ export function Customize({
   onImport,
   customSlug,
   onSlugChange,
+  open: externalOpen,
+  onOpenChange,
 }: {
   data: Portfolio
   onChange: (fn: (d: Portfolio) => Portfolio) => void
   onImport: (draft: Portfolio) => boolean
   customSlug: string
   onSlugChange: (slug: string) => void
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
 }) {
-  const [open, setOpen] = useState(false)
+  const [localOpen, setLocalOpen] = useState(false)
+  const open = externalOpen ?? localOpen
+  const setOpen = (next: boolean | ((current: boolean) => boolean)) => {
+    const resolved = typeof next === 'function' ? next(open) : next
+    if (onOpenChange) onOpenChange(resolved)
+    else setLocalOpen(resolved)
+  }
   const root = useRef<HTMLDivElement>(null)
   const fileInput = useRef<HTMLInputElement>(null)
 

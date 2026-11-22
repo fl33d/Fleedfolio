@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { CircleHelp, Eye, FileText, PenLine, RotateCcw, Send } from 'lucide-react'
+import { CircleHelp, Eye, FileText, PenLine, RotateCcw, Search, Send } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { Customize } from '@/components/portfolio/Customize'
@@ -8,6 +8,7 @@ import { ShareDialog } from '@/components/portfolio/ShareDialog'
 import { Walkthrough } from '@/components/portfolio/Walkthrough'
 import { Portfolio } from '@/components/portfolio/Portfolio'
 import { CvView } from '@/components/portfolio/CvView'
+import { CommandPalette, type CommandAction } from '@/components/portfolio/CommandPalette'
 import { Backdrop, ScrollProgress } from '@/components/portfolio/effects'
 import {
   blankPortfolio,
@@ -40,8 +41,21 @@ function Editor() {
   const [publishing, setPublishing] = useState(false)
   const [shareOpen, setShareOpen] = useState(false)
   const [tourOpen, setTourOpen] = useState(false)
+  const [commandsOpen, setCommandsOpen] = useState(false)
+  const [customiseOpen, setCustomiseOpen] = useState(false)
   const loaded = useRef(false)
   const storageWarningShown = useRef(false)
+
+  useEffect(() => {
+    const onKeys = (event: KeyboardEvent) => {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault()
+        setCommandsOpen(open => !open)
+      }
+    }
+    window.addEventListener('keydown', onKeys)
+    return () => window.removeEventListener('keydown', onKeys)
+  }, [])
 
   useEffect(() => {
     try {
@@ -180,6 +194,38 @@ function Editor() {
     ? window.location.origin + portfolioPublicPath(published.id, published.slug)
     : undefined
 
+  const commands: CommandAction[] = [
+    { id: 'edit', title: 'Edit portfolio', description: 'Return to writing directly on the page.', group: 'Create', run: () => switchMode(true) },
+    { id: 'preview', title: 'Preview portfolio', description: 'See what visitors will see.', group: 'Create', run: () => switchMode(false) },
+    { id: 'customise', title: 'Open design library', description: 'Change your theme and sections.', group: 'Appearance', run: () => { setCvOpen(false); setCustomiseOpen(true) } },
+    { id: 'cv', title: 'Open CV', description: 'Print or download a clean résumé.', group: 'Create', run: () => { setCvOpen(true); window.scrollTo({ top: 0 }) } },
+    { id: 'tour', title: 'Show beginner guide', description: 'Walk through the basics again.', group: 'Create', run: () => setTourOpen(true) },
+    { id: 'skills', title: 'Go to skills', group: 'Navigate', run: () => {
+      setCvOpen(false)
+      window.setTimeout(() => document.querySelector<HTMLElement>('.pf-skill-editor, .pf-skills')?.scrollIntoView({ behavior: 'smooth' }), 35)
+    } },
+    { id: 'work', title: 'Go to selected work', group: 'Navigate', run: () => {
+      setCvOpen(false)
+      window.setTimeout(() => document.getElementById('work')?.scrollIntoView({ behavior: 'smooth' }), 35)
+    } },
+    { id: 'about', title: 'Go to about', group: 'Navigate', run: () => {
+      setCvOpen(false)
+      window.setTimeout(() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' }), 35)
+    } },
+    { id: 'light', title: 'Switch to paper', description: 'A quiet light palette.', group: 'Appearance', run: () =>
+      setData(current => ({ ...current, theme: { ...current.theme, palette: 'paper' } })) },
+    { id: 'dark', title: 'Switch to ink', description: 'A precise dark palette.', group: 'Appearance', run: () =>
+      setData(current => ({ ...current, theme: { ...current.theme, palette: 'ink' } })) },
+    { id: 'publish', title: published ? 'Update portfolio' : 'Publish portfolio', group: 'Share', run: () => { void publish() } },
+    ...(publicUrl ? [{
+      id: 'copy', title: 'Copy public link', description: publicUrl, group: 'Share' as const,
+      run: () => { void navigator.clipboard.writeText(publicUrl).then(
+        () => toast.success('Link copied.'),
+        () => toast.error('Unable to copy. Open Share to copy the address.'),
+      ) },
+    }] : []),
+  ]
+
   return (
     <div className={cn('app', cvOpen ? 'mode-cv' : editing ? 'mode-edit' : 'mode-view')} {...themeProps(data)}>
       {!cvOpen && !editing && data.theme.backdrop && <Backdrop />}
@@ -189,7 +235,12 @@ function Editor() {
         <CvView data={data} publicUrl={publicUrl} onBack={() => setCvOpen(false)} />
       ) : (
         <div key={editing ? 'edit' : 'view'} className="mode-swap">
-          <Portfolio data={data} editing={editing} onChange={setData} />
+          <Portfolio
+            data={data}
+            editing={editing}
+            onChange={setData}
+            onOpenCommands={() => setCommandsOpen(true)}
+          />
         </div>
       )}
 
@@ -208,7 +259,7 @@ function Editor() {
         <span className="dock-sep" />
 
         {!cvOpen && (
-          <Customize data={data} onChange={setData} onImport={importDraft} customSlug={customSlug} onSlugChange={setCustomSlug} />
+          <Customize data={data} onChange={setData} onImport={importDraft} customSlug={customSlug} onSlugChange={setCustomSlug} open={customiseOpen} onOpenChange={setCustomiseOpen} />
         )}
 
         <button
@@ -221,6 +272,10 @@ function Editor() {
         >
           <FileText className="size-4" />
           <span>CV</span>
+        </button>
+
+        <button className="dock-icon" onClick={() => setCommandsOpen(true)} aria-label="Open command palette" title="Quick actions · Ctrl+K">
+          <Search className="size-4" />
         </button>
 
         <button className="dock-icon" onClick={() => setTourOpen(true)} aria-label="How to use Fleedfolio" title="How it works">
@@ -245,6 +300,7 @@ function Editor() {
         onSaveAddress={publish}
       />
       <Walkthrough open={tourOpen} onClose={closeTour} />
+      <CommandPalette open={commandsOpen} onOpenChange={setCommandsOpen} actions={commands} />
     </div>
   )
 }

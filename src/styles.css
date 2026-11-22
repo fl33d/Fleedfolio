@@ -886,3 +886,39 @@ html { scroll-behavior: smooth; }
 .pf-suggestion-hint { color: var(--dim); font-family: var(--font-sans); font-size: .68rem; padding: .5rem .65rem .3rem; border-top: 1px solid var(--hair); }
 .pf-suggestion:focus-visible { outline: 2px solid var(--accent-c); }
 @media (max-width: 650px) { .pf-suggestion small { display: none; } .pf-skill-popover { width: 100%; } }
+
+
+/* Quick actions are a keyboard-first utility, not a dashboard to learn. */
+.command-dialog {
+  width: min(35rem, calc(100vw - 1.5rem));
+  background: #151618; color: #eeece8; border: 1px solid #343536;
+  padding: 0; gap: 0; border-radius: 12px;
+  box-shadow: 0 30px 90px rgb(0 0 0 / .65);
+  overflow: hidden;
+}
+.command-search {
+  display: flex; align-items: center; gap: .7rem; padding: .95rem 1rem;
+  border-bottom: 1px solid #333436; color: #a6a6a6;
+}
+.command-search input {
+  flex: 1; width: 100%; background: transparent; border: 0; outline: 0;
+  color: #eee; font-family: var(--font-sans); font-size: .94rem;
+}
+.command-search input::placeholder { color: #858585; }
+.command-search kbd { padding: .15rem .3rem; font-size: .7rem; border: 1px solid #38393c; border-radius: 4px; }
+.command-results { max-height: min(60vh, 25rem); overflow-y: auto; padding: .45rem; }
+.command-result {
+  width: 100%; padding: .65rem .75rem; display: flex; align-items: center;
+  gap: .65rem; border-radius: 7px; text-align: left; font-family: var(--font-sans);
+}
+.command-result[aria-selected='true'], .command-result:hover { background: #282a2c; }
+.command-result span { flex: 1; min-width: 0; display: grid; gap: .18rem; }
+.command-result strong { font-weight: 500; font-size: .86rem; color: #f5f2ee; }
+.command-result small { font-size: .74rem; color: #aaa; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.command-result em { font-style: normal; font-size: .67rem; color: #999; }
+.command-result svg { color: #c9d5be; }
+.command-empty { padding: 1.5rem; font-size: .85rem; color: #aaa; }
+.command-footer { border-top: 1px solid #333436; padding: .65rem 1rem; display: flex; gap: 1rem; color: #a0a0a0; font-size: .69rem; }
+.command-footer span { display: inline-flex; align-items: center; gap: .2rem; }
+.command-dialog button:focus-visible { outline: 2px solid #c9d5be; outline-offset: 1px; }
+@media (max-width: 500px) { .command-result em { display: none; } .command-footer { gap: .55rem; } }
