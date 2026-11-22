@@ -149,7 +149,10 @@ export function validateStudioDocument(value: unknown): StudioValidation {
         case 'project': {
           const project = projects.get(block.projectId)
           if (!project) bad('Unknown project ref ' + block.projectId)
-          else if (obj(project.lenses) && obj(project.lenses[block.defaultLens]) && project.lenses[block.defaultLens].enabled !== true) bad('Default project lens disabled')
+          else if (obj(project.lenses)) {
+            const lens = project.lenses[block.defaultLens]
+            if (obj(lens) && lens.enabled !== true) bad('Default project lens disabled')
+          }
           break
         }
         case 'project-list':
