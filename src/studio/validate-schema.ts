@@ -1,4 +1,4 @@
-import studioSchema from './schema/fleedfolio-studio-v1.schema.json'
+import studioSchema from './schema/fleedfolio-studio-v1.schema.json' with { type: 'json' }
 
 type JsonSchema = Record<string, unknown>
 const root = studioSchema as unknown as JsonSchema
