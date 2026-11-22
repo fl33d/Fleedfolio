@@ -63,7 +63,7 @@ export function validateStudioDocument(value: unknown): StudioValidation {
   }
   const projects = new Map<string, Record<string, unknown>>()
   const skills = new Set<string>(), assets = new Set<string>()
-  const experiences = new Set<string>(), education = new Set<string>()
+  const experiences = new Set<string>(), education = new Set<string>(), achievements = new Set<string>()
   const content = value.content
   if (!obj(content)) bad('Missing content')
   else {
@@ -81,6 +81,19 @@ export function validateStudioDocument(value: unknown): StudioValidation {
         if (typeof v.id === 'string') target.add(v.id)
       })
     }
+    if (content.achievements !== undefined && arr(content.achievements, 100, 'achievements')) content.achievements.forEach((v, i) => {
+      if (!obj(v)) { bad('Invalid achievement ' + i); return }
+      takeId(v.id, 'achievement.' + i)
+      if (typeof v.id === 'string') achievements.add(v.id)
+      str(v.title, 180, 'achievement title')
+      str(v.issuer, 150, 'achievement issuer')
+      str(v.date, 50, 'achievement date')
+      str(v.description, 900, 'achievement description')
+      if (v.evidenceUrl !== null) {
+        url(v.evidenceUrl, 'achievement evidence URL')
+        if (typeof v.evidenceUrl === 'string' && !v.evidenceUrl.startsWith('https://')) bad('Achievement evidence requires HTTPS')
+      }
+    })
     if (arr(content.projects, 100, 'projects')) content.projects.forEach((v, i) => {
       if (!obj(v)) { bad('Invalid project ' + i); return }
       takeId(v.id, 'project.' + i)
@@ -160,6 +173,9 @@ export function validateStudioDocument(value: unknown): StudioValidation {
           break
         case 'skills':
           if (arr(block.skillIds, 100, 'skillIds')) block.skillIds.forEach(skillId => { if (!skills.has(skillId)) bad('Missing listed skill ' + skillId) })
+          break
+        case 'achievements':
+          if (arr(block.achievementIds, 100, 'achievement IDs')) block.achievementIds.forEach(achievementId => { if (!achievements.has(achievementId)) bad('Missing achievement ' + achievementId) })
           break
         case 'timeline': {
           const collection = block.collection === 'education' ? education : experiences
