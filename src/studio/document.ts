@@ -11,7 +11,7 @@ export type Skill = { id: Identifier; label: string; category: 'development' | '
 export type Experience = { id: Identifier; role: string; organisation: string; start: string; end: string | null; summary: string; highlights: string[] }
 export type Education = { id: Identifier; qualification: string; institution: string; period: string; details: string }
 /** A creator-authored accomplishment, never an auto-generated verified credential. */
-export type Achievement = { id: Identifier; title: string; category: 'award' | 'certification' | 'competition' | 'milestone' | 'publication' | 'other'; issuer: string; date: string; description: string; evidenceUrl: string | null }
+export type Achievement = { id: Identifier; title: string; category: 'award' | 'certification' | 'competition' | 'milestone' | 'publication' | 'github' | 'other'; issuer: string; date: string; description: string; evidenceUrl: string | null }
 export type StudioMetric = { id: Identifier; label: string; value: string; context: string }
 export type ProjectLens = 'story' | 'spec' | 'board' | 'demo'
 export type Project = {
