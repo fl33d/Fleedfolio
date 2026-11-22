@@ -1,21 +1,7 @@
 import { useId, useMemo, useRef, useState } from 'react'
 import { X } from 'lucide-react'
-import { suggestSkills, type CatalogSkill } from '@/lib/skill-catalog'
-
-function SkillIcon({ skill }: { skill: CatalogSkill }) {
-  return (
-    <span className="pf-suggestion-icon" aria-hidden="true">
-      <span>{skill.name[0]?.toUpperCase()}</span>
-      {skill.icon && (
-        <img
-          src={'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/' + skill.icon}
-          width={20} height={20} loading="lazy" alt=""
-          onError={(event) => { event.currentTarget.style.display = 'none' }}
-        />
-      )}
-    </span>
-  )
-}
+import { suggestSkills } from '@/lib/skill-catalog'
+import { SkillMark } from './SkillMark'
 
 /** Suggests skills in place. Custom values and comma-separated entry still work. */
 export function SkillAutocomplete({ skills, onChange }: {
@@ -55,7 +41,8 @@ export function SkillAutocomplete({ skills, onChange }: {
         <div className="pf-skill-entries">
           {skills.map((skill, index) => (
             <span className="pf-chip" key={skill + '-' + index}>
-              {skill}
+              <SkillMark name={skill} size={17} />
+              <span>{skill}</span>
               <button type="button" aria-label={'Remove ' + skill}
                 onClick={() => onChange(skills.filter((_, i) => i !== index))}>
                 <X className="size-3" />
@@ -69,7 +56,7 @@ export function SkillAutocomplete({ skills, onChange }: {
             role="combobox" aria-autocomplete="list" aria-expanded={open}
             aria-controls={id + '-options'}
             aria-activedescendant={open ? id + '-option-' + highlighted : undefined}
-            placeholder={skills.length ? 'Add another skill…' : 'Try Vite, video editing, photography…'}
+            placeholder={skills.length ? 'Search technologies or enter any skill…' : 'Search Python, React, Figma, writing…'}
             onChange={(event) => { setDraft(event.target.value); setActive(0); setDismissed(false) }}
             onFocus={() => setFocused(true)}
             onBlur={() => { setFocused(false); if (draft.trim()) add(draft) }}
@@ -96,7 +83,7 @@ export function SkillAutocomplete({ skills, onChange }: {
           />
         </div>
         {open && (
-          <div className="pf-skill-popover" id={id + '-options'} role="listbox" aria-label="Suggested skills">
+          <div className="pf-skill-popover" id={id + '-options'} role="listbox" aria-label="Suggested skills and programming languages">
             {options.map((skill, index) => (
               <button
                 key={skill.name} type="button" role="option"
@@ -105,7 +92,7 @@ export function SkillAutocomplete({ skills, onChange }: {
                 onMouseDown={(event) => event.preventDefault()}
                 onClick={() => { add(skill.name); input.current?.focus() }}
               >
-                <SkillIcon skill={skill} />
+                <SkillMark name={skill.name} size={20} />
                 <span className="pf-suggestion-text">{skill.name}</span>
                 <small>{skill.category}</small>
                 {index === highlighted && <kbd>Enter</kbd>}
@@ -115,7 +102,7 @@ export function SkillAutocomplete({ skills, onChange }: {
           </div>
         )}
       </div>
-      <p className="pf-hint">Choose a suggestion or enter your own skill. Separate multiple skills with commas.</p>
+      <p className="pf-hint">Choose a technology with a logo, or type any skill. Use Enter or commas to add more.</p>
     </section>
   )
 }
