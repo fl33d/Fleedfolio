@@ -17,6 +17,7 @@ import {
 import { cn } from '@/lib/utils'
 import { createPortfolioBackup, parsePortfolioBackup } from '@/lib/portfolio-backup.ts'
 import { normalizeCustomSlug } from '@/lib/portfolio-slug'
+import { applyDesignPreset, DESIGN_PRESETS } from '@/lib/design-presets'
 
 const SECTIONS: { key: SectionKey; label: string }[] = [
   { key: 'skills', label: 'Skills & tools' },
@@ -111,12 +112,31 @@ export function Customize({
       >
         <SlidersHorizontal className="size-4" />
         <span className="cz-trigger-label">Customise</span>
-        <span className="cz-trigger-dot" />
         <ChevronDown className="size-3.5 cz-chevron" />
       </button>
 
       {open && (
         <div className="cz-panel" role="dialog" aria-label="Customise">
+          <Group title="Design library">
+            <p className="cz-group-intro">A complete look, ready to make yours. Every detail stays editable.</p>
+            <div className="cz-designs">
+              {DESIGN_PRESETS.map((preset) => (
+                <button
+                  key={preset.id}
+                  type="button"
+                  className="cz-design"
+                  onClick={() => onChange((portfolio) => applyDesignPreset(portfolio, preset))}
+                  title={preset.description}
+                >
+                  <span className="cz-design-swatch" style={{ background: PALETTES[preset.palette].paper, color: PALETTES[preset.palette].ink, fontFamily: FONTS[preset.font].family }}>
+                    <span>Ag</span>
+                    <i style={{ background: preset.accent }} />
+                  </span>
+                  <span className="cz-design-info"><strong>{preset.name}</strong><small>{preset.description}</small></span>
+                </button>
+              ))}
+            </div>
+          </Group>
           <Group title="Tone">
             <div className="cz-palettes">
               {(Object.keys(PALETTES) as PaletteKey[]).map((key) => {

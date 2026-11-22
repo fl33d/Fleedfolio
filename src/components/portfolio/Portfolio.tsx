@@ -23,9 +23,10 @@ type Props = {
   data: PortfolioData
   editing: boolean
   onChange?: (next: PortfolioData) => void
+  onOpenCommands?: () => void
 }
 
-export function Portfolio({ data, editing, onChange }: Props) {
+export function Portfolio({ data, editing, onChange, onOpenCommands }: Props) {
   const set = <K extends keyof PortfolioData>(key: K, value: PortfolioData[K]) =>
     onChange?.({ ...data, [key]: value })
 
@@ -57,13 +58,6 @@ export function Portfolio({ data, editing, onChange }: Props) {
   const shown = (key: PortfolioData['hidden'][number]) => !data.hidden.includes(key)
   const setLabel = (key: keyof Labels, value: string) => set('labels', { ...data.labels, [key]: value })
   const labels = data.labels
-  const initials =
-    data.name
-      .split(/\s+/)
-      .filter(Boolean)
-      .slice(0, 2)
-      .map((w) => w[0]?.toUpperCase())
-      .join('') || '○'
   const emailHref = mailtoHref(data.email)
   const hasContact = Boolean(emailHref) || socials.length > 0
 
@@ -98,25 +92,33 @@ export function Portfolio({ data, editing, onChange }: Props) {
       style={{ '--accent-c': data.accent } as CSSProperties}
     >
       <header className="pf-nav">
-        <ScrollLink to="top" className="pf-mono-badge" aria-label="Back to top">
-          <span>{initials}</span>
+        <ScrollLink to="top" className="pf-identity" aria-label="Back to top">
+          {editing ? (
+            <span className="pf-identity-brand">fleed<span aria-hidden="true">.</span></span>
+          ) : (
+            <span className="pf-identity-name">{data.name.trim() || 'Portfolio'}</span>
+          )}
         </ScrollLink>
         <nav className="pf-main-nav" aria-label="Portfolio sections">
-          {nav.map((n) => (
-            <ScrollLink key={n.id} to={n.id} className="pf-nav-link">
-              {n.label}
+          {nav.map((item) => (
+            <ScrollLink key={item.id} to={item.id} className="pf-nav-link">
+              {item.label}
             </ScrollLink>
           ))}
         </nav>
-        <div className="pf-meta">
-          <span>{data.location || (editing ? 'Editing your portfolio' : 'Selected work')}</span>
-        </div>
+        {editing && onOpenCommands ? (
+          <button type="button" className="pf-command-trigger" onClick={onOpenCommands} aria-label="Open command menu">
+            <span>Quick actions</span><kbd>Ctrl K</kbd>
+          </button>
+        ) : (
+          <span className="pf-header-rule" aria-hidden="true" />
+        )}
       </header>
 
       {/* Hero */}
       <section id="top" className={cn('pf-hero slot-host', data.photo && 'has-photo')}>
         <div className="pf-hero-main">
-        {editing && <p className="pf-editor-eyebrow">01 / Introduction</p>}
+        {editing && <p className="pf-editor-eyebrow">YOUR SPACE / START HERE</p>}
         {(editing || data.status) && (
           <div className="pf-status">
             {editing ? (

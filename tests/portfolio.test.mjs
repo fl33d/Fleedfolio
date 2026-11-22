@@ -5,6 +5,7 @@ import { blankPortfolio, mailtoHref, normalizePortfolio, reorderItems, safeImage
 import { createPortfolioBackup, parsePortfolioBackup } from '../src/lib/portfolio-backup.ts'
 import { normalizeCustomSlug, portfolioPublicPath } from '../src/lib/portfolio-slug.ts'
 import { portfolioCvText } from '../src/lib/cv.ts'
+import { DESIGN_PRESETS, applyDesignPreset } from '../src/lib/design-presets.ts'
 
 test('safeUrl rejects executable or unsupported protocols', () => {
   for (const value of ['javascript:alert(1)', 'data:text/html,x', 'vbscript:msgbox(1)', 'file:///etc/passwd']) {
@@ -128,4 +129,20 @@ test('portfolio project order can be changed without mutating the original conte
   assert.deepEqual(projects.map(p => p.id), ['a', 'b', 'c'])
   assert.deepEqual(reorderItems(projects, 0, -1).map(p => p.id), ['a', 'b', 'c'])
   assert.deepEqual(reorderItems(projects, 2, 1).map(p => p.id), ['a', 'b', 'c'])
+})
+
+test('design library preserves user content and offers distinct, editable recipes', () => {
+  const draft = blankPortfolio()
+  draft.name = 'Creator'
+  draft.skills = ['Python']
+  const presets = DESIGN_PRESETS.map(p => p.id)
+  assert.equal(new Set(presets).size, presets.length)
+  for (const preset of DESIGN_PRESETS) {
+    const result = applyDesignPreset(draft, preset)
+    assert.equal(result.name, 'Creator')
+    assert.deepEqual(result.skills, ['Python'])
+    assert.equal(result.theme.font, preset.font)
+    assert.equal(result.theme.palette, preset.palette)
+    assert.equal(result.theme.backdrop, false)
+  }
 })

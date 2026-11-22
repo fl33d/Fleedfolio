@@ -88,7 +88,7 @@ export const DEFAULT_LABELS: Labels = {
 
 export const DEFAULT_THEME: Theme = {
   palette: 'ink',
-  font: 'serif',
+  font: 'sans',
   scale: 'regular',
   align: 'left',
   motion: true,
