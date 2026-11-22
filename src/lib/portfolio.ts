@@ -64,6 +64,10 @@ export type Theme = {
   align: 'left' | 'center'
   motion: boolean
   backdrop: boolean
+  /** Display mode for skills on the published portfolio; original backups default to text. */
+  skillDisplay: 'text' | 'icons' | 'both'
+  /** Visitor-facing header identity; available for every design composition. */
+  identityMode: 'initial' | 'wordmark' | 'photo' | 'none'
 }
 
 export type SectionKey = 'skills' | 'about' | 'work' | 'experience' | 'education' | 'contact'
@@ -97,11 +101,15 @@ export const DEFAULT_THEME: Theme = {
   align: 'left',
   motion: true,
   backdrop: false,
+  skillDisplay: 'text',
+  identityMode: 'initial',
 }
 
 export type Portfolio = {
   name: string
   photo: string
+  /** Optional wordmark in the visitor header, not the person's legal name. */
+  identityText: string
   role: string
   tagline: string
   location: string
@@ -196,6 +204,7 @@ export const emptySocial = (): SocialLink => ({ id: uid(), label: '', url: '' })
 export const blankPortfolio = (): Portfolio => ({
   name: '',
   photo: '',
+  identityText: '',
   role: '',
   tagline: '',
   location: '',
@@ -265,6 +274,7 @@ export function normalizePortfolio(input: any): Portfolio {
   return {
     name: str(p.name, 80),
     photo: safeImage(p.photo),
+    identityText: str(p.identityText, 60),
     role: str(p.role, 120),
     tagline: str(p.tagline, 280),
     location: str(p.location, 80),
@@ -313,7 +323,9 @@ export function normalizePortfolio(input: any): Portfolio {
       align: pick(t.align, ['left', 'center'], DEFAULT_THEME.align),
       motion: typeof t.motion === 'boolean' ? t.motion : DEFAULT_THEME.motion,
       backdrop: typeof t.backdrop === 'boolean' ? t.backdrop : DEFAULT_THEME.backdrop,
-    },
+      skillDisplay: pick(t.skillDisplay, ['text', 'icons', 'both'], DEFAULT_THEME.skillDisplay),
+      identityMode: pick(t.identityMode, ['initial', 'wordmark', 'photo', 'none'], DEFAULT_THEME.identityMode),
+    }
     labels: {
       about: label(l.about, 60, DEFAULT_LABELS.about),
       work: label(l.work, 60, DEFAULT_LABELS.work),
