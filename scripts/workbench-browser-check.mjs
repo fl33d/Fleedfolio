@@ -37,6 +37,7 @@ try {
       await field.fill('Riley Portfolio')
       if (!(await field.inputValue()).includes('Riley Portfolio')) throw new Error('Inline editing blocked while library is open')
       if (!(await page.getByRole('complementary',{name:'Elements library'}).isVisible())) throw new Error('Library closed while typing')
+      if (width === 390 || width === 1440) await page.screenshot({path:path.join(artifact,width+'-library.png'),fullPage:true,animations:'disabled'})
       const search=page.getByRole('textbox',{name:'Search elements'})
       await search.fill('Text')
       await page.locator('.ff-library .element-option').first().click()
