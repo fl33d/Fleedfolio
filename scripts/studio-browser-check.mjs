@@ -27,11 +27,16 @@ try {
       await page.getByRole('heading', { name: /make it yours/i }).waitFor({ timeout: 20000 })
       const name = page.getByRole('textbox', { name: 'Your name' })
       await name.fill('Avery Design Test')
+      await page.waitForFunction(() => document.querySelector('main.stx-public h1')?.textContent?.includes('Avery Design Test'), null, { timeout: 10000 })
+      const achievementSection = page.locator('section[aria-labelledby="stx-your-achievements"]')
+      await achievementSection.getByRole('button', { name: /add an achievement/i }).click()
+      await achievementSection.getByRole('textbox', { name: 'Title' }).last().fill('Browser-tested creative milestone')
+      await page.waitForFunction(() => document.querySelector('main.stx-public')?.textContent?.includes('Browser-tested creative milestone'), null, { timeout: 10000 })
       await page.waitForTimeout(650)
       const markup = await page.locator('main.stx-public').innerText()
-      if (!markup.includes('Avery Design Test')) throw new Error('Simple edit not reflected in portfolio')
+      if (!markup.includes('Avery Design Test') || !markup.includes('Browser-tested creative milestone')) throw new Error('Simple name/achievement edit not reflected in portfolio')
       await page.getByRole('button', { name: 'Studio', exact: true }).click()
-      if (!(await page.locator('main.stx-public').innerText()).includes('Avery Design Test')) throw new Error('Studio lost shared name')
+      if (!(await page.locator('main.stx-public').innerText()).includes('Avery Design Test') || !(await page.locator('main.stx-public').innerText()).includes('Browser-tested creative milestone')) throw new Error('Studio lost shared edits')
       if (width === 390 || width === 1440) {
         await page.screenshot({ path: path.join(directory, width + '-studio.png'), fullPage: true, animations: 'disabled' })
       }
@@ -47,6 +52,7 @@ try {
       await page.reload({ waitUntil: 'domcontentloaded' })
       await page.getByRole('textbox', { name: 'Your name' }).waitFor({ timeout: 20000 })
       if (await page.getByRole('textbox', { name: 'Your name' }).inputValue() !== 'Avery Design Test') throw new Error('Local draft did not survive reload')
+      if (!(await page.locator('main.stx-public').innerText()).includes('Browser-tested creative milestone')) throw new Error('Achievement not restored from local draft')
       const dimensions = await page.evaluate(() => ({
         viewport: document.documentElement.clientWidth,
         page: document.documentElement.scrollWidth,
