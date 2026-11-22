@@ -1,0 +1,1416 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fleed.online/schemas/fleedfolio-studio-v1.json",
+  "title": "Fleedfolio Studio Portable Document v1 (proposal)",
+  "description": "Public portable content + appearance. Never contains publishing tokens, sessions or domain secrets. Schema v1 is NEW and distinct from legacy backup version 1.",
+  "type": "object",
+  "properties": {
+    "format": {
+      "const": "fleedfolio-studio"
+    },
+    "schemaVersion": {
+      "const": 1
+    },
+    "documentId": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 70,
+      "pattern": "^[a-z][a-z0-9_-]*$"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "identity": {
+      "$ref": "#/$defs/identity"
+    },
+    "content": {
+      "type": "object",
+      "properties": {
+        "skills": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/skill"
+          },
+          "minItems": 0,
+          "maxItems": 100
+        },
+        "projects": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/project"
+          },
+          "minItems": 0,
+          "maxItems": 100
+        },
+        "experience": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/experience"
+          },
+          "minItems": 0,
+          "maxItems": 100
+        },
+        "education": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/education"
+          },
+          "minItems": 0,
+          "maxItems": 100
+        }
+      },
+      "required": [
+        "skills",
+        "projects",
+        "experience",
+        "education"
+      ],
+      "additionalProperties": false
+    },
+    "pages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 70,
+            "pattern": "^[a-z][a-z0-9_-]*$"
+          },
+          "slug": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120,
+            "pattern": "^/[a-z0-9-]*$"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 160
+          },
+          "blocks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/block"
+            },
+            "minItems": 0,
+            "maxItems": 120
+          }
+        },
+        "required": [
+          "id",
+          "slug",
+          "title",
+          "blocks"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1,
+      "maxItems": 8
+    },
+    "assets": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/asset"
+      },
+      "minItems": 0,
+      "maxItems": 200
+    },
+    "presentation": {
+      "type": "object",
+      "properties": {
+        "system": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 70,
+          "pattern": "^[a-z][a-z0-9-]*$"
+        },
+        "typography": {
+          "enum": [
+            "editorial",
+            "modern",
+            "mono",
+            "expressive"
+          ]
+        },
+        "density": {
+          "enum": [
+            "airy",
+            "balanced",
+            "compact"
+          ]
+        },
+        "surface": {
+          "enum": [
+            "paper",
+            "ink",
+            "soft",
+            "contrast"
+          ]
+        },
+        "accent": {
+          "type": "string",
+          "minLength": 7,
+          "maxLength": 7,
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        },
+        "motion": {
+          "enum": [
+            "system",
+            "reduced",
+            "off"
+          ]
+        }
+      },
+      "required": [
+        "system",
+        "typography",
+        "density",
+        "surface",
+        "accent",
+        "motion"
+      ],
+      "additionalProperties": false
+    },
+    "settings": {
+      "type": "object",
+      "properties": {
+        "visibility": {
+          "enum": [
+            "draft",
+            "public",
+            "unlisted"
+          ]
+        },
+        "discoverable": {
+          "type": "boolean"
+        },
+        "defaultPageId": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 70,
+          "pattern": "^[a-z][a-z0-9_-]*$"
+        },
+        "seo": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string",
+              "minLength": 0,
+              "maxLength": 160
+            },
+            "description": {
+              "type": "string",
+              "minLength": 0,
+              "maxLength": 320
+            }
+          },
+          "required": [
+            "title",
+            "description"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "visibility",
+        "discoverable",
+        "defaultPageId",
+        "seo"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "format",
+    "schemaVersion",
+    "documentId",
+    "revision",
+    "identity",
+    "content",
+    "pages",
+    "assets",
+    "presentation",
+    "settings"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "richRun": {
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 4000
+        },
+        "marks": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "bold",
+              "italic",
+              "code",
+              "underline"
+            ]
+          },
+          "minItems": 0,
+          "maxItems": 4
+        },
+        "href": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 2048,
+          "pattern": "^(https?://|mailto:)[^\\s<>]*$"
+        }
+      },
+      "required": [
+        "text"
+      ],
+      "additionalProperties": false
+    },
+    "paragraph": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "enum": [
+            "paragraph",
+            "heading",
+            "quote",
+            "bullet"
+          ]
+        },
+        "level": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4
+        },
+        "runs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/richRun"
+          },
+          "minItems": 1,
+          "maxItems": 200
+        }
+      },
+      "required": [
+        "kind",
+        "runs"
+      ],
+      "additionalProperties": false
+    },
+    "link": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 70,
+          "pattern": "^[a-z][a-z0-9_-]*$"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "url": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 2048,
+          "pattern": "^(https?://|mailto:)[^\\s<>]*$"
+        },
+        "rel": {
+          "enum": [
+            "personal",
+            "work",
+            "source",
+            "demo",
+            "contact",
+            "other"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "label",
+        "url",
+        "rel"
+      ],
+      "additionalProperties": false
+    },
+    "identity": {
+      "type": "object",
+      "properties": {
+        "displayName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "minItems": 0,
+          "maxItems": 8
+        },
+        "headline": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 320
+        },
+        "bio": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 4000
+        },
+        "location": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 100
+        },
+        "availability": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 160
+        },
+        "links": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/link"
+          },
+          "minItems": 0,
+          "maxItems": 32
+        }
+      },
+      "required": [
+        "displayName",
+        "roles",
+        "headline",
+        "bio",
+        "location",
+        "availability",
+        "links"
+      ],
+      "additionalProperties": false
+    },
+    "skill": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 70,
+          "pattern": "^[a-z][a-z0-9_-]*$"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 70
+        },
+        "category": {
+          "enum": [
+            "development",
+            "design",
+            "research",
+            "writing",
+            "professional",
+            "other"
+          ]
+        },
+        "iconKey": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 70,
+          "pattern": "^[a-z0-9][a-z0-9-]*$"
+        }
+      },
+      "required": [
+        "id",
+        "label",
+        "category"
+      ],
+      "additionalProperties": false
+    },
+    "experience": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 70,
+          "pattern": "^[a-z][a-z0-9_-]*$"
+        },
+        "role": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 140
+        },
+        "organisation": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "start": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 20
+        },
+        "end": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 0,
+              "maxLength": 20
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 1200
+        },
+        "highlights": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 400
+          },
+          "minItems": 0,
+          "maxItems": 20
+        }
+      },
+      "required": [
+        "id",
+        "role",
+        "organisation",
+        "start",
+        "end",
+        "summary",
+        "highlights"
+      ],
+      "additionalProperties": false
+    },
+    "education": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 70,
+          "pattern": "^[a-z][a-z0-9_-]*$"
+        },
+        "qualification": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "institution": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "period": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 80
+        },
+        "details": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 1000
+        }
+      },
+      "required": [
+        "id",
+        "qualification",
+        "institution",
+        "period",
+        "details"
+      ],
+      "additionalProperties": false
+    },
+    "metric": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 70,
+          "pattern": "^[a-z][a-z0-9_-]*$"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 70
+        },
+        "value": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 70
+        },
+        "context": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 260
+        }
+      },
+      "required": [
+        "id",
+        "label",
+        "value",
+        "context"
+      ],
+      "additionalProperties": false
+    },
+    "projectStory": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "sections": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 3,
+                "maxLength": 70,
+                "pattern": "^[a-z][a-z0-9_-]*$"
+              },
+              "heading": {
+                "type": "string",
+                "minLength": 0,
+                "maxLength": 180
+              },
+              "paragraphs": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/paragraph"
+                },
+                "minItems": 0,
+                "maxItems": 60
+              }
+            },
+            "required": [
+              "id",
+              "heading",
+              "paragraphs"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 0,
+          "maxItems": 40
+        }
+      },
+      "required": [
+        "enabled",
+        "sections"
+      ],
+      "additionalProperties": false
+    },
+    "projectSpec": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "problem": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 2400
+        },
+        "approach": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 2400
+        },
+        "decisions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 600
+          },
+          "minItems": 0,
+          "maxItems": 30
+        },
+        "tradeoffs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 600
+          },
+          "minItems": 0,
+          "maxItems": 20
+        },
+        "metrics": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/metric"
+          },
+          "minItems": 0,
+          "maxItems": 20
+        },
+        "architectureAssetId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 70,
+              "pattern": "^[a-z][a-z0-9_-]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "enabled",
+        "problem",
+        "approach",
+        "decisions",
+        "tradeoffs",
+        "metrics",
+        "architectureAssetId"
+      ],
+      "additionalProperties": false
+    },
+    "projectBoard": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "assetIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 70,
+            "pattern": "^[a-z][a-z0-9_-]*$"
+          },
+          "minItems": 0,
+          "maxItems": 60
+        },
+        "caption": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 500
+        }
+      },
+      "required": [
+        "enabled",
+        "assetIds",
+        "caption"
+      ],
+      "additionalProperties": false
+    },
+    "projectDemo": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "url": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 2048,
+              "pattern": "^https://[^\\s<>]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "fallbackText": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 700
+        },
+        "launchLabel": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 100
+        }
+      },
+      "required": [
+        "enabled",
+        "url",
+        "fallbackText",
+        "launchLabel"
+      ],
+      "additionalProperties": false
+    },
+    "project": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 70,
+          "pattern": "^[a-z][a-z0-9_-]*$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 1200
+        },
+        "year": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 30
+        },
+        "contribution": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 500
+        },
+        "skillIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 70,
+            "pattern": "^[a-z][a-z0-9_-]*$"
+          },
+          "minItems": 0,
+          "maxItems": 50
+        },
+        "links": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/link"
+          },
+          "minItems": 0,
+          "maxItems": 20
+        },
+        "coverAssetId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 70,
+              "pattern": "^[a-z][a-z0-9_-]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "lenses": {
+          "type": "object",
+          "properties": {
+            "story": {
+              "$ref": "#/$defs/projectStory"
+            },
+            "spec": {
+              "$ref": "#/$defs/projectSpec"
+            },
+            "board": {
+              "$ref": "#/$defs/projectBoard"
+            },
+            "demo": {
+              "$ref": "#/$defs/projectDemo"
+            }
+          },
+          "required": [
+            "story",
+            "spec",
+            "board",
+            "demo"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "summary",
+        "year",
+        "contribution",
+        "skillIds",
+        "links",
+        "coverAssetId",
+        "lenses"
+      ],
+      "additionalProperties": false
+    },
+    "asset": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 70,
+          "pattern": "^[a-z][a-z0-9_-]*$"
+        },
+        "kind": {
+          "enum": [
+            "image",
+            "video",
+            "file"
+          ]
+        },
+        "mime": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "alt": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 500
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 400,
+          "pattern": "^assets/[A-Za-z0-9._/-]+$"
+        },
+        "width": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20000
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20000
+        },
+        "sha256": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "mime",
+        "alt",
+        "path"
+      ],
+      "additionalProperties": false
+    },
+    "style": {
+      "type": "object",
+      "properties": {
+        "variant": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 50,
+          "pattern": "^[a-z][a-z0-9-]*$"
+        },
+        "emphasis": {
+          "enum": [
+            "normal",
+            "featured",
+            "quiet"
+          ]
+        }
+      },
+      "required": [
+        "variant",
+        "emphasis"
+      ],
+      "additionalProperties": false
+    },
+    "block": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 70,
+              "pattern": "^[a-z][a-z0-9_-]*$"
+            },
+            "type": {
+              "const": "identity"
+            },
+            "style": {
+              "$ref": "#/$defs/style"
+            },
+            "scale": {
+              "enum": [
+                "compact",
+                "standard",
+                "hero"
+              ]
+            }
+          },
+          "required": [
+            "id",
+            "type",
+            "style",
+            "scale"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 70,
+              "pattern": "^[a-z][a-z0-9_-]*$"
+            },
+            "type": {
+              "const": "rich-text"
+            },
+            "style": {
+              "$ref": "#/$defs/style"
+            },
+            "paragraphs": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/paragraph"
+              },
+              "minItems": 1,
+              "maxItems": 80
+            }
+          },
+          "required": [
+            "id",
+            "type",
+            "style",
+            "paragraphs"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 70,
+              "pattern": "^[a-z][a-z0-9_-]*$"
+            },
+            "type": {
+              "const": "project"
+            },
+            "style": {
+              "$ref": "#/$defs/style"
+            },
+            "projectId": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 70,
+              "pattern": "^[a-z][a-z0-9_-]*$"
+            },
+            "defaultLens": {
+              "enum": [
+                "story",
+                "spec",
+                "board",
+                "demo"
+              ]
+            }
+          },
+          "required": [
+            "id",
+            "type",
+            "style",
+            "projectId",
+            "defaultLens"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 70,
+              "pattern": "^[a-z][a-z0-9_-]*$"
+            },
+            "type": {
+              "const": "project-list"
+            },
+            "style": {
+              "$ref": "#/$defs/style"
+            },
+            "projectIds": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 3,
+                "maxLength": 70,
+                "pattern": "^[a-z][a-z0-9_-]*$"
+              },
+              "minItems": 0,
+              "maxItems": 100
+            },
+            "display": {
+              "enum": [
+                "index",
+                "featured",
+                "gallery"
+              ]
+            }
+          },
+          "required": [
+            "id",
+            "type",
+            "style",
+            "projectIds",
+            "display"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 70,
+              "pattern": "^[a-z][a-z0-9_-]*$"
+            },
+            "type": {
+              "const": "skills"
+            },
+            "style": {
+              "$ref": "#/$defs/style"
+            },
+            "skillIds": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 3,
+                "maxLength": 70,
+                "pattern": "^[a-z][a-z0-9_-]*$"
+              },
+              "minItems": 0,
+              "maxItems": 100
+            },
+            "display": {
+              "enum": [
+                "text",
+                "list",
+                "icons"
+              ]
+            }
+          },
+          "required": [
+            "id",
+            "type",
+            "style",
+            "skillIds",
+            "display"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 70,
+              "pattern": "^[a-z][a-z0-9_-]*$"
+            },
+            "type": {
+              "const": "timeline"
+            },
+            "style": {
+              "$ref": "#/$defs/style"
+            },
+            "collection": {
+              "enum": [
+                "experience",
+                "education"
+              ]
+            },
+            "itemIds": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 3,
+                "maxLength": 70,
+                "pattern": "^[a-z][a-z0-9_-]*$"
+              },
+              "minItems": 0,
+              "maxItems": 60
+            }
+          },
+          "required": [
+            "id",
+            "type",
+            "style",
+            "collection",
+            "itemIds"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 70,
+              "pattern": "^[a-z][a-z0-9_-]*$"
+            },
+            "type": {
+              "const": "media"
+            },
+            "style": {
+              "$ref": "#/$defs/style"
+            },
+            "assetId": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 70,
+              "pattern": "^[a-z][a-z0-9_-]*$"
+            },
+            "caption": {
+              "type": "string",
+              "minLength": 0,
+              "maxLength": 500
+            },
+            "fit": {
+              "enum": [
+                "contain",
+                "cover"
+              ]
+            }
+          },
+          "required": [
+            "id",
+            "type",
+            "style",
+            "assetId",
+            "caption",
+            "fit"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 70,
+              "pattern": "^[a-z][a-z0-9_-]*$"
+            },
+            "type": {
+              "const": "links"
+            },
+            "style": {
+              "$ref": "#/$defs/style"
+            },
+            "linkIds": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 3,
+                "maxLength": 70,
+                "pattern": "^[a-z][a-z0-9_-]*$"
+              },
+              "minItems": 0,
+              "maxItems": 32
+            }
+          },
+          "required": [
+            "id",
+            "type",
+            "style",
+            "linkIds"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 70,
+              "pattern": "^[a-z][a-z0-9_-]*$"
+            },
+            "type": {
+              "const": "divider"
+            },
+            "style": {
+              "$ref": "#/$defs/style"
+            },
+            "weight": {
+              "enum": [
+                "hairline",
+                "rule",
+                "space"
+              ]
+            }
+          },
+          "required": [
+            "id",
+            "type",
+            "style",
+            "weight"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 70,
+              "pattern": "^[a-z][a-z0-9_-]*$"
+            },
+            "type": {
+              "const": "code"
+            },
+            "style": {
+              "$ref": "#/$defs/style"
+            },
+            "language": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 50
+            },
+            "source": {
+              "type": "string",
+              "minLength": 0,
+              "maxLength": 12000
+            },
+            "caption": {
+              "type": "string",
+              "minLength": 0,
+              "maxLength": 350
+            }
+          },
+          "required": [
+            "id",
+            "type",
+            "style",
+            "language",
+            "source",
+            "caption"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 70,
+              "pattern": "^[a-z][a-z0-9_-]*$"
+            },
+            "type": {
+              "const": "embed"
+            },
+            "style": {
+              "$ref": "#/$defs/style"
+            },
+            "url": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 2048,
+              "pattern": "^https://[^\\s<>]*$"
+            },
+            "title": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 180
+            },
+            "fallbackText": {
+              "type": "string",
+              "minLength": 0,
+              "maxLength": 600
+            },
+            "requiresConsent": {
+              "const": true
+            }
+          },
+          "required": [
+            "id",
+            "type",
+            "style",
+            "url",
+            "title",
+            "fallbackText",
+            "requiresConsent"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 70,
+              "pattern": "^[a-z][a-z0-9_-]*$"
+            },
+            "type": {
+              "const": "group"
+            },
+            "style": {
+              "$ref": "#/$defs/style"
+            },
+            "layout": {
+              "enum": [
+                "stack",
+                "columns",
+                "split"
+              ]
+            },
+            "columns": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 3
+            },
+            "children": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/block"
+              },
+              "minItems": 1,
+              "maxItems": 30
+            }
+          },
+          "required": [
+            "id",
+            "type",
+            "style",
+            "layout",
+            "columns",
+            "children"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    }
+  }
+}
