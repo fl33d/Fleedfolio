@@ -187,7 +187,12 @@ export function safeImage(raw: unknown): string {
 /** A plain, single email address only: never accept headers, queries or URL schemes. */
 export function mailtoHref(raw: string): string | undefined {
   const value = raw.trim()
-  if (value.length > 200 || !/^[^\\s@%?#/\\\\:;,<>]+@[^\\s@%?#/\\\\:;,<>]+\\.[^\\s@%?#/\\\\:;,<>]+$/.test(value)) {
+  if (
+    value.length > 200 ||
+    !/^[^\s@%?#:;,<>]+@[^\s@%?#:;,<>]+\.[^\s@%?#:;,<>]+$/.test(value) ||
+    value.includes('/') ||
+    value.includes('\\')
+  ) {
     return undefined
   }
   return 'mailto:' + value
