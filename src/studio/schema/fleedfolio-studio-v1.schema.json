@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://fleed.online/schemas/fleedfolio-studio-v1.json",
   "title": "Fleedfolio Studio Portable Document v1 (proposal)",
-  "description": "Public portable content + appearance. Never contains publishing tokens, sessions or domain secrets. Schema v1 is NEW and distinct from legacy backup version 1. Drafts may have empty titles/names; publishing must run additional publishability validation. Achievements are an additive optional Studio v1 content collection; older v1 backups without achievements remain valid. Achievement evidence is a creator-supplied HTTPS link, not platform verification.",
+  "description": "Public portable content + appearance. Never contains publishing tokens, sessions or domain secrets. Schema v1 is NEW and distinct from legacy backup version 1. Drafts may have empty titles/names; publishing must run additional publishability validation. Achievements are an additive optional Studio v1 content collection; older v1 backups without achievements remain valid. Achievement evidence is a creator-supplied HTTPS link, not platform verification. A GitHub achievement is a creator-asserted profile badge, not a verified or API-synced credential.",
   "type": "object",
   "properties": {
     "format": {
@@ -1484,6 +1484,7 @@
             "competition",
             "milestone",
             "publication",
+            "github",
             "other"
           ]
         },
