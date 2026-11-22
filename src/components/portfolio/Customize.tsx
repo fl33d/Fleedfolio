@@ -16,6 +16,7 @@ import {
 } from '@/lib/portfolio'
 import { cn } from '@/lib/utils'
 import { createPortfolioBackup, parsePortfolioBackup } from '@/lib/portfolio-backup.ts'
+import { normalizeCustomSlug } from '@/lib/portfolio-slug'
 
 const SECTIONS: { key: SectionKey; label: string }[] = [
   { key: 'skills', label: 'Skills ticker' },
@@ -30,10 +31,14 @@ export function Customize({
   data,
   onChange,
   onImport,
+  customSlug,
+  onSlugChange,
 }: {
   data: Portfolio
   onChange: (fn: (d: Portfolio) => Portfolio) => void
   onImport: (draft: Portfolio) => boolean
+  customSlug: string
+  onSlugChange: (slug: string) => void
 }) {
   const [open, setOpen] = useState(false)
   const root = useRef<HTMLDivElement>(null)
@@ -224,6 +229,32 @@ export function Customize({
                 onChange={() => setTheme('motion', !theme.motion)}
               />
             </div>
+          </Group>
+
+          <Group title="Your link">
+            <label className="cz-slug-label" htmlFor="fleedfolio-custom-link">
+              Personal URL <span>optional</span>
+            </label>
+            <div className="cz-slug-row">
+              <span>fleed.online/p/</span>
+              <input
+                id="fleedfolio-custom-link"
+                type="text"
+                autoComplete="off"
+                spellCheck={false}
+                maxLength={30}
+                value={customSlug}
+                placeholder="yourname"
+                onChange={(event) => onSlugChange(event.target.value.toLowerCase())}
+                aria-describedby="fleedfolio-slug-help"
+                aria-invalid={Boolean(customSlug.trim() && !normalizeCustomSlug(customSlug))}
+              />
+            </div>
+            <p id="fleedfolio-slug-help" className="cz-slug-help">
+              {customSlug.trim() && !normalizeCustomSlug(customSlug)
+                ? 'Use 3–30 letters, numbers or single hyphens; some names are reserved.'
+                : 'Saved when you publish. Blank uses a generated link. Changing your name retires the previous custom URL.'}
+            </p>
           </Group>
 
           <Group title="Your work">

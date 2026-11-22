@@ -5,10 +5,10 @@ import { loadPortfolio, savePortfolio } from './portfolio.server'
 
 export const publishPortfolio = createServerFn({ method: 'POST' })
   .inputValidator(
-    (data: { id?: string; token?: string; portfolio: unknown }) => data,
+    (data: { id?: string; token?: string; slug?: string; portfolio: unknown }) => data,
   )
   .handler(({ data }) =>
-    savePortfolio(normalizePortfolio(data.portfolio), data.id, data.token),
+    savePortfolio(normalizePortfolio(data.portfolio), data.id, data.token, data.slug),
   )
 
 export const getPortfolio = createServerFn({ method: 'GET' })

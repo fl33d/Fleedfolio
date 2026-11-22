@@ -8,7 +8,7 @@ Fleedfolio is a browser-based editor with a small server-side publishing layer. 
 2. Changes update React state and are saved under the legacy `blank:draft` localStorage key. That key must remain compatible with existing drafts.
 3. **Customise → Your work** exports the draft as versioned JSON, without publishing credentials. An imported backup restores content only.
 4. **Publish / Update** calls `publishPortfolio` in `src/server/portfolio.functions.ts`.
-5. `src/server/portfolio.server.ts` validates publishing credentials and writes published JSON to the existing D1 table `portfolios`.
+5. `src/server/portfolio.server.ts` validates publishing credentials and writes published JSON to the existing D1 table `portfolios`. Optional personal links are mapped to the same portfolio ID by the `portfolio_slugs` table added in migration 0002; names are unique and validated.
 6. Visitors open `/p/{id}`; the route loads and normalizes the stored portfolio, then renders the same `Portfolio` component in read-only mode.
 
 ## Storage and trust boundaries
@@ -36,6 +36,8 @@ Only the server accesses D1 through the `fleed_portfolios` binding. Incoming por
 - `src/components/portfolio/Customize.tsx`: theme, section and backup controls.
 - `src/lib/portfolio.ts`: types, defaults, normalization and URL helpers.
 - `src/lib/portfolio-backup.ts`: portable, versioned JSON backup format.
+- `src/lib/portfolio-slug.ts`: custom link format, normalization and reserved names.
+- `migrations/0002_portfolio_slugs.sql`: personal-link aliases, pending a deliberate production migration.
 - `src/server/portfolio.functions.ts`: typed server function boundary.
 - `src/server/portfolio.server.ts`: D1 reads and writes.
 - `wrangler.jsonc`: Worker configuration and the existing database binding.

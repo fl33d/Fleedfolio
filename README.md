@@ -14,7 +14,7 @@ Fleedfolio is an open-source portfolio editor built with React, TanStack Start a
 
 - Write directly into the page; locally saved drafts survive a normal refresh.
 - Switch between editing and a visitor preview.
-- Publish to a public `/p/{id}` URL, and update it again using the edit credential retained in the original browser.
+- Publish to `/p/{id}` or claim an optional personal address like `/p/yourname` (after the D1 slug migration), using an edit credential retained in the original browser.
 - Add projects, experience, links, skills and custom sections.
 - Choose from five page palettes, three typefaces, accents and motion settings.
 - **Export/import JSON backups** from **Customise → Your work**, so you can move a draft between browsers or recover it after clearing local data.
@@ -24,6 +24,7 @@ Fleedfolio is an open-source portfolio editor built with React, TanStack Start a
 
 - **No accounts or cross-device sync.** Drafts and publishing credentials live in that browser. Export a backup before resetting the browser or switching devices.
 - Importing a backup restores the *draft*, not an edit credential. Publishing after importing creates a new public link.
+- A chosen personal URL must be unique. Renaming it retires the old custom URL; the original generated `/p/{id}` link continues working.
 - Image uploads are currently disabled; `/api/upload` returns 503 and `/img/:key` is unavailable. Image hosting is not advertised as a working feature.
 - The public portfolio is stored in Cloudflare D1. Do not delete the existing database during a GitHub repository or domain migration.
 
