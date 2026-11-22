@@ -1,4 +1,4 @@
-import { useEffect, useState, type CSSProperties, type MouseEvent, type ReactNode } from 'react'
+import { useEffect, type CSSProperties, type MouseEvent, type ReactNode } from 'react'
 import { useLocation } from '@tanstack/react-router'
 import { ArrowDown, ArrowUp, ArrowUpRight, Plus, X } from 'lucide-react'
 
