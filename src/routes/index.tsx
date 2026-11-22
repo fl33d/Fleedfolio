@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { CircleHelp, Eye, PenLine, RotateCcw, Send } from 'lucide-react'
+import { CircleHelp, Eye, FileText, PenLine, RotateCcw, Send } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { Customize } from '@/components/portfolio/Customize'
 import { ShareDialog } from '@/components/portfolio/ShareDialog'
 import { Walkthrough } from '@/components/portfolio/Walkthrough'
 import { Portfolio } from '@/components/portfolio/Portfolio'
+import { CvView } from '@/components/portfolio/CvView'
 import { Backdrop, ScrollProgress } from '@/components/portfolio/effects'
 import {
   blankPortfolio,
@@ -16,7 +17,7 @@ import {
 } from '@/lib/portfolio'
 import { publishPortfolio } from '@/server/portfolio.functions'
 import { cn } from '@/lib/utils'
-import { normalizeCustomSlug } from '@/lib/portfolio-slug'
+import { normalizeCustomSlug, portfolioPublicPath } from '@/lib/portfolio-slug'
 
 export const Route = createFileRoute('/')({
   component: Editor,
@@ -33,6 +34,7 @@ type Published = { id: string; token: string; slug?: string }
 function Editor() {
   const [data, setData] = useState<PortfolioData>(blankPortfolio)
   const [editing, setEditing] = useState(true)
+  const [cvOpen, setCvOpen] = useState(false)
   const [published, setPublished] = useState<Published | null>(null)
   const [customSlug, setCustomSlug] = useState('')
   const [publishing, setPublishing] = useState(false)
@@ -103,6 +105,7 @@ function Editor() {
   }, [customSlug])
 
   const switchMode = (next: boolean) => {
+    setCvOpen(false)
     setEditing(next)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
@@ -154,6 +157,7 @@ function Editor() {
     } catch {
       // Import still works if browser storage is unavailable.
     }
+    setCvOpen(false)
     setEditing(true)
     return true
   }
@@ -172,30 +176,52 @@ function Editor() {
     switchMode(true)
   }
 
+  const publicUrl = published && typeof window !== 'undefined'
+    ? window.location.origin + portfolioPublicPath(published.id, published.slug)
+    : undefined
+
   return (
-    <div className={cn('app', editing ? 'mode-edit' : 'mode-view')} {...themeProps(data)}>
-      {!editing && data.theme.backdrop && <Backdrop />}
+    <div className={cn('app', cvOpen ? 'mode-cv' : editing ? 'mode-edit' : 'mode-view')} {...themeProps(data)}>
+      {!cvOpen && !editing && data.theme.backdrop && <Backdrop />}
       <ScrollProgress />
 
-      <div key={editing ? 'edit' : 'view'} className="mode-swap">
-        <Portfolio data={data} editing={editing} onChange={setData} />
-      </div>
+      {cvOpen ? (
+        <CvView data={data} publicUrl={publicUrl} onBack={() => setCvOpen(false)} />
+      ) : (
+        <div key={editing ? 'edit' : 'view'} className="mode-swap">
+          <Portfolio data={data} editing={editing} onChange={setData} />
+        </div>
+      )}
 
       {/* Floating dock */}
       <div className="dock chrome">
         <div className="dock-toggle" role="group" aria-label="Editor mode">
           <span className={cn('dock-toggle-pill', !editing && 'is-right')} />
-          <button type="button" aria-pressed={editing} onClick={() => switchMode(true)}>
+          <button type="button" aria-pressed={editing && !cvOpen} onClick={() => switchMode(true)}>
             <PenLine className="size-4" /> Edit
           </button>
-          <button type="button" aria-pressed={!editing} onClick={() => switchMode(false)}>
+          <button type="button" aria-pressed={!editing && !cvOpen} onClick={() => switchMode(false)}>
             <Eye className="size-4" /> Preview
           </button>
         </div>
 
         <span className="dock-sep" />
 
-        <Customize data={data} onChange={setData} onImport={importDraft} customSlug={customSlug} onSlugChange={setCustomSlug} />
+        {!cvOpen && (
+          <Customize data={data} onChange={setData} onImport={importDraft} customSlug={customSlug} onSlugChange={setCustomSlug} />
+        )}
+
+        <button
+          type="button"
+          className={cn('dock-icon', 'dock-cv', cvOpen && 'is-active')}
+          aria-label={cvOpen ? 'Return from CV view' : 'Preview CV'}
+          aria-pressed={cvOpen}
+          title="CV / résumé"
+          onClick={() => setCvOpen((value) => !value)}
+        >
+          <FileText className="size-4" />
+          <span>CV</span>
+        </button>
 
         <button className="dock-icon" onClick={() => setTourOpen(true)} aria-label="How to use Fleedfolio" title="How it works">
           <CircleHelp className="size-4" />

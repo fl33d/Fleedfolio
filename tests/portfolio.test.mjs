@@ -4,6 +4,7 @@ import assert from 'node:assert/strict'
 import { blankPortfolio, mailtoHref, normalizePortfolio, safeImage, safeUrl } from '../src/lib/portfolio.ts'
 import { createPortfolioBackup, parsePortfolioBackup } from '../src/lib/portfolio-backup.ts'
 import { normalizeCustomSlug, portfolioPublicPath } from '../src/lib/portfolio-slug.ts'
+import { portfolioCvText } from '../src/lib/cv.ts'
 
 test('safeUrl rejects executable or unsupported protocols', () => {
   for (const value of ['javascript:alert(1)', 'data:text/html,x', 'vbscript:msgbox(1)', 'file:///etc/passwd']) {
@@ -100,4 +101,22 @@ test('education entries survive normalization while older portfolios remain comp
   assert.equal(updated.education.length, 1)
   assert.equal(updated.education[0].qualification, 'GCSE Computer Science')
   assert.equal(updated.education[0].institution, 'Example School')
+})
+
+test('CV text exports education, experience and valid links without invented details', () => {
+  const data = blankPortfolio()
+  data.name = 'Test Candidate'
+  data.role = 'Developer'
+  data.education = [{ id: 'one', qualification: 'Computer Science', institution: 'Example School', period: '2024–2026' }]
+  data.experience = [{ id: 'two', role: 'Volunteer', company: 'Library', period: 'Summer 2025' }]
+  data.projects = [{ id: 'three', title: 'My App', description: 'Built a website', year: '2026', link: 'https://example.com/app', image: '' }]
+  data.socials = [{ id: 'four', label: 'GitHub', url: 'javascript:alert(1)' }]
+  const text = portfolioCvText(data, 'https://example.com/@test')
+  assert.match(text, /EDUCATION/)
+  assert.match(text, /Computer Science \| Example School \| 2024–2026/)
+  assert.match(text, /EXPERIENCE/)
+  assert.match(text, /Volunteer \| Library/)
+  assert.match(text, /https:\/\/example\.com\/app/)
+  assert.doesNotMatch(text, /javascript:/)
+  assert.doesNotMatch(text, /No experience/)
 })

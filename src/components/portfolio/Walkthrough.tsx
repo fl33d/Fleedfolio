@@ -4,6 +4,7 @@ import {
   ArrowRight,
   Check,
   Download,
+  FileText,
   Eye,
   MousePointer2,
   Send,
@@ -45,6 +46,12 @@ const STEPS: { title: string; description: string; example: string; icon: Lucide
     icon: Send,
   },
   {
+    title: 'Prepare your CV.',
+    description: 'Add education, experience, projects and skills to the portfolio. Open CV from the dock to preview a clean résumé you can print or save as a PDF.',
+    example: 'CV → Print / Save PDF',
+    icon: FileText,
+  },
+  {
     title: 'Keep a copy of your work.',
     description: 'Your draft saves in this browser. Export a JSON backup from Customise so you can recover your content or move it to another device.',
     example: 'Customise → Your work → Export backup',
@@ -70,7 +77,7 @@ export function Walkthrough({ open, onClose }: { open: boolean; onClose: () => v
           <span>Get to know Fleedfolio</span>
           <span>{String(stepIndex + 1).padStart(2, '0')} / {String(STEPS.length).padStart(2, '0')}</span>
         </div>
-        <div className="tour-progress" aria-label={`Step ${stepIndex + 1} of ${STEPS.length}`}>
+        <div className="tour-progress" style={{ gridTemplateColumns: `repeat(${STEPS.length}, 1fr)` }} aria-label={`Step ${stepIndex + 1} of ${STEPS.length}`}>
           {STEPS.map((item, index) => (
             <span key={item.title} className={index <= stepIndex ? 'is-complete' : undefined} />
           ))}
