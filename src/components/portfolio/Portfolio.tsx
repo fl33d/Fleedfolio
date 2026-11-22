@@ -18,6 +18,8 @@ import { cn } from '@/lib/utils'
 import { Field } from './Field'
 import { ImageSlot } from './ImageSlot'
 import { SkillAutocomplete } from './SkillAutocomplete'
+import { SkillMark } from './SkillMark'
+import { findCatalogSkill } from '@/lib/skill-catalog'
 import { Reveal } from './effects'
 
 type Props = {
@@ -81,6 +83,9 @@ export function Portfolio({ data, editing, onChange, onOpenCommands }: Props) {
     if (location.hash) history.replaceState(history.state, '', location.pathname + location.search)
   }, [])
 
+  const identityMode = data.theme.identityMode ?? 'wordmark'
+  const skillDisplay = data.theme.skillDisplay ?? 'text'
+
   let section = 0
   const nextNumber = () => String(++section).padStart(2, '0')
 
@@ -94,13 +99,19 @@ export function Portfolio({ data, editing, onChange, onOpenCommands }: Props) {
       style={{ '--accent-c': data.accent } as CSSProperties}
     >
       <header className="pf-nav">
-        <ScrollLink to="top" className="pf-identity" aria-label="Back to top">
-          {editing ? (
-            <span className="pf-identity-brand">fleed<span aria-hidden="true">.</span></span>
-          ) : (
-            <span className="pf-identity-name">{data.name.trim() || 'Portfolio'}</span>
-          )}
-        </ScrollLink>
+        {(editing || identityMode !== 'none') && (
+          <ScrollLink to="top" className="pf-identity" aria-label="Back to top">
+            {editing ? (
+              <span className="pf-identity-brand">fleed<span aria-hidden="true">.</span></span>
+            ) : identityMode === 'photo' && data.photo ? (
+              <img className="pf-identity-photo" src={data.photo} alt="" width={44} height={44}/>
+            ) : identityMode === 'wordmark' ? (
+              <span className="pf-identity-name">{data.identityText.trim() || data.name.trim() || 'Portfolio'}</span>
+            ) : (
+              <span className="pf-identity-mark" aria-hidden="true">{data.name.trim().slice(0, 1).toUpperCase() || 'F'}</span>
+            )}
+          </ScrollLink>
+        )}
         <nav className="pf-main-nav" aria-label="Portfolio sections">
           {nav.map((item) => (
             <ScrollLink key={item.id} to={item.id} className="pf-nav-link">
@@ -224,10 +235,17 @@ export function Portfolio({ data, editing, onChange, onOpenCommands }: Props) {
         ) : data.skills.length > 0 ? (
           <section className="pf-skills" aria-label="Skills">
             <span className="pf-skills-heading">Skills & tools</span>
-            <div className="pf-skills-list">
-              {data.skills.map((skill, index) => (
-                <span key={`${skill}-${index}`}>{skill}</span>
-              ))}
+            <div className="pf-skills-list" data-skill-display={skillDisplay}>
+              {data.skills.map((skill, index) => {
+                const known = findCatalogSkill(skill)
+                const display = skillDisplay
+                const showMark = display !== 'text'
+                const showText = display !== 'icons' || !known?.icon
+                return <span key={`${skill}-${index}`} className="pf-skill-item" aria-label={skill}>
+                  {showMark && <SkillMark name={skill} size={19}/>}
+                  {showText ? <span className="pf-skill-name">{skill}</span> : <span className="sr-only">{skill}</span>}
+                </span>
+              })}
             </div>
           </section>
         ) : null

@@ -28,6 +28,45 @@ export const SKILLS: readonly CatalogSkill[] = [
   dev('Cloudflare', 'cloudflare/cloudflare-original.svg'),
   dev('Next.js', 'nextjs/nextjs-original.svg'),
   dev('PostgreSQL', 'postgresql/postgresql-original.svg'),
+  dev('Go', 'go/go-original.svg'),
+  dev('Rust', 'rust/rust-original.svg'),
+  dev('Java', 'java/java-original.svg'),
+  dev('C', 'c/c-original.svg'),
+  dev('C++', 'cplusplus/cplusplus-original.svg'),
+  dev('C#', 'csharp/csharp-original.svg'),
+  dev('PHP', 'php/php-original.svg'),
+  dev('Ruby', 'ruby/ruby-original.svg'),
+  dev('Swift', 'swift/swift-original.svg'),
+  dev('Kotlin', 'kotlin/kotlin-original.svg'),
+  dev('Dart', 'dart/dart-original.svg'),
+  dev('Bash', 'bash/bash-original.svg'),
+  dev('PowerShell', 'powershell/powershell-original.svg'),
+  dev('SQL', 'azuresqldatabase/azuresqldatabase-original.svg'),
+  dev('Vue', 'vuejs/vuejs-original.svg'),
+  dev('Svelte', 'svelte/svelte-original.svg'),
+  dev('Angular', 'angular/angular-original.svg'),
+  dev('Astro', 'astro/astro-original.svg'),
+  dev('Tailwind CSS', 'tailwindcss/tailwindcss-original.svg'),
+  dev('GitLab', 'gitlab/gitlab-original.svg'),
+  dev('Terraform', 'terraform/terraform-original.svg'),
+  dev('Redis', 'redis/redis-original.svg'),
+  dev('MongoDB', 'mongodb/mongodb-original.svg'),
+  dev('MySQL', 'mysql/mysql-original.svg'),
+  dev('SQLite', 'sqlite/sqlite-original.svg'),
+  dev('AWS', 'amazonwebservices/amazonwebservices-original-wordmark.svg'),
+  dev('Azure', 'azure/azure-original.svg'),
+  dev('Google Cloud', 'googlecloud/googlecloud-original.svg'),
+  dev('Supabase', 'supabase/supabase-original.svg'),
+  dev('Vercel', 'vercel/vercel-original.svg'),
+  dev('Nginx', 'nginx/nginx-original.svg'),
+  dev('Express', 'express/express-original.svg'),
+  dev('FastAPI', 'fastapi/fastapi-original.svg'),
+  dev('Flask', 'flask/flask-original.svg'),
+  dev('Django', 'django/django-plain.svg'),
+  dev('PyTorch', 'pytorch/pytorch-original.svg'),
+  dev('Pandas', 'pandas/pandas-original.svg'),
+  dev('NumPy', 'numpy/numpy-original.svg'),
+  dev('Linux Arch', 'archlinux/archlinux-original.svg'),
   art('Figma', 'figma/figma-original.svg'),
   art('Blender', 'blender/blender-original.svg'),
   art('Photoshop', 'photoshop/photoshop-original.svg'),
@@ -50,4 +89,10 @@ export function suggestSkills(input: string, selected: readonly string[], limit 
       a.name.length - b.name.length || a.name.localeCompare(b.name),
     )
     .slice(0, limit)
+}
+
+/** Match known technology names without treating arbitrary user text as an image URL. */
+export function findCatalogSkill(name: string): CatalogSkill | undefined {
+  const normalized = name.trim().toLowerCase()
+  return SKILLS.find(skill => skill.name.toLowerCase() === normalized)
 }

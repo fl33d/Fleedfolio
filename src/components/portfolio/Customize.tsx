@@ -128,7 +128,7 @@ export function Customize({
       </button>
 
       {open && (
-        <div className="cz-panel" role="dialog" aria-label="Customise">
+        <div className="cz-panel" role="dialog" aria-modal={false} aria-label="Customise portfolio">
           <Group title="Design library">
             <p className="cz-group-intro">Five distinct compositions. Your words stay put while the design changes.</p>
             <div className="cz-designs" aria-label="Choose a design">
@@ -186,6 +186,45 @@ export function Customize({
               ))}
             </div>
           </Group>
+          <Group title="Header identity">
+            <p className="cz-group-intro">Choose what appears at the top left of the visitor's portfolio. This never changes your name or profile information.</p>
+            <div className="cz-identity-options" role="group" aria-label="Visitor header identity">
+              {([
+                ['initial','Initial'],
+                ['wordmark','Wordmark'],
+                ['photo','Photo'],
+                ['none','Hidden'],
+              ] as const).map(([value,label])=>(
+                <button type="button" key={value} className={cn('cz-identity-option',theme.identityMode === value && 'is-active')}
+                  aria-pressed={theme.identityMode === value} onClick={() => setTheme('identityMode',value)}>
+                  {label}
+                </button>
+              ))}
+            </div>
+            {theme.identityMode === 'wordmark' && <label className="cz-editor-label">Custom wordmark
+              <input type="text" value={data.identityText} placeholder={data.name || 'Your name'} maxLength={60}
+                onChange={event => onChange(previous => ({ ...previous, identityText:event.target.value }))}/>
+            </label>}
+            {theme.identityMode === 'photo' && <p className="cz-group-intro">
+              {data.photo ? 'Your existing profile photo will appear here.' : 'No profile photo is saved yet. The header shows your initial until image uploads are available.'}
+            </p>}
+          </Group>
+          <Group title="Skill appearance">
+            <p className="cz-group-intro">Show skill names, recognised technology logos, or both. Unknown skills always stay readable.</p>
+            <div className="cz-skill-display" role="group" aria-label="Skill appearance">
+              {([
+                ['text','Names'],
+                ['both','Logo + name'],
+                ['icons','Logos'],
+              ] as const).map(([value,label])=>(
+                <button type="button" key={value} className={cn(theme.skillDisplay === value && 'is-active')}
+                  aria-pressed={theme.skillDisplay === value} onClick={() => setTheme('skillDisplay',value)}>
+                  {label}
+                </button>
+              ))}
+            </div>
+          </Group>
+
           <Group title="Tone">
             <div className="cz-palettes">
               {(Object.keys(PALETTES) as PaletteKey[]).map((key) => {
