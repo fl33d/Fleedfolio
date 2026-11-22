@@ -87,3 +87,17 @@ test('new portfolios start with a calm presentation rather than a decorative bac
   assert.equal(blank.theme.backdrop, false)
   assert.equal(blank.labels.ctaBottom, 'Get in touch.')
 })
+
+test('education entries survive normalization while older portfolios remain compatible', () => {
+  const old = blankPortfolio()
+  delete old.education
+  const normalizedOld = normalizePortfolio(old)
+  assert.deepEqual(normalizedOld.education, [])
+  const updated = normalizePortfolio({
+    ...old,
+    education: [{ id: 'gcse', qualification: 'GCSE Computer Science', institution: 'Example School', period: '2024–2026' }],
+  })
+  assert.equal(updated.education.length, 1)
+  assert.equal(updated.education[0].qualification, 'GCSE Computer Science')
+  assert.equal(updated.education[0].institution, 'Example School')
+})

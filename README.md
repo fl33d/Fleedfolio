@@ -17,7 +17,7 @@ Fleedfolio is an open-source portfolio editor built with React, TanStack Start a
 - **Beginner walkthrough:** A five-step first-use guide explains editing, Customise, Preview, publishing and backups. Reopen it any time using the help icon in the editor dock.
 - **Editable share address:** Rename your personal `/@username` directly in the published-link dialog, with validation and a save button. No need to hunt through settings.
 - Publish to `/p/{id}` or claim an optional personal address like `/@yourname` (using the existing D1 table, with no schema migration), using an edit credential retained in the original browser.
-- Add projects, experience, links, skills and custom sections.
+- Add projects, experience, **education**, links, skills and custom sections.
 - Choose from five page palettes, three typefaces, accents and motion settings.
 - **Export/import JSON backups** from **Customise → Your work**, so you can move a draft between browsers or recover it after clearing local data.
 - Reduced-motion support, accessible form controls and responsive layouts.

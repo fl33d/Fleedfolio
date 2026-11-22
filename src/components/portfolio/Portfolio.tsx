@@ -5,6 +5,7 @@ import { ArrowUpRight, Plus, X } from 'lucide-react'
 import {
   emptyCustomSection,
   emptyExperience,
+  emptyEducation,
   emptyProject,
   emptySocial,
   safeUrl,
@@ -27,7 +28,7 @@ export function Portfolio({ data, editing, onChange }: Props) {
   const set = <K extends keyof PortfolioData>(key: K, value: PortfolioData[K]) =>
     onChange?.({ ...data, [key]: value })
 
-  type ListKey = 'projects' | 'experience' | 'socials' | 'extras'
+  type ListKey = 'projects' | 'experience' | 'education' | 'socials' | 'extras'
 
   const updateItem = <K extends ListKey>(
     key: K,
@@ -46,6 +47,7 @@ export function Portfolio({ data, editing, onChange }: Props) {
 
   const projects = editing ? data.projects : data.projects.filter((p) => p.title || p.description)
   const experience = editing ? data.experience : data.experience.filter((e) => e.role || e.company)
+  const education = editing ? data.education : data.education.filter((e) => e.qualification || e.institution)
   const socials = editing ? data.socials : data.socials.filter((s) => s.label && safeUrl(s.url))
   const extras = editing ? data.extras : data.extras.filter((x) => x.title || x.body || x.image)
   const shown = (key: PortfolioData['hidden'][number]) => !data.hidden.includes(key)
@@ -64,12 +66,14 @@ export function Portfolio({ data, editing, onChange }: Props) {
   const showAbout = shown('about') && (editing || !!data.about || !!data.aboutImage)
   const showWork = shown('work') && (editing || projects.length > 0)
   const showExperience = shown('experience') && (editing || experience.length > 0)
+  const showEducation = shown('education') && (editing || education.length > 0)
   const showContact = shown('contact') && (editing || hasContact)
 
   const nav = [
     { id: 'about', label: labels.about || 'About', show: showAbout },
     { id: 'work', label: labels.work || 'Work', show: showWork },
     { id: 'experience', label: labels.experience || 'Experience', show: showExperience },
+    { id: 'education', label: labels.education || 'Education', show: showEducation },
     { id: 'contact', label: labels.contact || 'Contact', show: showContact },
   ].filter((n) => n.show)
 
@@ -422,6 +426,61 @@ export function Portfolio({ data, editing, onChange }: Props) {
             >
               Add experience
             </AddButton>
+          )}
+        </Section>
+      ) : null}
+
+      {/* Education: reusable on the portfolio and in printable CV mode. */}
+      {showEducation ? (
+        <Section
+          id="education"
+          number={nextNumber()}
+          title={labels.education}
+          editing={editing}
+          onTitle={(value) => setLabel('education', value)}
+        >
+          <ul className="pf-timeline">
+            {education.map((entry, index) => (
+              <Reveal key={entry.id} as="li" delay={index * 80} className="pf-row">
+                <div className="pf-row-role">
+                  {editing ? (
+                    <Field
+                      value={entry.qualification}
+                      onChange={(value) => updateItem('education', entry.id, { qualification: value })}
+                      placeholder="Qualification or course"
+                      maxLength={120}
+                    />
+                  ) : entry.qualification}
+                </div>
+                <div className="pf-row-company">
+                  {editing ? (
+                    <Field
+                      value={entry.institution}
+                      onChange={(value) => updateItem('education', entry.id, { institution: value })}
+                      placeholder="School or institution"
+                      maxLength={120}
+                    />
+                  ) : entry.institution}
+                </div>
+                <div className="pf-row-period">
+                  {editing ? (
+                    <Field
+                      value={entry.period}
+                      onChange={(value) => updateItem('education', entry.id, { period: value })}
+                      placeholder="Years"
+                      maxLength={60}
+                    />
+                  ) : entry.period}
+                </div>
+                {editing && <RemoveButton onClick={() => removeItem('education', entry.id)} />}
+              </Reveal>
+            ))}
+          </ul>
+          {editing && data.education.length < 24 && (
+            <AddButton
+              className="pf-add-inline"
+              onClick={() => set('education', [...data.education, emptyEducation()])}
+            >Add education</AddButton>
           )}
         </Section>
       ) : null}

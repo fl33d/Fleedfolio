@@ -16,6 +16,14 @@ export type Experience = {
   period: string
 }
 
+/** Education is optional and not fabricated from a user's profile. */
+export type Education = {
+  id: string
+  qualification: string
+  institution: string
+  period: string
+}
+
 export type SocialLink = {
   id: string
   label: string
@@ -55,13 +63,14 @@ export type Theme = {
   backdrop: boolean
 }
 
-export type SectionKey = 'skills' | 'about' | 'work' | 'experience' | 'contact'
+export type SectionKey = 'skills' | 'about' | 'work' | 'experience' | 'education' | 'contact'
 
 /** Headings the writer can rename. */
 export type Labels = {
   about: string
   work: string
   experience: string
+  education: string
   contact: string
   ctaTop: string
   ctaBottom: string
@@ -71,6 +80,7 @@ export const DEFAULT_LABELS: Labels = {
   about: 'About',
   work: 'Selected work',
   experience: 'Experience',
+  education: 'Education',
   contact: 'Contact',
   ctaTop: 'Have a question?',
   ctaBottom: 'Get in touch.',
@@ -96,6 +106,7 @@ export type Portfolio = {
   skills: string[]
   projects: Project[]
   experience: Experience[]
+  education: Education[]
   email: string
   socials: SocialLink[]
   extras: CustomSection[]
@@ -156,6 +167,13 @@ export const emptyExperience = (): Experience => ({
   period: '',
 })
 
+export const emptyEducation = (): Education => ({
+  id: uid(),
+  qualification: '',
+  institution: '',
+  period: '',
+})
+
 export const emptySocial = (): SocialLink => ({ id: uid(), label: '', url: '' })
 
 export const blankPortfolio = (): Portfolio => ({
@@ -169,6 +187,7 @@ export const blankPortfolio = (): Portfolio => ({
   skills: [],
   projects: [emptyProject()],
   experience: [emptyExperience()],
+  education: [emptyEducation()],
   email: '',
   socials: [emptySocial()],
   extras: [],
@@ -216,7 +235,7 @@ const pick = <T extends string>(v: unknown, options: readonly T[], fallback: T):
   options.includes(v as T) ? (v as T) : fallback
 const label = (v: unknown, max: number, fallback: string) =>
   typeof v === 'string' ? v.slice(0, max) : fallback
-const SECTION_KEYS: SectionKey[] = ['skills', 'about', 'work', 'experience', 'contact']
+const SECTION_KEYS: SectionKey[] = ['skills', 'about', 'work', 'experience', 'education', 'contact']
 
 const list = <T,>(v: unknown, max: number, map: (item: any) => T): T[] =>
   Array.isArray(v) ? v.slice(0, max).map(map) : []
@@ -249,6 +268,12 @@ export function normalizePortfolio(input: any): Portfolio {
       company: str(x?.company, 120),
       period: str(x?.period, 60),
     })),
+    education: list(p.education, 24, (x) => ({
+      id: str(x?.id, 20) || uid(),
+      qualification: str(x?.qualification, 120),
+      institution: str(x?.institution, 120),
+      period: str(x?.period, 60),
+    })),
     email: str(p.email, 200),
     socials: list(p.socials, 12, (x) => ({
       id: str(x?.id, 20) || uid(),
@@ -275,11 +300,12 @@ export function normalizePortfolio(input: any): Portfolio {
       about: label(l.about, 60, DEFAULT_LABELS.about),
       work: label(l.work, 60, DEFAULT_LABELS.work),
       experience: label(l.experience, 60, DEFAULT_LABELS.experience),
+      education: label(l.education, 60, DEFAULT_LABELS.education),
       contact: label(l.contact, 60, DEFAULT_LABELS.contact),
       ctaTop: label(l.ctaTop, 60, DEFAULT_LABELS.ctaTop),
       ctaBottom: label(l.ctaBottom, 60, DEFAULT_LABELS.ctaBottom),
     },
-    hidden: list(p.hidden, 5, (x) => x).filter((x): x is SectionKey =>
+    hidden: list(p.hidden, 6, (x) => x).filter((x): x is SectionKey =>
       SECTION_KEYS.includes(x),
     ),
   }
