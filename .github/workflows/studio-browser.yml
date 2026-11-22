@@ -44,14 +44,25 @@ jobs:
           npm install --prefix /tmp/fleed-browser --no-save --no-audit --no-fund playwright@1.65.1
           /tmp/fleed-browser/node_modules/.bin/playwright install --with-deps chromium
 
-      - name: Start the local-only development server
+      - name: Start local-only development server using test-runtime compatibility
         run: |
+          # The pinned Miniflare/workerd in pnpm-lock only supports dates up to
+          # 2026-10-19, while production wrangler.jsonc requests 2026-10-21.
+          # Change the throwaway Actions checkout ONLY. Do not commit this
+          # workaround, use it for production, or treat visual QA as deployment QA.
+          node -e "const f=require('fs');const p='wrangler.jsonc';const s=f.readFileSync(p,'utf8');if(!s.includes('2026-10-21'))process.exit(1);f.writeFileSync(p,s.replace('2026-10-21','2026-10-19'))"
+          echo "CI-only workerd compatibility fallback; production config in Git remains unchanged."
           pnpm dev --host 127.0.0.1 > /tmp/fleed-studio-dev.log 2>&1 &
           echo $! > /tmp/fleed-studio.pid
-          for i in $(seq 1 90); do
-            if curl -fsS http://127.0.0.1:3000/studio > /dev/null; then
+          for i in $(seq 1 45); do
+            if curl -fsS http://127.0.0.1:3000/studio > /dev/null 2>&1; then
               echo "Local Studio responding"
               exit 0
+            fi
+            if ! kill -0 "$(cat /tmp/fleed-studio.pid)" 2>/dev/null; then
+              echo "Dev server exited early:"
+              cat /tmp/fleed-studio-dev.log
+              exit 1
             fi
             sleep 2
           done
