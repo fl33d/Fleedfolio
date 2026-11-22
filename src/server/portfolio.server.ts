@@ -30,16 +30,29 @@ const tokensMatch = (a: string, b: string): boolean => {
 export const validId = (id: unknown): id is string =>
   typeof id === 'string' && /^[a-z0-9]{6,32}$/.test(id)
 
-type StoredPortfolio = {
+type StoredRecord = {
   portfolio_json: string
   token_hash: string
 }
-
-type Alias = { slug: string; portfolio_id: string }
 type Published = { id: string; token: string; slug?: string }
 
+// Alias IDs begin with @, so they cannot overlap with generated portfolio IDs.
+// This uses the existing D1 table; no database schema migration is necessary.
+const aliasId = (slug: string) => '@' + slug
+
+function storedSlug(json: string): string | undefined {
+  try {
+    const data: unknown = JSON.parse(json)
+    if (!data || typeof data !== 'object' || Array.isArray(data)) return undefined
+    const raw = (data as Record<string, unknown>).__fleed_slug
+    return normalizeCustomSlug(raw) ?? undefined
+  } catch {
+    return undefined
+  }
+}
+
 function requestedSlug(value: unknown): string | undefined {
-  // Omitted = retain existing alias; empty string = explicitly use the default URL.
+  // Omitted means retain the existing name; empty means use the generated URL.
   if (value === undefined) return undefined
   if (typeof value !== 'string') throw new Error('Invalid custom link.')
   if (!value.trim()) return ''
@@ -48,25 +61,14 @@ function requestedSlug(value: unknown): string | undefined {
   return slug
 }
 
-async function assertSlugAvailable(
+async function ensureAvailable(
   db: typeof env.fleed_portfolios,
   slug: string,
-  portfolioId?: string,
+  ownerHash: string,
 ): Promise<void> {
-  const alias = await db
-    .prepare('SELECT portfolio_id FROM portfolio_slugs WHERE slug = ?')
-    .bind(slug)
-    .first<Alias>()
-  if (alias && alias.portfolio_id !== portfolioId) {
-    throw new Error('That custom link is already taken.')
-  }
-
-  // Older stored IDs also take precedence over aliases in public routing.
-  const idCollision = await db
-    .prepare('SELECT id FROM portfolios WHERE id = ?')
-    .bind(slug)
-    .first<{ id: string }>()
-  if (idCollision && idCollision.id !== portfolioId) {
+  const existing = await db.prepare('SELECT token_hash FROM portfolios WHERE id = ?')
+    .bind(aliasId(slug)).first<{ token_hash: string }>()
+  if (existing && !tokensMatch(existing.token_hash, ownerHash)) {
     throw new Error('That custom link is already taken.')
   }
 }
@@ -78,89 +80,119 @@ export async function savePortfolio(
   slugInput?: string,
 ): Promise<Published> {
   const db = env.fleed_portfolios
-  const slug = requestedSlug(slugInput)
-  const json = JSON.stringify(portfolio)
-  const timestamp = new Date().toISOString()
+  const requested = requestedSlug(slugInput)
+  const now = new Date().toISOString()
 
   if (id !== undefined || token !== undefined) {
-    // Never silently create a second portfolio after a failed update.
     if (!validId(id) || typeof token !== 'string' || !token) {
       throw new Error('Publishing credentials are invalid.')
     }
-    const existing = await db
-      .prepare('SELECT portfolio_json, token_hash FROM portfolios WHERE id = ?')
-      .bind(id)
-      .first<StoredPortfolio>()
-    if (!existing || !tokensMatch(existing.token_hash, await hash(token))) {
+    const previous = await db.prepare(
+      'SELECT portfolio_json, token_hash FROM portfolios WHERE id = ?',
+    ).bind(id).first<StoredRecord>()
+    if (!previous || !tokensMatch(previous.token_hash, await hash(token))) {
       throw new Error('This portfolio cannot be updated from this browser.')
     }
-
-    const previous = await db
-      .prepare('SELECT slug FROM portfolio_slugs WHERE portfolio_id = ?')
-      .bind(id)
-      .first<Alias>()
-    const chosen = slug === undefined ? previous?.slug ?? '' : slug
-    if (chosen) await assertSlugAvailable(db, chosen, id)
-
+    const slug = requested === undefined ? storedSlug(previous.portfolio_json) ?? '' : requested
+    if (slug) await ensureAvailable(db, slug, previous.token_hash)
+    const json = JSON.stringify({
+      ...portfolio,
+      ...(slug ? { __fleed_slug: slug } : {}),
+    })
     const statements = [
-      db.prepare('UPDATE portfolios SET portfolio_json = ?, updated_at = ? WHERE id = ? AND token_hash = ?')
-        .bind(json, timestamp, id, existing.token_hash),
+      db.prepare(
+        'UPDATE portfolios SET portfolio_json = ?, updated_at = ? WHERE id = ? AND token_hash = ?',
+      ).bind(json, now, id, previous.token_hash),
+      // Remove any older alias for this edit credential before assigning the new one.
+      db.prepare("DELETE FROM portfolios WHERE id LIKE '@%' AND token_hash = ?")
+        .bind(previous.token_hash),
     ]
-    if (chosen !== (previous?.slug ?? '')) {
-      statements.push(db.prepare('DELETE FROM portfolio_slugs WHERE portfolio_id = ?').bind(id))
-      if (chosen) {
-        statements.push(
-          db.prepare('INSERT INTO portfolio_slugs (slug, portfolio_id) VALUES (?, ?)')
-            .bind(chosen, id),
-        )
-      }
+    if (slug) {
+      statements.push(db.prepare(
+        'INSERT INTO portfolios (id, portfolio_json, token_hash, updated_at) VALUES (?, ?, ?, ?)',
+      ).bind(
+        aliasId(slug),
+        JSON.stringify({ __fleed_alias: 1, portfolioId: id }),
+        previous.token_hash,
+        now,
+      ))
     }
-    // D1 batch statements execute transactionally; a collision rolls back the update.
-    await db.batch(statements)
-    return { id, token, ...(chosen ? { slug: chosen } : {}) }
+    // D1 batches are atomic. Duplicate usernames roll back the entire update.
+    try {
+      await db.batch(statements)
+    } catch {
+      throw new Error('The custom link could not be claimed. It may already be taken.')
+    }
+    return { id, token, ...(slug ? { slug } : {}) }
   }
 
   const newId = randomHex(6)
   const newToken = randomHex(24)
-  if (slug) await assertSlugAvailable(db, slug)
-
+  const tokenHash = await hash(newToken)
+  const slug = requested || ''
+  if (slug) await ensureAvailable(db, slug, tokenHash)
+  const json = JSON.stringify({
+    ...portfolio,
+    ...(slug ? { __fleed_slug: slug } : {}),
+  })
   const statements = [
-    db.prepare('INSERT INTO portfolios (id, portfolio_json, token_hash, updated_at) VALUES (?, ?, ?, ?)')
-      .bind(newId, json, await hash(newToken), timestamp),
+    db.prepare(
+      'INSERT INTO portfolios (id, portfolio_json, token_hash, updated_at) VALUES (?, ?, ?, ?)',
+    ).bind(newId, json, tokenHash, now),
   ]
   if (slug) {
-    statements.push(
-      db.prepare('INSERT INTO portfolio_slugs (slug, portfolio_id) VALUES (?, ?)')
-        .bind(slug, newId),
-    )
+    statements.push(db.prepare(
+      'INSERT INTO portfolios (id, portfolio_json, token_hash, updated_at) VALUES (?, ?, ?, ?)',
+    ).bind(
+      aliasId(slug),
+      JSON.stringify({ __fleed_alias: 1, portfolioId: newId }),
+      tokenHash,
+      now,
+    ))
   }
-  await db.batch(statements)
+  try {
+    await db.batch(statements)
+  } catch {
+    throw new Error('Publishing failed. The custom link may already be taken.')
+  }
   return { id: newId, token: newToken, ...(slug ? { slug } : {}) }
 }
 
-export async function loadPortfolio(idOrSlug: string): Promise<Portfolio | null> {
-  const db = env.fleed_portfolios
-  let stored: { portfolio_json: string } | null = null
-
-  // Existing numeric/hex links always keep working, even when an alias exists.
-  if (validId(idOrSlug)) {
-    stored = await db
-      .prepare('SELECT portfolio_json FROM portfolios WHERE id = ?')
-      .bind(idOrSlug)
-      .first<{ portfolio_json: string }>()
-  }
-  if (!stored) {
-    const slug = normalizeCustomSlug(idOrSlug)
-    if (!slug) return null
-    stored = await db
-      .prepare('SELECT p.portfolio_json FROM portfolios p JOIN portfolio_slugs s ON s.portfolio_id = p.id WHERE s.slug = ?')
-      .bind(slug)
-      .first<{ portfolio_json: string }>()
-  }
-
+/** Existing /p/{id} URLs continue to resolve directly. */
+export async function loadPortfolio(id: string): Promise<Portfolio | null> {
+  if (!validId(id)) return null
+  const stored = await env.fleed_portfolios.prepare(
+    'SELECT portfolio_json FROM portfolios WHERE id = ?',
+  ).bind(id).first<{ portfolio_json: string }>()
   if (!stored) return null
   try {
     return JSON.parse(stored.portfolio_json) as Portfolio
+  } catch {
+    return null
+  }
+}
+
+/** Resolve /@name to the published portfolio, with an ownership check. */
+export async function loadCustomPortfolio(rawSlug: string): Promise<Portfolio | null> {
+  const slug = normalizeCustomSlug(rawSlug)
+  if (!slug) return null
+  const db = env.fleed_portfolios
+  const alias = await db.prepare(
+    'SELECT portfolio_json, token_hash FROM portfolios WHERE id = ?',
+  ).bind(aliasId(slug)).first<StoredRecord>()
+  if (!alias) return null
+
+  try {
+    const pointer: unknown = JSON.parse(alias.portfolio_json)
+    if (!pointer || typeof pointer !== 'object' || Array.isArray(pointer)) return null
+    const data = pointer as Record<string, unknown>
+    if (data.__fleed_alias !== 1 || !validId(data.portfolioId)) return null
+    const owner = await db.prepare(
+      'SELECT portfolio_json, token_hash FROM portfolios WHERE id = ?',
+    ).bind(data.portfolioId).first<StoredRecord>()
+    if (!owner || !tokensMatch(owner.token_hash, alias.token_hash)) return null
+    if (storedSlug(owner.portfolio_json) !== slug) return null
+    return JSON.parse(owner.portfolio_json) as Portfolio
   } catch {
     return null
   }
