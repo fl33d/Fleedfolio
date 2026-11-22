@@ -164,7 +164,7 @@ function StudioRoute() {
   // Render a consistent server/client shell while the local draft is restored.
   // Prevent editing the sample before hydration from losing the first keystrokes.
   if (!hydrated) return <div className="stx-shell stx-initializing" role="status">Preparing your Studio draft…</div>
-  return <div className="stx-shell">
+  return <div className="stx-shell" data-hydrated={hydrated ? "true" : "false"}>
     <a className="stx-skip" href="#stx-start">Skip to portfolio</a>
     <input ref={uploadRef} type="file" accept=".json,application/json" className="stx-hidden-input" onChange={e => {void importFile(e.target.files?.[0]);e.target.value=''}}/>
     <header className="stx-workbar">
@@ -240,12 +240,12 @@ function StudioRoute() {
                 <label>Title<input value={achievement.title} maxLength={180} onChange={e => commit(next => { updateSimpleAchievement(next, id, 'title', e.target.value) })}/></label>
                 <label>Type<select value={achievement.category} onChange={e => commit(next => { updateSimpleAchievement(next, id, 'category', e.target.value) })}>
                   <option value="award">Award</option><option value="certification">Certification</option><option value="competition">Competition</option>
-                  <option value="milestone">Milestone</option><option value="publication">Publication</option><option value="other">Other</option>
+                  <option value="milestone">Milestone</option><option value="publication">Publication</option><option value="github">GitHub profile badge</option><option value="other">Other</option>
                 </select></label>
                 <label>Issuer<input value={achievement.issuer} maxLength={150} onChange={e => commit(next => { updateSimpleAchievement(next, id, 'issuer', e.target.value) })}/></label>
                 <label>Year or date<input value={achievement.date} maxLength={50} onChange={e => commit(next => { updateSimpleAchievement(next, id, 'date', e.target.value) })}/></label>
                 <label>What it means<textarea value={achievement.description} maxLength={900} onChange={e => commit(next => { updateSimpleAchievement(next, id, 'description', e.target.value) })}/></label>
-                <p className="stx-editor-hint">Evidence links can be entered in Simple mode. Your existing link is preserved.</p>
+                <p className="stx-editor-hint">Evidence links can be added in Simple mode. GitHub badges are creator-declared, not automatically verified.</p>
               </div>
             })}
             <button type="button" className="stx-add-simple" onClick={() => addBlock('achievements')}>+ Add another achievement</button>
