@@ -229,6 +229,21 @@ function StudioRoute() {
               <label>Approach<textarea value={project.lenses.spec.approach} onChange={e=>commit(next=>{const p=next.content.projects.find(p=>p.id===project.id);if(p)p.lenses.spec.approach=e.target.value})}/></label>
             </>}
           </>}
+          {selected?.type === 'code' && <>
+            <label>Caption<input value={selected.caption} maxLength={180} onChange={e=>patchBlock(selected.id,b=>{if(b.type==='code')b.caption=e.target.value})}/></label>
+            <label>Language<input value={selected.language} maxLength={40} onChange={e=>patchBlock(selected.id,b=>{if(b.type==='code')b.language=e.target.value})}/></label>
+            <label>Code excerpt (never executed)<textarea value={selected.source} rows={7} maxLength={6000} onChange={e=>patchBlock(selected.id,b=>{if(b.type==='code')b.source=e.target.value})}/></label>
+          </>}
+          {selected?.type === 'timeline' && <label>Timeline type
+            <select value={selected.collection} onChange={e=>patchBlock(selected.id,b=>{
+              if(b.type!=='timeline')return
+              const collection=e.target.value as 'experience'|'education'
+              b.collection=collection
+              b.itemIds=(collection==='experience'?doc.content.experience:doc.content.education).map(x=>x.id)
+            })}><option value="experience">Experience</option><option value="education">Education</option></select>
+          </label>}
+          {selected?.type === 'project-list' && <p className="stx-editor-hint">This index references {selected.projectIds.length} project(s) already in your document.</p>}
+          {selected?.type === 'links' && <p className="stx-editor-hint">This block references the identity links stored in this document.</p>}
           {selected?.type === 'divider' && <p className="stx-editor-hint">A meaningful pause between sections.</p>}
           {selected?.type === 'skills' && <p className="stx-editor-hint">This block references skills in the document. Detailed skill editing is a later milestone.</p>}
           {selected && selected.type !== 'identity' && <button className="stx-remove" onClick={()=>remove(selected.id)}>Remove selected block</button>}
