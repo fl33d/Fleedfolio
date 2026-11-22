@@ -14,11 +14,15 @@ This branch is **review-only and not a production release**.
 - Isolated `/studio` guest proof route: select blocks, edit core text/project facts, add/reorder blocks using buttons, switch aesthetics, undo/redo, autosave to `fleedfolio:studio-draft:v1`, import/export JSON.
 - Regression cases in `tests/studio.test.mjs`.
 
+## Verified on GitHub Actions
+
+[Run 45066115529](https://github.com/fl33d/Fleedfolio/actions/runs/45066115529) passed on code commit `763766f76fea8ce0acc7613f327da31f8fc47b18`: clean dependency install, Cloudflare type generation, strict TypeScript, **29/29 tests**, production client build and Worker SSR build. There were earlier failing attempts, fixed by narrowing the lens type and adding the Node JSON import attribute. This is not a visual/browser acceptance result. See `docs/STUDIO_VISUAL_RESEARCH.md` for actual art-direction assumptions and defects to investigate.
+
 ## Not yet achieved
 - The new route is **not** a replacement for `/` or a public publishing flow.
 - Full rich text, all 12 block editors, nested group controls, media bytes, Markdown ZIP, CV projection, source mode, touch DnD, account claims and real-world user testing remain.
 - Visual quality has **not** been demonstrated with screenshots of the running React app from this branch.
-- Local installation/build/browser QA cannot be claimed until tools actually execute them.
+- Local installation/browser QA has not run; the **GitHub CI build and unit tests have** (see above).
 - The full Studio schema is an experiment, not a deployed migration or guarantee of complete legacy compatibility.
 - No authenticated runtime, Worker deployment, real D1 migration, custom domains, messaging or payments introduced.
 
