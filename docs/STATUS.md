@@ -36,3 +36,14 @@ Craft-style ease and editorial composition; Fastfolio's clarity about the creati
 
 ## Next release gate
 A successful clean build, typecheck, unit run, and real-browser mobile/tablet/desktop inspection; fix defects before asking for approval. Then prove a complete guest portfolio authoring -> validated export -> true publish/update path on local D1/staging, with safe legacy coexistence.
+
+
+## Visual continuation refinement (PR #9 / 22 Nov 2026)
+Branch: `design/creator-studio-refinement-20261122` based on `feat/studio-proof-20261122`. This is **review-only** and must not be merged or deployed without explicit approval.
+
+Changes committed in this branch:
+- `src/routes/studio.tsx`: searchable eight-element shelf; click-to-add and drag into the Page structure list; safe code display block, project list, links, and timeline projections; editable code caption/language/source and timeline source selection.
+- `src/studio/studio-refinement.css`: high-contrast, responsive, tactile editor chrome; author-facing portfolio output stays independent of the Fleed app styling.
+- Existing Studio data contract, draft storage key, preview route, Classic routes, publish/edit tokens and Cloudflare resources are unchanged.
+
+Evidence boundary: the separate **standalone integrated HTML** received Chromium UI checks, including five viewport widths and import/export roundtrips. Those checks are **not** an acceptance test of this React branch. No React browser screenshots or successful workflow run on this commit are recorded yet. The new shelf supports click/drag insert and arrow-based existing block reordering; it is not a full freeform canvas. Only a subset of the twelve Studio block types have dedicated editors.

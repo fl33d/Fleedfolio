@@ -45,3 +45,14 @@ Branch: `feat/studio-proof-20261122`. All reported results must be linked to com
 
 ## Before release
 Only change NOT RUN to PASS or FAIL with genuine tool output; never use a green CI badge to claim browser visual quality.
+
+
+## PR #9 refinement verification (22 Nov 2026)
+- Source commit: see `design/creator-studio-refinement-20261122` head (do not conflate with PR #6).
+- CI after the source change: **not yet verified** (no associated workflow run found at the time of the review).
+- React `/studio` screenshots / interaction tests: **NOT RUN** in this execution environment (source not locally installable from GitHub due network restrictions).
+- Required: `pnpm install --frozen-lockfile`, `pnpm exec wrangler types`, `pnpm typecheck`, `pnpm test`, `pnpm build`; fix failures on the safe branch.
+- Required browser QA: open `/studio`; test search, categories, all eight add buttons, drag-to-position, code edit, timeline selection, undo/redo, file import/export, mobile layout at 320/390/768/1024/1440, keyboard use and reduced motion. Check long-content rendering, blank docs and sanitized visitor output.
+- Required compatibility check: existing `/`, `/p/{id}`, `/@handle`, backup, CV and edit tokens continue working. No production data should be used for the first regression run.
+
+Standalone `Fleedfolio_Next_Integrated_Experience.html` test evidence is separate and may not be used as proof that this source branch passes its E2E release gate.
