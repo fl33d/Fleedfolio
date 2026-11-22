@@ -4,6 +4,8 @@ import { CircleHelp, Eye, FileText, Layers3, PenLine, Search, Send } from 'lucid
 import { toast } from 'sonner'
 
 import { Customize } from '@/components/portfolio/Customize'
+import { WorkbenchBar } from '@/components/portfolio/WorkbenchBar'
+import '@/styles/workbench-revamp.css'
 import { ShareDialog } from '@/components/portfolio/ShareDialog'
 import { Walkthrough } from '@/components/portfolio/Walkthrough'
 import { Portfolio } from '@/components/portfolio/Portfolio'
@@ -125,6 +127,7 @@ function Editor() {
   const switchMode = (next: boolean) => {
     setCvOpen(false)
     setEditing(next)
+    if (!next) { setElementsOpen(false); setCustomiseOpen(false) }
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
@@ -201,7 +204,6 @@ function Editor() {
   const addElement = (kind: ElementKind) => {
     setCvOpen(false)
     setEditing(true)
-    setElementsOpen(false)
     setDropTarget(false)
     setData(current => addPortfolioElement(current, kind))
     const target = kind === 'text' ? '[id^="extra-"]' : kind === 'project' ? '#work' : kind === 'experience' ? '#experience' : kind === 'education' ? '#education' : kind === 'skills' ? '.pf-skill-editor' : '#contact'
@@ -245,9 +247,24 @@ function Editor() {
   ]
 
   return (
-    <div className={cn('app', cvOpen ? 'mode-cv' : editing ? 'mode-edit' : 'mode-view')} {...themeProps(data)}>
+    <div className={cn('app', cvOpen ? 'mode-cv' : editing ? 'mode-edit' : 'mode-view')}
+      data-library-open={elementsOpen && editing ? 'true' : 'false'}
+      data-design-open={customiseOpen && editing ? 'true' : 'false'}
+      {...themeProps(data)}>
       {!cvOpen && !editing && data.theme.backdrop && <Backdrop />}
       <ScrollProgress />
+      {!cvOpen && editing && <WorkbenchBar
+        data={data} onChange={setData} onImport={importDraft}
+        customSlug={customSlug} onSlugChange={setCustomSlug} onReset={reset}
+        libraryOpen={elementsOpen}
+        onToggleLibrary={() => { setElementsOpen(value => !value); setCustomiseOpen(false) }}
+        customiseOpen={customiseOpen}
+        onOpenCustomise={(open) => { setCustomiseOpen(open); if (open) setElementsOpen(false) }}
+        onPreview={() => switchMode(false)}
+        onCv={() => setCvOpen(true)} onCommands={() => setCommandsOpen(true)}
+        onTour={() => setTourOpen(true)} onPublish={() => { void publish() }}
+        published={Boolean(published)} publishing={publishing}
+      />}
 
       {cvOpen ? (
         <CvView data={data} publicUrl={publicUrl} onBack={() => setCvOpen(false)} />
@@ -281,8 +298,8 @@ function Editor() {
         </div>
       )}
 
-      {/* Floating dock */}
-      <div className="dock chrome">
+      {/* The original floating dock remains for viewer / legacy preview. */}
+      {!editing && <div className="dock chrome">
         <div className="dock-toggle" role="group" aria-label="Editor mode">
           <span className={cn('dock-toggle-pill', !editing && 'is-right')} />
           <button type="button" aria-pressed={editing && !cvOpen} onClick={() => switchMode(true)}>
@@ -333,7 +350,7 @@ function Editor() {
           <Send className={cn('size-4', publishing && 'animate-pulse')} />
           {publishing ? 'Publishing…' : published ? 'Update' : 'Publish'}
         </button>
-      </div>
+      </div>}
 
       <ElementsShelf open={elementsOpen} onClose={() => setElementsOpen(false)} onAdd={addElement} />
 
