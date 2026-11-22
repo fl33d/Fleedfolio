@@ -6,6 +6,7 @@ import { createPortfolioBackup, parsePortfolioBackup } from '../src/lib/portfoli
 import { normalizeCustomSlug, portfolioPublicPath } from '../src/lib/portfolio-slug.ts'
 import { portfolioCvText } from '../src/lib/cv.ts'
 import { DESIGN_PRESETS, applyDesignPreset } from '../src/lib/design-presets.ts'
+import { suggestSkills } from '../src/lib/skill-catalog.ts'
 
 test('safeUrl rejects executable or unsupported protocols', () => {
   for (const value of ['javascript:alert(1)', 'data:text/html,x', 'vbscript:msgbox(1)', 'file:///etc/passwd']) {
@@ -145,4 +146,14 @@ test('design library preserves user content and offers distinct, editable recipe
     assert.equal(result.theme.palette, preset.palette)
     assert.equal(result.theme.backdrop, false)
   }
+})
+
+test('skills search ranks tech and creative matches while preventing duplicate suggestions', () => {
+  const names = suggestSkills('vi', []).map(s => s.name)
+  for (const name of ['Vite', 'Vim', 'Vitest', 'Visual Studio Code', 'Video Editing']) {
+    assert.ok(names.includes(name), name + ' should appear')
+  }
+  assert.ok(!suggestSkills('vi', ['Vite']).some(s => s.name === 'Vite'))
+  assert.deepEqual(suggestSkills('', []), [])
+  assert.deepEqual(suggestSkills('vi,foo', []), [])
 })

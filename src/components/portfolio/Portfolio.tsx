@@ -17,6 +17,7 @@ import {
 import { cn } from '@/lib/utils'
 import { Field } from './Field'
 import { ImageSlot } from './ImageSlot'
+import { SkillAutocomplete } from './SkillAutocomplete'
 import { Reveal, SplitText } from './effects'
 
 type Props = {
@@ -218,7 +219,7 @@ export function Portfolio({ data, editing, onChange, onOpenCommands }: Props) {
       {/* Skills */}
       {shown('skills') && (
         editing ? (
-          <SkillEditor skills={data.skills} onChange={(s) => set('skills', s)} />
+          <SkillAutocomplete skills={data.skills} onChange={(s) => set('skills', s)} />
         ) : data.skills.length > 0 ? (
           <section className="pf-skills" aria-label="Skills">
             <span className="pf-skills-heading">Skills & tools</span>
@@ -731,60 +732,6 @@ function Section({
       </Reveal>
       {children}
     </section>
-  )
-}
-
-function SkillEditor({
-  skills,
-  onChange,
-}: {
-  skills: string[]
-  onChange: (skills: string[]) => void
-}) {
-  const [draft, setDraft] = useState('')
-  const add = () => {
-    const parts = draft
-      .split(',')
-      .map((s) => s.trim())
-      .filter(Boolean)
-    if (parts.length) onChange([...skills, ...parts].slice(0, 40))
-    setDraft('')
-  }
-  return (
-    <div className="pf-skill-editor">
-      <span className="pf-label">Skills</span>
-      <div className="flex flex-wrap items-center gap-2">
-        {skills.map((s, i) => (
-          <span key={`${s}-${i}`} className="pf-chip">
-            {s}
-            <button
-              type="button"
-              aria-label={`Remove ${s}`}
-              onClick={() => onChange(skills.filter((_, j) => j !== i))}
-            >
-              <X className="size-3" />
-            </button>
-          </span>
-        ))}
-        <input
-          value={draft}
-          maxLength={80}
-          onChange={(e) => setDraft(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ',') {
-              e.preventDefault()
-              add()
-            } else if (e.key === 'Backspace' && !draft && skills.length) {
-              onChange(skills.slice(0, -1))
-            }
-          }}
-          onBlur={add}
-          placeholder={skills.length ? 'Add another…' : 'Type a skill, press Enter'}
-          className="pf-chip-input"
-        />
-      </div>
-      <p className="pf-hint">Press Enter or separate skills with commas. They appear as a simple list on your published page.</p>
-    </div>
   )
 }
 
