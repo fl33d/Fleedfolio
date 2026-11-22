@@ -4,11 +4,11 @@ import { createFileRoute, Link, notFound } from '@tanstack/react-router'
 import { Portfolio } from '@/components/portfolio/Portfolio'
 import { Backdrop, ScrollProgress, Wordmark } from '@/components/portfolio/effects'
 import { themeProps } from '@/lib/portfolio'
-import { getPortfolio } from '@/server/portfolio.functions'
+import { getCustomPortfolio } from '@/server/portfolio.functions'
 
 export const Route = createFileRoute('/@{$slug}')({
   loader: async ({ params }) => {
-    const portfolio = await getPortfolio({ data: { id: params.slug } })
+    const portfolio = await getCustomPortfolio({ data: { slug: params.slug } })
     if (!portfolio) throw notFound()
     return portfolio
   },
