@@ -1,5 +1,10 @@
 # Fleedfolio Studio — milestone status
 
+## Classic workbench UI milestone — 2026-11-22
+
+Draft PR #8 (`feat/classic-workbench-revamp-20261122`) adds a readable editor-only top toolbar, a non-modal three-line-menu library sidebar, a right design inspector, inline editing preserved, optional public header identity (original name/initial/photo/hidden), and opt-in text/logos/both skill display. Normalized old records default to original full name and text-only skills. No Worker/D1/credentials changed. Verified source CI: [run 45081286577](https://github.com/fl33d/Fleedfolio/actions/runs/45081286577), 48/48 tests, TypeScript and build. Real Chromium [run 45081286571](https://github.com/fl33d/Fleedfolio/actions/runs/45081286571) passed 320/390/768/1024/1440. These are review tests, not a deployed build. See `docs/CLASSIC_WORKBENCH_VISUAL_REVIEW.md` and `docs/WORKERS_DEV_RELEASE_GATE.md`.
+
+
 ## PR #7 integration checkpoint (22 November 2026)
 
 On review-only branch `feat/studio-shared-editing-20261122`, stacked on PR #6: Simple, Studio and Preview share one Studio Document/history; the original Classic editor remains available at `/` with separate legacy local storage. Changes in Simple do not flatten advanced rich text. A distinct Achievements block, editor, and optional canonical `achievements` collection support awards, certifications, milestones and **GitHub profile badges** with user-supplied HTTPS evidence links. GitHub badges are not API-synced or platform verified. Older v1 archives without the optional collection remain valid. No production deployment, database migration or legacy credential changes occurred. The browser visual verification is being evaluated separately from green source CI.
