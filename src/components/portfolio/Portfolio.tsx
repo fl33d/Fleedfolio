@@ -1,21 +1,23 @@
 import { useEffect, useState, type CSSProperties, type MouseEvent, type ReactNode } from 'react'
 import { useLocation } from '@tanstack/react-router'
-import { ArrowUpRight, Plus, X } from 'lucide-react'
+import { ArrowDown, ArrowUp, ArrowUpRight, Plus, X } from 'lucide-react'
 
 import {
   emptyCustomSection,
   emptyExperience,
+  emptyEducation,
   emptyProject,
   emptySocial,
   safeUrl,
   mailtoHref,
+  reorderItems,
   type Labels,
   type Portfolio as PortfolioData,
 } from '@/lib/portfolio'
 import { cn } from '@/lib/utils'
 import { Field } from './Field'
 import { ImageSlot } from './ImageSlot'
-import { LiveClock, Marquee, Reveal, SplitText } from './effects'
+import { Reveal, SplitText } from './effects'
 
 type Props = {
   data: PortfolioData
@@ -27,7 +29,7 @@ export function Portfolio({ data, editing, onChange }: Props) {
   const set = <K extends keyof PortfolioData>(key: K, value: PortfolioData[K]) =>
     onChange?.({ ...data, [key]: value })
 
-  type ListKey = 'projects' | 'experience' | 'socials' | 'extras'
+  type ListKey = 'projects' | 'experience' | 'education' | 'socials' | 'extras'
 
   const updateItem = <K extends ListKey>(
     key: K,
@@ -44,8 +46,12 @@ export function Portfolio({ data, editing, onChange }: Props) {
   const removeItem = <K extends ListKey>(key: K, id: string) =>
     set(key, (data[key] as { id: string }[]).filter((i) => i.id !== id) as PortfolioData[K])
 
+  const moveProject = (index: number, offset: -1 | 1) =>
+    set('projects', reorderItems(data.projects, index, offset))
+
   const projects = editing ? data.projects : data.projects.filter((p) => p.title || p.description)
   const experience = editing ? data.experience : data.experience.filter((e) => e.role || e.company)
+  const education = editing ? data.education : data.education.filter((e) => e.qualification || e.institution)
   const socials = editing ? data.socials : data.socials.filter((s) => s.label && safeUrl(s.url))
   const extras = editing ? data.extras : data.extras.filter((x) => x.title || x.body || x.image)
   const shown = (key: PortfolioData['hidden'][number]) => !data.hidden.includes(key)
@@ -64,12 +70,14 @@ export function Portfolio({ data, editing, onChange }: Props) {
   const showAbout = shown('about') && (editing || !!data.about || !!data.aboutImage)
   const showWork = shown('work') && (editing || projects.length > 0)
   const showExperience = shown('experience') && (editing || experience.length > 0)
+  const showEducation = shown('education') && (editing || education.length > 0)
   const showContact = shown('contact') && (editing || hasContact)
 
   const nav = [
     { id: 'about', label: labels.about || 'About', show: showAbout },
-    { id: 'work', label: 'Work', show: showWork },
+    { id: 'work', label: labels.work || 'Work', show: showWork },
     { id: 'experience', label: labels.experience || 'Experience', show: showExperience },
+    { id: 'education', label: labels.education || 'Education', show: showEducation },
     { id: 'contact', label: labels.contact || 'Contact', show: showContact },
   ].filter((n) => n.show)
 
@@ -93,7 +101,7 @@ export function Portfolio({ data, editing, onChange }: Props) {
         <ScrollLink to="top" className="pf-mono-badge" aria-label="Back to top">
           <span>{initials}</span>
         </ScrollLink>
-        <nav className="hidden md:flex gap-9">
+        <nav className="pf-main-nav" aria-label="Portfolio sections">
           {nav.map((n) => (
             <ScrollLink key={n.id} to={n.id} className="pf-nav-link">
               {n.label}
@@ -101,30 +109,28 @@ export function Portfolio({ data, editing, onChange }: Props) {
           ))}
         </nav>
         <div className="pf-meta">
-          {data.location && <span>{data.location}</span>}
-          <LiveClock />
+          <span>{data.location || (editing ? 'Editing your portfolio' : 'Selected work')}</span>
         </div>
       </header>
 
       {/* Hero */}
       <section id="top" className={cn('pf-hero slot-host', data.photo && 'has-photo')}>
         <div className="pf-hero-main">
+        {editing && <p className="pf-editor-eyebrow">01 / Introduction</p>}
         {(editing || data.status) && (
-          <Reveal delay={100}>
-            <div className="pf-status">
-              <span className="pf-pulse" />
-              {editing ? (
-                <Field
-                  value={data.status}
-                  onChange={(v) => set('status', v)}
-                  placeholder="Status — e.g. open to work"
-                  maxLength={80}
-                />
-              ) : (
-                data.status
-              )}
-            </div>
-          </Reveal>
+          <div className="pf-status">
+            {editing ? (
+              <Field
+                value={data.status}
+                onChange={(v) => set('status', v)}
+                placeholder="Availability (optional)"
+                label="Availability"
+                maxLength={80}
+              />
+            ) : (
+              data.status
+            )}
+          </div>
         )}
 
         <h1 className="pf-name">
@@ -144,12 +150,13 @@ export function Portfolio({ data, editing, onChange }: Props) {
         </h1>
 
         <div className="pf-hero-row">
-          <Reveal delay={350} className="pf-role">
+          <Reveal delay={150} className="pf-role">
+            {editing && <span className="pf-field-label">Your role</span>}
             {editing ? (
               <Field
                 value={data.role}
                 onChange={(v) => set('role', v)}
-                placeholder="What you do"
+                placeholder="Designer, developer, artist…"
                 label="Role"
                 maxLength={120}
               />
@@ -157,12 +164,13 @@ export function Portfolio({ data, editing, onChange }: Props) {
               data.role
             )}
           </Reveal>
-          <Reveal delay={500} className="pf-tagline">
+          <Reveal delay={150} className="pf-tagline">
+            {editing && <span className="pf-field-label">A short introduction</span>}
             {editing ? (
               <Field
                 value={data.tagline}
                 onChange={(v) => set('tagline', v)}
-                placeholder="A one-line hook. What makes your work worth a look?"
+                placeholder="What you make, and what matters to you."
                 label="Tagline"
                 maxLength={280}
                 multiline
@@ -174,12 +182,12 @@ export function Portfolio({ data, editing, onChange }: Props) {
         </div>
 
         {editing && (
-          <Reveal delay={600} className="pf-inline-meta">
+          <Reveal delay={150} className="pf-inline-meta">
             <span className="pf-label">Based in</span>
             <Field
               value={data.location}
               onChange={(v) => set('location', v)}
-              placeholder="City, Country"
+              placeholder="City or region (optional)"
               label="Location"
               maxLength={80}
             />
@@ -206,16 +214,20 @@ export function Portfolio({ data, editing, onChange }: Props) {
       </section>
 
       {/* Skills */}
-      {shown('skills') &&
-        (editing ? (
+      {shown('skills') && (
+        editing ? (
           <SkillEditor skills={data.skills} onChange={(s) => set('skills', s)} />
-        ) : (
-          data.skills.length > 0 && (
-            <div className="pf-marquees">
-              <Marquee items={data.skills} />
+        ) : data.skills.length > 0 ? (
+          <section className="pf-skills" aria-label="Skills">
+            <span className="pf-skills-heading">Skills & tools</span>
+            <div className="pf-skills-list">
+              {data.skills.map((skill, index) => (
+                <span key={`${skill}-${index}`}>{skill}</span>
+              ))}
             </div>
-          )
-        ))}
+          </section>
+        ) : null
+      )}
 
       {/* About */}
       {showAbout && (
@@ -232,7 +244,7 @@ export function Portfolio({ data, editing, onChange }: Props) {
               <Field
                 value={data.about}
                 onChange={(v) => set('about', v)}
-                placeholder="Tell your story. Where you started, what you obsess over, what you're building next…"
+                placeholder="A little about your background, interests and work."
                 label="About"
                 maxLength={3000}
                 multiline
@@ -301,7 +313,7 @@ export function Portfolio({ data, editing, onChange }: Props) {
                           <Field
                             value={p.description}
                             onChange={(v) => updateItem('projects', p.id, { description: v })}
-                            placeholder="What was it, what was your part, what happened?"
+                            placeholder="Briefly describe the project and what you did."
                             maxLength={800}
                             multiline
                           />
@@ -321,7 +333,29 @@ export function Portfolio({ data, editing, onChange }: Props) {
                               maxLength={400}
                             />
                           </span>
-                          <RemoveButton onClick={() => removeItem('projects', p.id)} />
+                          <div className="pf-work-actions" role="group" aria-label={`Order ${p.title || 'project ' + (i + 1)}`}>
+                            <button
+                              type="button"
+                              className="pf-order-button"
+                              aria-label={`Move ${p.title || 'project'} up`}
+                              title="Move up"
+                              disabled={i === 0}
+                              onClick={() => moveProject(i, -1)}
+                            >
+                              <ArrowUp className="size-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              className="pf-order-button"
+                              aria-label={`Move ${p.title || 'project'} down`}
+                              title="Move down"
+                              disabled={i === data.projects.length - 1}
+                              onClick={() => moveProject(i, 1)}
+                            >
+                              <ArrowDown className="size-3.5" />
+                            </button>
+                            <RemoveButton onClick={() => removeItem('projects', p.id)} />
+                          </div>
                         </>
                       ) : (
                         href && (
@@ -422,6 +456,61 @@ export function Portfolio({ data, editing, onChange }: Props) {
         </Section>
       ) : null}
 
+      {/* Education: reusable on the portfolio and in printable CV mode. */}
+      {showEducation ? (
+        <Section
+          id="education"
+          number={nextNumber()}
+          title={labels.education}
+          editing={editing}
+          onTitle={(value) => setLabel('education', value)}
+        >
+          <ul className="pf-timeline">
+            {education.map((entry, index) => (
+              <Reveal key={entry.id} as="li" delay={index * 80} className="pf-row">
+                <div className="pf-row-role">
+                  {editing ? (
+                    <Field
+                      value={entry.qualification}
+                      onChange={(value) => updateItem('education', entry.id, { qualification: value })}
+                      placeholder="Qualification or course"
+                      maxLength={120}
+                    />
+                  ) : entry.qualification}
+                </div>
+                <div className="pf-row-company">
+                  {editing ? (
+                    <Field
+                      value={entry.institution}
+                      onChange={(value) => updateItem('education', entry.id, { institution: value })}
+                      placeholder="School or institution"
+                      maxLength={120}
+                    />
+                  ) : entry.institution}
+                </div>
+                <div className="pf-row-period">
+                  {editing ? (
+                    <Field
+                      value={entry.period}
+                      onChange={(value) => updateItem('education', entry.id, { period: value })}
+                      placeholder="Years"
+                      maxLength={60}
+                    />
+                  ) : entry.period}
+                </div>
+                {editing && <RemoveButton onClick={() => removeItem('education', entry.id)} />}
+              </Reveal>
+            ))}
+          </ul>
+          {editing && data.education.length < 24 && (
+            <AddButton
+              className="pf-add-inline"
+              onClick={() => set('education', [...data.education, emptyEducation()])}
+            >Add education</AddButton>
+          )}
+        </Section>
+      ) : null}
+
       {/* Sections the writer added themselves */}
       {extras.map((x) => (
         <Section
@@ -441,7 +530,7 @@ export function Portfolio({ data, editing, onChange }: Props) {
                   <Field
                     value={x.body}
                     onChange={(v) => updateItem('extras', x.id, { body: v })}
-                    placeholder="Anything you like: a manifesto, awards, a reading list, a note to visitors…"
+                    placeholder="Add a note about this section."
                     maxLength={3000}
                     multiline
                   />
@@ -692,7 +781,7 @@ function SkillEditor({
           className="pf-chip-input"
         />
       </div>
-      <p className="pf-hint">These drift by in a slow ticker on your live page.</p>
+      <p className="pf-hint">Press Enter or separate skills with commas. They appear as a simple list on your published page.</p>
     </div>
   )
 }

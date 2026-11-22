@@ -1,9 +1,10 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 
-import { blankPortfolio, mailtoHref, normalizePortfolio, safeImage, safeUrl } from '../src/lib/portfolio.ts'
+import { blankPortfolio, mailtoHref, normalizePortfolio, reorderItems, safeImage, safeUrl } from '../src/lib/portfolio.ts'
 import { createPortfolioBackup, parsePortfolioBackup } from '../src/lib/portfolio-backup.ts'
 import { normalizeCustomSlug, portfolioPublicPath } from '../src/lib/portfolio-slug.ts'
+import { portfolioCvText } from '../src/lib/cv.ts'
 
 test('safeUrl rejects executable or unsupported protocols', () => {
   for (const value of ['javascript:alert(1)', 'data:text/html,x', 'vbscript:msgbox(1)', 'file:///etc/passwd']) {
@@ -80,4 +81,51 @@ test('named links use the root-level /@name format while generated IDs stay at /
   assert.equal(portfolioPublicPath('0ea7cf64947b', 'Hamood'), '/@hamood')
   assert.equal(portfolioPublicPath('0ea7cf64947b'), '/p/0ea7cf64947b')
   assert.equal(portfolioPublicPath('0ea7cf64947b', 'admin'), '/p/0ea7cf64947b')
+})
+
+test('new portfolios start with a calm presentation rather than a decorative backdrop', () => {
+  const blank = blankPortfolio()
+  assert.equal(blank.theme.backdrop, false)
+  assert.equal(blank.labels.ctaBottom, 'Get in touch.')
+})
+
+test('education entries survive normalization while older portfolios remain compatible', () => {
+  const old = blankPortfolio()
+  delete old.education
+  const normalizedOld = normalizePortfolio(old)
+  assert.deepEqual(normalizedOld.education, [])
+  const updated = normalizePortfolio({
+    ...old,
+    education: [{ id: 'gcse', qualification: 'GCSE Computer Science', institution: 'Example School', period: '2024–2026' }],
+  })
+  assert.equal(updated.education.length, 1)
+  assert.equal(updated.education[0].qualification, 'GCSE Computer Science')
+  assert.equal(updated.education[0].institution, 'Example School')
+})
+
+test('CV text exports education, experience and valid links without invented details', () => {
+  const data = blankPortfolio()
+  data.name = 'Test Candidate'
+  data.role = 'Developer'
+  data.education = [{ id: 'one', qualification: 'Computer Science', institution: 'Example School', period: '2024–2026' }]
+  data.experience = [{ id: 'two', role: 'Volunteer', company: 'Library', period: 'Summer 2025' }]
+  data.projects = [{ id: 'three', title: 'My App', description: 'Built a website', year: '2026', link: 'https://example.com/app', image: '' }]
+  data.socials = [{ id: 'four', label: 'GitHub', url: 'javascript:alert(1)' }]
+  const text = portfolioCvText(data, 'https://example.com/@test')
+  assert.match(text, /EDUCATION/)
+  assert.match(text, /Computer Science \| Example School \| 2024–2026/)
+  assert.match(text, /EXPERIENCE/)
+  assert.match(text, /Volunteer \| Library/)
+  assert.match(text, /https:\/\/example\.com\/app/)
+  assert.doesNotMatch(text, /javascript:/)
+  assert.doesNotMatch(text, /No experience/)
+})
+
+test('portfolio project order can be changed without mutating the original content', () => {
+  const projects = [{ id: 'a' }, { id: 'b' }, { id: 'c' }]
+  const promoted = reorderItems(projects, 1, -1)
+  assert.deepEqual(promoted.map(p => p.id), ['b', 'a', 'c'])
+  assert.deepEqual(projects.map(p => p.id), ['a', 'b', 'c'])
+  assert.deepEqual(reorderItems(projects, 0, -1).map(p => p.id), ['a', 'b', 'c'])
+  assert.deepEqual(reorderItems(projects, 2, 1).map(p => p.id), ['a', 'b', 'c'])
 })

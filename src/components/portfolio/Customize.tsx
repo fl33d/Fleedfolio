@@ -19,10 +19,11 @@ import { createPortfolioBackup, parsePortfolioBackup } from '@/lib/portfolio-bac
 import { normalizeCustomSlug } from '@/lib/portfolio-slug'
 
 const SECTIONS: { key: SectionKey; label: string }[] = [
-  { key: 'skills', label: 'Skills ticker' },
+  { key: 'skills', label: 'Skills & tools' },
   { key: 'about', label: 'About' },
   { key: 'work', label: 'Work' },
   { key: 'experience', label: 'Experience' },
+  { key: 'education', label: 'Education' },
   { key: 'contact', label: 'Contact' },
 ]
 
@@ -105,6 +106,7 @@ export function Customize({
         className={cn('cz-trigger', open && 'is-open')}
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
+        aria-label="Customise your portfolio"
         aria-haspopup="dialog"
       >
         <SlidersHorizontal className="size-4" />
