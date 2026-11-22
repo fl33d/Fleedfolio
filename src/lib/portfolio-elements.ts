@@ -19,7 +19,7 @@ export function addPortfolioElement(current: Portfolio, kind: ElementKind): Port
 
   switch (kind) {
     case 'text':
-      return current.extras.length < 24
+      return current.extras.length < 12
         ? { ...current, extras: [...current.extras, emptyCustomSection()] }
         : current
     case 'project': {
