@@ -1,0 +1,76 @@
+name: Studio browser QA (review only)
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/studio/**'
+      - 'src/routes/studio.tsx'
+      - 'scripts/studio-browser-check.mjs'
+      - '.github/workflows/studio-browser.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  studio-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out review source
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.10.0
+
+      - name: Install Node 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install source dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Cloudflare types (local)
+        run: pnpm exec wrangler types
+
+      - name: Install temporary browser QA tools (not production dependencies)
+        run: |
+          mkdir -p /tmp/fleed-browser
+          npm install --prefix /tmp/fleed-browser --no-save --no-audit --no-fund playwright@1.65.1
+          /tmp/fleed-browser/node_modules/.bin/playwright install --with-deps chromium
+
+      - name: Start the local-only development server
+        run: |
+          pnpm dev --host 127.0.0.1 > /tmp/fleed-studio-dev.log 2>&1 &
+          echo $! > /tmp/fleed-studio.pid
+          for i in $(seq 1 90); do
+            if curl -fsS http://127.0.0.1:3000/studio > /dev/null; then
+              echo "Local Studio responding"
+              exit 0
+            fi
+            sleep 2
+          done
+          cat /tmp/fleed-studio-dev.log
+          exit 1
+
+      - name: Check real browser rendering and editor switches
+        env:
+          PLAYWRIGHT_IMPORT: /tmp/fleed-browser/node_modules/playwright/index.mjs
+          STUDIO_BASE_URL: http://127.0.0.1:3000
+        run: node scripts/studio-browser-check.mjs
+
+      - name: Save screenshots, results and local runtime logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fleedfolio-studio-react-review
+          path: |
+            artifacts/studio-browser/
+            /tmp/fleed-studio-dev.log
+          if-no-files-found: warn
+          retention-days: 7
