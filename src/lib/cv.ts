@@ -1,4 +1,4 @@
-import { mailtoHref, safeUrl, type Portfolio } from './portfolio'
+import { mailtoHref, safeUrl, type Portfolio } from './portfolio.ts'
 
 /** A portable single-column text version alongside the browser's print-ready CV. */
 export function portfolioCvText(data: Portfolio, publicUrl?: string): string {
