@@ -1,9 +1,8 @@
 // Personal portfolio paths use /@name. Legacy /p/{id} routes remain supported.
 import { createFileRoute, Link, notFound } from '@tanstack/react-router'
 
-import { Portfolio } from '@/components/portfolio/Portfolio'
-import { Backdrop, ScrollProgress, Wordmark } from '@/components/portfolio/effects'
-import { themeProps } from '@/lib/portfolio'
+import { PublicPage } from '@/components/portfolio/PublicPage'
+import { Backdrop } from '@/components/portfolio/effects'
 import { getCustomPortfolio } from '@/server/portfolio.functions'
 
 export const Route = createFileRoute('/@{$slug}')({
@@ -42,17 +41,5 @@ export const Route = createFileRoute('/@{$slug}')({
 })
 
 function PublicPortfolio() {
-  const data = Route.useLoaderData()
-  return (
-    <div className="app mode-view" {...themeProps(data)}>
-      {data.theme.backdrop && <Backdrop />}
-      <ScrollProgress />
-      <Portfolio data={data} editing={false} />
-      <footer className="pf-powered">
-        <Link to="/" aria-label="Create your own portfolio with Fleed">
-          <span>Made with</span> <Wordmark />
-        </Link>
-      </footer>
-    </div>
-  )
+  return <PublicPage data={Route.useLoaderData()} />
 }

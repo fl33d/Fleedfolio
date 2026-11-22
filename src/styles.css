@@ -1242,3 +1242,36 @@ html { scroll-behavior: smooth; }
 .pf-powered a:hover { color: var(--ink); }
 .pf-powered .brand { font-weight: 650; letter-spacing: -.055em; color: var(--ink); }
 .pf-powered .brand-dot { color: var(--accent-c); }
+
+
+/* Public source view is an optional inspection tool, not a fixed developer overlay. */
+.pf-powered { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.pf-inspect-link {
+  display: inline-flex; align-items: center; gap: .45rem;
+  padding: .25rem 0; border-bottom: 1px solid transparent;
+  color: var(--dim); font-size: .76rem; transition: color .18s, border-color .18s;
+}
+.pf-inspect-link:hover { color: var(--ink); border-color: var(--hair); }
+.pf-inspect-link:focus-visible { outline: 2px solid var(--accent-c); outline-offset: 3px; }
+.pf-source-dialog {
+  width: min(48rem, calc(100vw - 1.5rem)); max-width: 48rem; gap: 1rem;
+  padding: 1.4rem; background: #151618; color: #f1efea; border: 1px solid #3b3b3c; border-radius: 12px;
+}
+.pf-source-kicker { display: block; color: #a9b79c; font: 600 .75rem var(--font-sans); margin-bottom: .5rem; }
+.pf-source-title { font: 550 clamp(1.55rem, 3vw, 2.1rem)/1.2 var(--font-sans); letter-spacing: -.055em; }
+.pf-source-description { color: #b3b0aa; font: .85rem/1.5 var(--font-sans); margin-top: .45rem; }
+.pf-source-actions { display: flex; flex-wrap: wrap; gap: .6rem; }
+.pf-source-actions button {
+  display: inline-flex; align-items: center; gap: .45rem; padding: .6rem .75rem;
+  border: 1px solid #3f4141; border-radius: 7px; color: #e9e6dd;
+  font: 500 .8rem var(--font-sans);
+}
+.pf-source-actions button:hover { border-color: #a9b79c; }
+.pf-source-actions button:focus-visible { outline: 2px solid #a9b79c; outline-offset: 2px; }
+.pf-source-code {
+  max-height: min(55vh, 35rem); overflow: auto; margin: 0; padding: 1rem;
+  border: 1px solid #363738; border-radius: 8px; background: #0e1011;
+  color: #c9d5c3; font: 400 .76rem/1.6 var(--font-mono); tab-size: 2;
+  white-space: pre; overflow-wrap: normal;
+}
+.pf-source-note { color: #9da19c; font: .73rem/1.5 var(--font-sans); }
