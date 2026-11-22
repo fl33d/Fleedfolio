@@ -1,4 +1,5 @@
 import type { CSSProperties, ReactNode } from 'react'
+import { Github } from 'lucide-react'
 import { safeUrl } from '@/lib/portfolio'
 import type { DocumentLink, Project, ProjectLens, RichParagraph, RichRun, StudioBlock, StudioDocument } from './document'
 
@@ -116,14 +117,14 @@ export function StudioView({ document: doc, editing = false, selectedId, onSelec
             const achievement = (items.achievements ?? []).find(item => item.id === id)
             if (!achievement) return null
             const href = achievement.evidenceUrl?.startsWith('https://') ? safeUrl(achievement.evidenceUrl) : undefined
-            return <li key={id} className="stx-achievement-entry">
-              <div className="stx-achievement-mark" aria-hidden="true">{String(index + 1).padStart(2, '0')}</div>
+            return <li key={id} className={'stx-achievement-entry' + (achievement.category === 'github' ? ' is-github' : '')}>
+              <div className="stx-achievement-mark" aria-hidden="true">{achievement.category === 'github' ? <Github size={24} strokeWidth={1.5} /> : String(index + 1).padStart(2, '0')}</div>
               <div className="stx-achievement-info">
-                <span className="stx-achievement-meta">{achievement.category} {achievement.date ? ' / ' + achievement.date : ''}</span>
+                <span className="stx-achievement-meta">{achievement.category === 'github' ? 'GitHub profile badge · creator-supplied' : achievement.category} {achievement.date ? ' / ' + achievement.date : ''}</span>
                 <h3>{achievement.title || 'Untitled achievement'}</h3>
                 {achievement.issuer && <p className="stx-achievement-issuer">{achievement.issuer}</p>}
                 {achievement.description && <p className="stx-achievement-description">{achievement.description}</p>}
-                {href && <a href={href} target="_blank" rel="noopener noreferrer" className="stx-achievement-proof">See supporting evidence <span aria-hidden="true">↗</span></a>}
+                {href && <a href={href} target="_blank" rel="noopener noreferrer" className="stx-achievement-proof">{achievement.category === 'github' ? 'View linked GitHub evidence' : 'See supporting evidence'} <span aria-hidden="true">↗</span></a>}
               </div>
             </li>
           })}</ol>
