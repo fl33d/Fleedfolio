@@ -20,7 +20,8 @@ Fleedfolio is an open-source portfolio editor built with React, TanStack Start a
 - Add projects, experience, links, skills and custom sections.
 - Choose from five page palettes, three typefaces, accents and motion settings.
 - **Export/import JSON backups** from **Customise → Your work**, so you can move a draft between browsers or recover it after clearing local data.
-- Reduced-motion support, basic accessible form controls and responsive layouts.
+- Reduced-motion support, accessible form controls and responsive layouts.
+- Cleaner default editor: compact hero, static skill list on public portfolios, no distracting pulsing placeholders or circular completion meter.
 
 ## Honest limitations
 

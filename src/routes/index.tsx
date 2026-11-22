@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { CircleHelp, Eye, PenLine, RotateCcw, Send } from 'lucide-react'
 import { toast } from 'sonner'
@@ -25,83 +25,10 @@ export const Route = createFileRoute('/')({
 // Keys kept from the original "blank." name so existing drafts and edit tokens survive the rename
 const DRAFT_KEY = 'blank:draft'
 const PUBLISHED_KEY = 'blank:published'
-const HINT_KEY = 'blank:hint-dismissed'
 const CUSTOM_SLUG_KEY = 'fleedfolio:custom-slug'
 const TOUR_SEEN_KEY = 'fleedfolio:tour:v1'
 
 type Published = { id: string; token: string; slug?: string }
-
-function completeness(p: PortfolioData) {
-  const checks = [
-    p.name,
-    p.role,
-    p.tagline,
-    p.about,
-    p.skills.length,
-    p.projects.some((x) => x.title),
-    p.experience.some((x) => x.role),
-    p.email || p.socials.some((s) => s.url),
-  ]
-  return Math.round((checks.filter(Boolean).length / checks.length) * 100)
-}
-
-// Hint shown at the top of the editor. Ticking the box, typing anywhere or scrolling
-// closes it, and once closed it stays closed in this browser.
-function EditBanner() {
-  const [state, setState] = useState<'pending' | 'shown' | 'leaving' | 'gone'>('pending')
-  const [ticked, setTicked] = useState(false)
-
-  useEffect(() => {
-    setState(localStorage.getItem(HINT_KEY) ? 'gone' : 'shown')
-  }, [])
-
-  useEffect(() => {
-    if (state !== 'shown') return
-    const close = () => setState('leaving')
-    const onScroll = () => window.scrollY > 24 && close()
-    const onInput = (e: Event) => {
-      if (!(e.target as Element | null)?.closest?.('.edit-banner')) close()
-    }
-    window.addEventListener('scroll', onScroll, { passive: true })
-    document.addEventListener('input', onInput)
-    return () => {
-      window.removeEventListener('scroll', onScroll)
-      document.removeEventListener('input', onInput)
-    }
-  }, [state])
-
-  useEffect(() => {
-    if (state === 'leaving' || state === 'gone') localStorage.setItem(HINT_KEY, '1')
-  }, [state])
-
-  if (state === 'pending' || state === 'gone') return null
-
-  return (
-    <div
-      className={cn('edit-banner chrome', state === 'leaving' && 'is-leaving')}
-      onAnimationEnd={(e) => {
-        if (e.animationName === 'drop-out') setState('gone')
-      }}
-    >
-      <span className="edit-banner-dot" />
-      Click any line and begin writing. Everything saves as you go.
-      <label className="edit-banner-check">
-        <input
-          type="checkbox"
-          checked={ticked}
-          onChange={() => {
-            setTicked(true)
-            setTimeout(() => setState('leaving'), 350)
-          }}
-        />
-        <span className="edit-banner-box">
-          <Check className="size-2.5" strokeWidth={3} />
-        </span>
-        Got it
-      </label>
-    </div>
-  )
-}
 
 function Editor() {
   const [data, setData] = useState<PortfolioData>(blankPortfolio)
@@ -176,7 +103,6 @@ function Editor() {
     }
   }, [customSlug])
 
-  const percent = useMemo(() => completeness(data), [data])
   const switchMode = (next: boolean) => {
     setEditing(next)
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -250,10 +176,8 @@ function Editor() {
   return (
     <div className={cn('app', editing ? 'mode-edit' : 'mode-view')} {...themeProps(data)}>
       <Intro />
-      {data.theme.backdrop && <Backdrop />}
+      {!editing && data.theme.backdrop && <Backdrop />}
       <ScrollProgress />
-
-      {editing && <EditBanner />}
 
       <div key={editing ? 'edit' : 'view'} className="mode-swap">
         <Portfolio data={data} editing={editing} onChange={setData} />
@@ -275,25 +199,11 @@ function Editor() {
 
         <Customize data={data} onChange={setData} onImport={importDraft} customSlug={customSlug} onSlugChange={setCustomSlug} />
 
-        <div className="dock-progress" title={`${percent}% filled in`}>
-          <svg viewBox="0 0 36 36" className="size-9 -rotate-90">
-            <circle cx="18" cy="18" r="15" className="dock-ring-bg" />
-            <circle
-              cx="18"
-              cy="18"
-              r="15"
-              className="dock-ring"
-              style={{ strokeDashoffset: 94.25 - (94.25 * percent) / 100 }}
-            />
-          </svg>
-          <span>{percent}</span>
-        </div>
-
         <button className="dock-icon" onClick={() => setTourOpen(true)} aria-label="How to use Fleedfolio" title="How it works">
           <CircleHelp className="size-4" />
         </button>
 
-        <button className="dock-icon" onClick={reset} aria-label="Start over">
+        <button className="dock-icon" onClick={reset} aria-label="Reset draft" title="Reset draft">
           <RotateCcw className="size-4" />
         </button>
 

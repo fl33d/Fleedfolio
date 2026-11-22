@@ -82,7 +82,7 @@ export const DEFAULT_THEME: Theme = {
   scale: 'regular',
   align: 'left',
   motion: true,
-  backdrop: true,
+  backdrop: false,
 }
 
 export type Portfolio = {

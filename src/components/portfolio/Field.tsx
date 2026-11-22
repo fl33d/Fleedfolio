@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils'
 
 /**
  * A text box that looks like the finished typography. Grows with its content,
- * shows a shimmering placeholder while empty and an accent underline on focus.
+ * uses a quiet placeholder and an accent underline only while focused.
  */
 export function Field({
   value,
