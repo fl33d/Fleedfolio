@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 import { safeUrl } from '@/lib/portfolio'
 import type { DocumentLink, Project, ProjectLens, RichParagraph, RichRun, StudioBlock, StudioDocument } from './document'
 
@@ -118,7 +118,7 @@ export function StudioView({ document: doc, editing = false, selectedId, onSelec
       case 'embed': return identify(block,<div className="stx-embed"><p>{block.title}</p><p>{block.fallbackText}</p><a href={safeUrl(block.url)} target="_blank" rel="noopener noreferrer">Open external experience ↗</a><small>External content is not loaded in this page.</small></div>)
     }
   }
-  return <main className="stx-public" data-system={doc.presentation.system} data-motion={doc.presentation.motion} style={{'--stx-user-accent':doc.presentation.accent} as React.CSSProperties}>
+  return <main className="stx-public" data-system={doc.presentation.system} data-motion={doc.presentation.motion} style={{'--stx-user-accent':doc.presentation.accent} as CSSProperties}>
     <div className="stx-site-nav"><a href="#stx-start" className="stx-site-identity">{doc.identity.displayName || 'Creator'}</a><span>Work / Thought / Process</span><a href="#stx-bottom">Get in touch <span aria-hidden>↗</span></a></div>
     <div id="stx-start" className="stx-document">{page.blocks.map(renderBlock)}</div>
     <div id="stx-bottom" className="stx-end-anchor" aria-hidden />
