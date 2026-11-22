@@ -61,7 +61,7 @@ try {
       }
       await customise.click()
       if (width===390||width===1440) await page.screenshot({path:path.join(artifact,width+'-editor.png'),fullPage:true,animations:'disabled'})
-      await toolbar.getByRole('button',{name:/Preview/}).click()
+      await toolbar.getByRole('button',{name:'Preview',exact:true}).click()
       await page.locator('.mode-view .portfolio').waitFor()
       if (await page.locator('.pf-identity').count() !== 0) throw new Error('Identity hidden mode not respected')
       const list=page.locator('.pf-skills-list')
