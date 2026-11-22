@@ -2,6 +2,10 @@
 
 Branch: `feat/studio-proof-20261122`. All reported results must be linked to command logs or GitHub Actions results.
 
+## Verified GitHub CI
+
+[Successful run 45066115529](https://github.com/fl33d/Fleedfolio/actions/runs/45066115529) on commit `763766f76fea8ce0acc7613f327da31f8fc47b18` recorded `pnpm install`, `wrangler types`, `tsc --noEmit`, 29/29 unit tests, client and SSR builds. Earlier runs failed type narrowing and Node JSON import attributes; both were fixed. This does not constitute browser/visual QA.
+
 ## Source-level / proposed tests
 `tests/studio.test.mjs` adds cases for:
 - Valid fixture and unsupported format.
@@ -23,11 +27,11 @@ Branch: `feat/studio-proof-20261122`. All reported results must be linked to com
 ## Execution matrix
 | Command / QA | Status | Notes |
 | --- | --- | --- |
-| `pnpm install --frozen-lockfile` | NOT RUN | No network access for dependency installation in the authoring container |
-| `pnpm exec wrangler types` | NOT RUN | Requires a full checkout and node_modules |
-| `pnpm typecheck` | NOT RUN | Requires a full checkout and node_modules |
-| `pnpm test` | NOT RUN | Tests are committed but not yet executed against a checkout |
-| `pnpm build` | NOT RUN | Requires full dependency installation |
+| `pnpm install --frozen-lockfile` | PASS (GitHub Actions) | Successful in run 45066115529 |
+| `pnpm exec wrangler types` | PASS (GitHub Actions) | Generated Worker types in run 45066115529 |
+| `pnpm typecheck` | PASS (GitHub Actions) | TypeScript reported zero errors in run 45066115529 |
+| `pnpm test` | PASS (GitHub Actions) | 29 tests passed, 0 failed in run 45066115529 |
+| `pnpm build` | PASS (GitHub Actions) | Client and SSR Vite production builds succeeded in run 45066115529 |
 | Studio route actual browser screenshot | NOT RUN | There is not yet a running React build in the authoring container |
 | Production Worker deploy / live D1 | NOT RUN, PROHIBITED | No production changes authorised |
 
