@@ -25,6 +25,8 @@ try {
       const response = await page.goto(base + '/studio', { waitUntil: 'domcontentloaded', timeout: 60000 })
       if (!response?.ok()) throw new Error('Studio HTTP status: ' + (response?.status() ?? 'no response'))
       await page.getByRole('heading', { name: /make it yours/i }).waitFor({ timeout: 20000 })
+      await page.locator('.stx-shell[data-hydrated="true"]').waitFor({ timeout: 20000 })
+      // React event handlers may not be ready until hydration has finished.
       const name = page.getByRole('textbox', { name: 'Your name' })
       await name.fill('Avery Design Test')
       await page.waitForFunction(() => document.querySelector('main.stx-public h1')?.textContent?.includes('Avery Design Test'), null, { timeout: 10000 })
