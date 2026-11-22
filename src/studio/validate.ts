@@ -1,3 +1,4 @@
+import { validateStudioShape } from './validate-schema.ts'
 import type { StudioBlock, StudioDocument, ProjectLens } from './document.ts'
 
 export type StudioValidation =
@@ -10,7 +11,7 @@ export type StudioValidation =
  * The JSON Schema is the full wire-format contract. Keep both tests in sync.
  */
 export function validateStudioDocument(value: unknown): StudioValidation {
-  const issues: string[] = []
+  const issues: string[] = validateStudioShape(value)
   const bad = (message: string) => { if (issues.length < 30) issues.push(message) }
   const obj = (v: unknown): v is Record<string, unknown> => !!v && typeof v === 'object' && !Array.isArray(v)
   const arr = (v: unknown, max: number, where: string): v is unknown[] => {
@@ -50,7 +51,7 @@ export function validateStudioDocument(value: unknown): StudioValidation {
   const identityLinks = new Set<string>()
   if (!obj(identity)) bad('Missing identity')
   else {
-    str(identity.displayName, 100, 'identity.displayName', 1)
+    str(identity.displayName, 100, 'identity.displayName')
     for (const key of ['headline', 'bio', 'location', 'availability']) str(identity[key], key === 'bio' ? 4000 : 320, 'identity.' + key)
     if (arr(identity.roles, 8, 'identity.roles')) identity.roles.forEach((v, i) => str(v, 120, 'identity.roles.' + i, 1))
     if (arr(identity.links, 32, 'identity.links')) identity.links.forEach((v, i) => {
@@ -83,7 +84,7 @@ export function validateStudioDocument(value: unknown): StudioValidation {
     if (arr(content.projects, 100, 'projects')) content.projects.forEach((v, i) => {
       if (!obj(v)) { bad('Invalid project ' + i); return }
       takeId(v.id, 'project.' + i)
-      str(v.title, 160, 'project title', 1)
+      str(v.title, 160, 'project title')
       str(v.summary, 1200, 'project summary')
       str(v.contribution, 500, 'project contribution')
       if (typeof v.id === 'string') projects.set(v.id, v)
