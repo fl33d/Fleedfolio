@@ -41,7 +41,8 @@ try {
       await search.fill('Text')
       await page.locator('.ff-library .element-option').first().click()
       await page.waitForTimeout(260)
-      if (!(await page.locator('.portfolio').innerText()).includes('Riley Portfolio')) throw new Error('Adding element discarded existing text')
+      if ((await field.inputValue()) !== 'Riley Portfolio') throw new Error('Adding an element changed the inline name field')
+      if (!(await page.getByRole('complementary',{name:'Elements library'}).isVisible())) throw new Error('Library closed after adding a section')
       await toolbar.getByRole('button',{name:'Close elements library'}).click()
       // Autocomplete for programming languages is presented with an actual logo.
       const skillInput=page.locator('.pf-chip-input')
