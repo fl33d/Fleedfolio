@@ -285,8 +285,6 @@ html { scroll-behavior: smooth; }
   font-family: var(--font-display); font-weight: 400; font-size: var(--name-size, clamp(3.6rem, 11vw, 10.5rem));
   line-height: .92; letter-spacing: -.03em; margin: 0; max-width: 14ch;
 }
-.split-char { display: inline-block; opacity: 0; transform: translateY(.18em); animation: char-in 1.4s var(--ease) forwards; }
-@keyframes char-in { to { opacity: 1; transform: none; } }
 .pf-hero-row { display: grid; gap: 1.5rem 3rem; margin-top: 2.7rem; grid-template-columns: 1fr; }
 @media (min-width: 900px) { .pf-hero-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; } }
 .pf-role { font-family: var(--font-display); font-style: italic; font-size: clamp(1.5rem, 2.6vw, 2.2rem); line-height: 1.15; color: var(--accent-t); transition: color 1.2s; }
@@ -1229,3 +1227,18 @@ html { scroll-behavior: smooth; }
 @media (prefers-reduced-motion: reduce) {
   .cz-design, .cz-layouts button { transition: none; transform: none; }
 }
+
+
+/* Attribution belongs in the document footer, not a fixed chat-like badge. */
+.pf-powered {
+  width: min(85rem, 100%);
+  padding: 1.75rem clamp(1.2rem, 4.6vw, 4.5rem) 2.4rem;
+  margin: 0 auto;
+  color: var(--dim);
+  border-top: 1px solid var(--hair);
+  font: 400 .77rem var(--font-sans);
+}
+.pf-powered a { display: inline-flex; gap: .32rem; align-items: baseline; transition: color .18s; }
+.pf-powered a:hover { color: var(--ink); }
+.pf-powered .brand { font-weight: 650; letter-spacing: -.055em; color: var(--ink); }
+.pf-powered .brand-dot { color: var(--accent-c); }

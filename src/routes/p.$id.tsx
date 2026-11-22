@@ -47,9 +47,11 @@ function PublicPortfolio() {
       {data.theme.backdrop && <Backdrop />}
       <ScrollProgress />
       <Portfolio data={data} editing={false} />
-      <Link to="/" className="made-with">
-        made with <Wordmark />
-      </Link>
+      <footer className="pf-powered">
+        <Link to="/" aria-label="Create your own portfolio with Fleed">
+          <span>Made with</span> <Wordmark />
+        </Link>
+      </footer>
     </div>
   )
 }
