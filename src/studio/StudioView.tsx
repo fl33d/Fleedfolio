@@ -46,7 +46,7 @@ function ProjectStudy({ project, initial, lens, onLensChange }: { project: Proje
       <h2 id={'studio-project-' + project.id}>{project.title}</h2>
       <div className="stx-project-description"><p>{project.summary}</p><p className="stx-project-contribution">{project.contribution}</p></div>
     </div>
-    <div className="stx-diagram" role="img" aria-label={'Project structure: ' + [spec.problem, spec.approach, project.summary].filter(Boolean).join('; ')}>
+    {spec.enabled && (spec.problem || spec.approach) && <div className="stx-diagram" role="img" aria-label={'Project structure: ' + [spec.problem, spec.approach, project.summary].filter(Boolean).join('; ')}>
       <div className="stx-diagram-head"><span>01 / System notes</span><span>Observe → Explain</span></div>
       <div className="stx-diagram-row">
         <div className="stx-diagram-node"><small>CONTEXT</small><strong>{spec.problem || 'The starting point'}</strong></div>
@@ -56,7 +56,7 @@ function ProjectStudy({ project, initial, lens, onLensChange }: { project: Proje
         <div className="stx-diagram-node"><small>OUTPUT</small><strong>{project.summary}</strong></div>
       </div>
       <div className="stx-diagram-foot"><span>Designed from the project's authored facts</span><span>Not a live service diagram</span></div>
-    </div>
+    </div>}
     {supported.length > 1 && <div className="stx-lenses" role="group" aria-label={'Views of ' + project.title}>
       <span>Explore this project</span>
       <div className="stx-lens-buttons">{supported.map(key =>
@@ -109,7 +109,7 @@ export function StudioView({ document: doc, editing = false, selectedId, onSelec
       }
       case 'project-list': return identify(block, <section className="stx-project-list"><h2>Selected work</h2>{block.projectIds.map((id,i)=>{const project=items.projects.find(p=>p.id===id);return project&&<div key={id}><span>0{i+1}</span><strong>{project.title}</strong><span>{project.year}</span></div>})}</section>)
       case 'skills': return identify(block,<section className="stx-skills"><div className="stx-section-index">In practice / Tools</div><div><h2>What I work with</h2><ul>{block.skillIds.map((id,i)=>{const skill=items.skills.find(x=>x.id===id);return skill&&<li key={id}><span>{String(i+1).padStart(2,'0')}</span><strong>{skill.label}</strong><small>{skill.category}</small></li>})}</ul></div></section>)
-      case 'links': return identify(block,<footer className="stx-footer"><span>There is always more to make.</span><div className="stx-footer-links">{block.linkIds.map(id=>{const link=doc.identity.links.find(l=>l.id===id);return link&&<ExternalLink link={link} key={id}/>})}</div><div className="stx-footer-bottom"><span>{doc.identity.displayName} / {new Date().getFullYear()}</span><span>Made with care, not a template.</span></div></footer>)
+      case 'links': return identify(block,<footer className="stx-footer"><span>There is always more to make.</span><div className="stx-footer-links">{block.linkIds.map(id=>{const link=doc.identity.links.find(l=>l.id===id);return link&&<ExternalLink link={link} key={id}/>})}</div><div className="stx-footer-bottom"><span>{doc.identity.displayName} / Selected work</span><span>Made with care, not a template.</span></div></footer>)
       case 'divider': return identify(block, <hr className={'stx-divider stx-divider-'+block.weight}/>)
       case 'code': return identify(block, <figure className="stx-code"><figcaption>{block.caption || block.language}</figcaption><pre><code>{block.source}</code></pre></figure>)
       case 'timeline': return identify(block,<section className="stx-timeline"><h2>{block.collection === 'experience' ? 'Experience' : 'Education'}</h2><ol>{block.itemIds.map(id=>{const v=block.collection==='experience'?items.experience.find(x=>x.id===id):items.education.find(x=>x.id===id);if(!v)return null;return <li key={id}><strong>{'role' in v?v.role:v.qualification}</strong><span>{'organisation' in v?v.organisation:v.institution}</span><small>{'start' in v?v.start+' – '+(v.end||'Present'):v.period}</small></li>})}</ol></section>)
