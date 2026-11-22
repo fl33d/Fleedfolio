@@ -17,3 +17,9 @@ export function normalizeCustomSlug(input: unknown): string | null {
   ) return null
   return slug
 }
+
+/** Keep legacy generated URLs while sharing named portfolios as /@name. */
+export function portfolioPublicPath(id: string, slug?: string): string {
+  const safeSlug = normalizeCustomSlug(slug)
+  return safeSlug ? `/@${safeSlug}` : `/p/${id}`
+}

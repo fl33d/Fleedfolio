@@ -22,7 +22,7 @@ import {
 } from '@/lib/portfolio'
 import { publishPortfolio } from '@/server/portfolio.functions'
 import { cn } from '@/lib/utils'
-import { normalizeCustomSlug } from '@/lib/portfolio-slug'
+import { normalizeCustomSlug, portfolioPublicPath } from '@/lib/portfolio-slug'
 
 export const Route = createFileRoute('/')({
   component: Editor,
@@ -162,7 +162,9 @@ function Editor() {
 
   const percent = useMemo(() => completeness(data), [data])
   const shareUrl =
-    published && typeof window !== 'undefined' ? `${location.origin}/p/${published.slug || published.id}` : ''
+    published && typeof window !== 'undefined'
+      ? `${location.origin}${portfolioPublicPath(published.id, published.slug)}`
+      : ''
 
   const switchMode = (next: boolean) => {
     setEditing(next)

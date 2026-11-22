@@ -236,7 +236,7 @@ export function Customize({
               Personal URL <span>optional</span>
             </label>
             <div className="cz-slug-row">
-              <span>fleed.online/p/</span>
+              <span>/@</span>
               <input
                 id="fleedfolio-custom-link"
                 type="text"
@@ -253,7 +253,7 @@ export function Customize({
             <p id="fleedfolio-slug-help" className="cz-slug-help">
               {customSlug.trim() && !normalizeCustomSlug(customSlug)
                 ? 'Use 3–30 letters, numbers or single hyphens; some names are reserved.'
-                : 'Saved when you publish. Blank uses a generated link. Changing your name retires the previous custom URL.'}
+                : 'Published as /@yourname on this site. Leave blank for a generated link. Renaming retires the old custom URL.'}
             </p>
           </Group>
 

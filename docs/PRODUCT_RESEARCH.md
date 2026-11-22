@@ -15,7 +15,7 @@ This note reviews publicly visible portfolio products and projects found in Nove
 
 ## Prioritised decisions
 
-1. **Personal links:** claim a unique `/p/name` alias for a published portfolio, while keeping the original generated link functional. Do not introduce account requirements merely to add vanity URLs.
+1. **Personal links:** claim a unique `/@name` alias for a published portfolio, while keeping the original generated link functional. Do not introduce account requirements merely to add vanity URLs.
 2. **Data portability:** JSON export/import, preserving work without relying on browser storage; keep publishing credentials out of exported files.
 3. **Public-page quality:** resilient metadata, accessible semantic markup, responsive typography and measured motion. Verify rather than claim Lighthouse scores.
 4. **Fast onboarding:** ship a clear example/demonstration path and avoid an empty experience. Do not import third-party profile data without user consent.

@@ -27,8 +27,8 @@ The custom URL feature uses the new `portfolio_slugs` table. **Do not merge and 
 1. Back up the existing D1 database `fleed-portfolios` and verify the backup.
 2. Run the non-destructive SQL migration `migrations/0002_portfolio_slugs.sql` against that exact database using the authenticated Cloudflare CLI/dashboard.
 3. Confirm the table and unique constraints were created, and verify old published `/p/{id}` pages still load.
-4. Only then merge the application change and verify the Cloudflare deployment, existing editing and new `/p/yourname` links.
-5. Custom names use 3–30 lowercase letters/numbers with single hyphens, and cannot be reserved words or duplicate existing names.
+4. Only then merge the application change and verify the Cloudflare deployment, existing editing and new `/@yourname` links.
+5. Custom names use 3–30 lowercase letters/numbers with single hyphens and cannot be reserved or duplicate; links are published as `/@name` directly beneath the site root.
 6. Renaming removes the previous alias but does not change the underlying generated portfolio ID; old generated URLs continue working.
 
 No production migration is performed by this pull request.
