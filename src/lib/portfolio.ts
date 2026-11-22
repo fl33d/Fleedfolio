@@ -184,6 +184,15 @@ export function safeImage(raw: unknown): string {
   return typeof raw === 'string' && /^\/img\/[a-z0-9]{16,40}$/.test(raw) ? raw : ''
 }
 
+/** A plain, single email address only: never accept headers, queries or URL schemes. */
+export function mailtoHref(raw: string): string | undefined {
+  const value = raw.trim()
+  if (value.length > 200 || !/^[^\\s@%?#/\\\\:;,<>]+@[^\\s@%?#/\\\\:;,<>]+\\.[^\\s@%?#/\\\\:;,<>]+$/.test(value)) {
+    return undefined
+  }
+  return 'mailto:' + value
+}
+
 /** Only allow http(s) and mailto links so visitor-facing pages can't carry script URLs. */
 export function safeUrl(raw: string): string | undefined {
   const value = raw.trim()

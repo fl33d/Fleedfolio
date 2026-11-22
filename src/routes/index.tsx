@@ -114,6 +114,7 @@ function Editor() {
   const [shareOpen, setShareOpen] = useState(false)
   const [copied, setCopied] = useState(false)
   const loaded = useRef(false)
+  const storageWarningShown = useRef(false)
 
   // Restore the in-progress draft from this browser
   useEffect(() => {
@@ -129,7 +130,16 @@ function Editor() {
   }, [])
 
   useEffect(() => {
-    if (loaded.current) localStorage.setItem(DRAFT_KEY, JSON.stringify(data))
+    if (!loaded.current) return
+    try {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(data))
+      storageWarningShown.current = false
+    } catch {
+      if (!storageWarningShown.current) {
+        toast.error('Draft could not be saved locally. Export a backup from Customise.')
+        storageWarningShown.current = true
+      }
+    }
   }, [data])
 
   const percent = useMemo(() => completeness(data), [data])
@@ -160,6 +170,21 @@ function Editor() {
     } finally {
       setPublishing(false)
     }
+  }
+
+  const importDraft = (draft: PortfolioData): boolean => {
+    if (!window.confirm('Replace this draft with the imported backup? Unsaved changes will be lost.')) {
+      return false
+    }
+    setData(draft)
+    setPublished(null)
+    try {
+      localStorage.removeItem(PUBLISHED_KEY)
+    } catch {
+      // Import still works if browser storage is unavailable.
+    }
+    setEditing(true)
+    return true
   }
 
   const reset = () => {
@@ -194,7 +219,7 @@ function Editor() {
 
         <span className="dock-sep" />
 
-        <Customize data={data} onChange={setData} />
+        <Customize data={data} onChange={setData} onImport={importDraft} />
 
         <div className="dock-progress" title={`${percent}% filled in`}>
           <svg viewBox="0 0 36 36" className="size-9 -rotate-90">
@@ -234,9 +259,13 @@ function Editor() {
             <input readOnly value={shareUrl} className="share-input" onFocus={(e) => e.target.select()} />
             <Button
               onClick={async () => {
-                await navigator.clipboard.writeText(shareUrl)
-                setCopied(true)
-                setTimeout(() => setCopied(false), 1600)
+                try {
+                  await navigator.clipboard.writeText(shareUrl)
+                  setCopied(true)
+                  setTimeout(() => setCopied(false), 1600)
+                } catch {
+                  toast.error('Copy failed. Select the link and copy it manually.')
+                }
               }}
             >
               {copied ? <Check /> : <Copy />}
@@ -256,6 +285,21 @@ function Editor() {
 function Intro() {
   const [gone, setGone] = useState(false)
   useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setGone(true)
+      return
+    }
+
+    try {
+      if (sessionStorage.getItem('fleed:intro-seen')) {
+        setGone(true)
+        return
+      }
+      sessionStorage.setItem('fleed:intro-seen', '1')
+    } catch {
+      // Session storage may be disabled; the intro can still finish normally.
+    }
+
     const t = setTimeout(() => setGone(true), 2700)
     return () => clearTimeout(t)
   }, [])

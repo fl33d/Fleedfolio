@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { ChevronDown, RotateCcw, SlidersHorizontal } from 'lucide-react'
+import { ChevronDown, Download, RotateCcw, SlidersHorizontal, Upload } from 'lucide-react'
+import { toast } from 'sonner'
 
 import {
   ACCENTS,
@@ -14,6 +15,7 @@ import {
   type Theme,
 } from '@/lib/portfolio'
 import { cn } from '@/lib/utils'
+import { createPortfolioBackup, parsePortfolioBackup } from '@/lib/portfolio-backup.ts'
 
 const SECTIONS: { key: SectionKey; label: string }[] = [
   { key: 'skills', label: 'Skills ticker' },
@@ -27,12 +29,46 @@ const SECTIONS: { key: SectionKey; label: string }[] = [
 export function Customize({
   data,
   onChange,
+  onImport,
 }: {
   data: Portfolio
   onChange: (fn: (d: Portfolio) => Portfolio) => void
+  onImport: (draft: Portfolio) => boolean
 }) {
   const [open, setOpen] = useState(false)
   const root = useRef<HTMLDivElement>(null)
+  const fileInput = useRef<HTMLInputElement>(null)
+
+  const exportDraft = () => {
+    const blob = new Blob([createPortfolioBackup(data)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = 'fleedfolio-' + new Date().toISOString().slice(0, 10) + '.json'
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000)
+    toast.success('Portfolio backup downloaded.')
+  }
+
+  const importFile = async (file?: File) => {
+    if (!file) return
+    if (file.size > 2_000_000) {
+      toast.error('This backup is too large (2 MB maximum).')
+      return
+    }
+
+    try {
+      const draft = parsePortfolioBackup(await file.text())
+      if (onImport(draft)) {
+        setOpen(false)
+        toast.success('Backup imported. Publish to create a new share link.')
+      }
+    } catch {
+      toast.error('Invalid Fleedfolio backup. No changes were made.')
+    }
+  }
 
   useEffect(() => {
     if (!open) return
@@ -82,6 +118,8 @@ export function Customize({
                   <button
                     key={key}
                     className={cn('cz-palette', theme.palette === key && 'is-active')}
+                    aria-pressed={theme.palette === key}
+                    aria-label={p.label + ' palette'}
                     onClick={() => setTheme('palette', key)}
                     style={{ background: p.paper, color: p.ink }}
                   >
@@ -101,6 +139,7 @@ export function Customize({
                   aria-label={`Accent ${c}`}
                   onClick={() => onChange((d) => ({ ...d, accent: c }))}
                   className={cn('cz-accent', data.accent === c && 'is-active')}
+                  aria-pressed={data.accent === c}
                   style={{ background: c }}
                 />
               ))}
@@ -125,6 +164,7 @@ export function Customize({
                 <button
                   key={key}
                   className={cn('cz-font', theme.font === key && 'is-active')}
+                  aria-pressed={theme.font === key}
                   onClick={() => setTheme('font', key)}
                 >
                   <span style={{ fontFamily: FONTS[key].family }}>Aa</span>
@@ -184,6 +224,29 @@ export function Customize({
                 onChange={() => setTheme('motion', !theme.motion)}
               />
             </div>
+          </Group>
+
+          <Group title="Your work">
+            <div className="cz-utilities">
+              <button type="button" className="cz-utility" onClick={exportDraft}>
+                <Download className="size-3.5" /> Export backup
+              </button>
+              <button type="button" className="cz-utility" onClick={() => fileInput.current?.click()}>
+                <Upload className="size-3.5" /> Import backup
+              </button>
+            </div>
+            <input
+              ref={fileInput}
+              type="file"
+              accept=".json,application/json"
+              className="sr-only"
+              aria-label="Choose a Fleedfolio backup file"
+              onChange={(event) => {
+                const file = event.currentTarget.files?.[0]
+                event.currentTarget.value = ''
+                void importFile(file)
+              }}
+            />
           </Group>
 
           <button
