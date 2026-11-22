@@ -1,6 +1,6 @@
-import { useState } from 'react'
-import type { StudioDocument } from './document'
-import { addSimpleProject, addSimpleSkill, hideSimpleSkill, readSimpleIntro, visibleSimpleSkills, writeSimpleIntro } from './shared-editor'
+import { useEffect, useState } from 'react'
+import type { Achievement, StudioDocument } from './document'
+import { addSimpleAchievement, addSimpleProject, addSimpleSkill, hideSimpleAchievement, hideSimpleSkill, readSimpleIntro, updateSimpleAchievement, visibleSimpleAchievements, visibleSimpleSkills, writeSimpleIntro } from './shared-editor'
 
 type Update = (change: (doc: StudioDocument) => void) => void
 type Props = {
@@ -26,6 +26,32 @@ function Field({ name, value, onChange, multiline = false, placeholder = '' }: {
   }</label>
 }
 
+/** Evidence URL editing uses a local buffer so half-typed links can't poison a saved draft. */
+function AchievementEvidence({ value, onSave }: { value: string | null; onSave: (value: string | null) => void }) {
+  const [draft, setDraft] = useState(value ?? '')
+  const [error, setError] = useState('')
+  useEffect(() => { setDraft(value ?? '') }, [value])
+  const save = () => {
+    const text = draft.trim()
+    if (text) {
+      try {
+        const parsed = new URL(text)
+        if (parsed.protocol !== 'https:') throw new Error('HTTPS required')
+      } catch {
+        setError('Use a complete HTTPS link, or leave this blank.')
+        return
+      }
+    }
+    setError('')
+    onSave(text || null)
+  }
+  return <label className="stx-quick-field"><span>Evidence link (optional)</span>
+    <input type="url" inputMode="url" value={draft} placeholder="https://example.com/certificate"
+      onChange={event => { setDraft(event.target.value); setError('') }} onBlur={save} maxLength={2048}/>
+    {error && <small className="stx-quick-error" role="alert">{error}</small>}
+  </label>
+}
+
 /**
  * A shallow, human-friendly view of the SAME canonical Studio document.
  * It never replaces, normalizes, or deletes unsupported blocks.
@@ -35,6 +61,7 @@ export function StudioSimplePanel({ doc, onCommit, onOpenStudio, onExport, onImp
   const [newSkill, setNewSkill] = useState('')
   const story = readSimpleIntro(doc)
   const shownSkills = visibleSimpleSkills(doc)
+  const shownAchievements = visibleSimpleAchievements(doc)
   const updateIdentity = (key: 'displayName' | 'headline' | 'location' | 'availability', value: string) =>
     onCommit(next => { next.identity[key] = value })
   const updateProject = (id: string, key: 'title' | 'summary' | 'year' | 'contribution', value: string) =>
@@ -47,6 +74,10 @@ export function StudioSimplePanel({ doc, onCommit, onOpenStudio, onExport, onImp
     setNewSkill('')
   }
   const removeSkill = (id: string) => onCommit(next => { hideSimpleSkill(next, id) })
+  const addAchievement = () => onCommit(next => { addSimpleAchievement(next, makeId) })
+  const editAchievement = (id: string, key: 'title' | 'category' | 'issuer' | 'date' | 'description' | 'evidenceUrl', value: string | null) =>
+    onCommit(next => { updateSimpleAchievement(next, id, key, value) })
+  const removeAchievement = (id: string) => onCommit(next => { hideSimpleAchievement(next, id) })
 
   return <aside className="stx-simple-panel" aria-label="Simple portfolio editor">
     <div className="stx-simple-opening">
@@ -88,6 +119,27 @@ export function StudioSimplePanel({ doc, onCommit, onOpenStudio, onExport, onImp
         {shownSkills.map(skill => <span className="stx-simple-skill" key={skill.id}>{skill.label}<button type="button" onClick={() => removeSkill(skill.id)} aria-label={'Remove ' + skill.label + ' from page'}>×</button></span>)}
       </div>
       <label className="stx-quick-field"><span>Add a skill or tool</span><span className="stx-add-skill-row"><input value={newSkill} maxLength={70} placeholder="Writing, design, Python…" onChange={event => setNewSkill(event.target.value)} onKeyDown={event => { if (event.key === 'Enter') { event.preventDefault(); addSkill() } }} /><button type="button" onClick={addSkill}>Add</button></span></label>
+    </section>
+    <section className="stx-quick-section" aria-labelledby="stx-your-achievements">
+      <h3 id="stx-your-achievements"><span>05</span> Achievements</h3>
+      <p className="stx-quick-lede">Awards, certifications, competitions and milestones. Add evidence when you have it; Fleed doesn't issue verification badges.</p>
+      {shownAchievements.map((achievement: Achievement, index) => <div className="stx-quick-project" key={achievement.id}>
+        <div className="stx-quick-project-label">ACHIEVEMENT {String(index + 1).padStart(2, '0')}</div>
+        <Field name="Title" value={achievement.title} onChange={value => editAchievement(achievement.id, 'title', value)} placeholder="What did you achieve?"/>
+        <label className="stx-quick-field"><span>Type</span>
+          <select value={achievement.category} onChange={event => editAchievement(achievement.id, 'category', event.target.value)}>
+            <option value="award">Award</option><option value="certification">Certification</option>
+            <option value="competition">Competition</option><option value="milestone">Milestone</option>
+            <option value="publication">Publication</option><option value="other">Other</option>
+          </select>
+        </label>
+        <Field name="Issuer or organisation (optional)" value={achievement.issuer} onChange={value => editAchievement(achievement.id, 'issuer', value)}/>
+        <Field name="Date or year" value={achievement.date} onChange={value => editAchievement(achievement.id, 'date', value)} placeholder="2026"/>
+        <Field name="Details" value={achievement.description} onChange={value => editAchievement(achievement.id, 'description', value)} multiline/>
+        <AchievementEvidence value={achievement.evidenceUrl} onSave={value => editAchievement(achievement.id, 'evidenceUrl', value)}/>
+        <button type="button" className="stx-quick-hide" onClick={() => removeAchievement(achievement.id)}>Hide from this page</button>
+      </div>)}
+      <button type="button" className="stx-add-simple" onClick={addAchievement}>+ Add an achievement</button>
     </section>
     <div className="stx-quick-finale">
       <div className="stx-spark" aria-hidden="true">✳</div>
