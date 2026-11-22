@@ -23,6 +23,7 @@ try {
     try {
       const response=await page.goto(base+'/',{waitUntil:'domcontentloaded',timeout:60000})
       if (!response?.ok()) throw new Error('Classic HTTP '+response?.status())
+      await page.waitForTimeout(700) // Allow the legacy draft restoration effect to complete.
       const toolbar=page.getByRole('banner',{name:'Fleedfolio editor toolbar'})
       await toolbar.waitFor({timeout:30000})
       const field=page.locator('.pf-name .field-input').first()
