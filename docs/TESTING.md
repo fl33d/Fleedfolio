@@ -1,5 +1,10 @@
 # Fleedfolio Studio — testing record
 
+## PR #7 checks — pending current CI
+
+New `tests/achievements.test.mjs` covers canonical achievements, GitHub badges, HTTPS evidence, no invented verification, and compatibility with older Studio v1 documents. Shared-editor tests preserve project skills, advanced rich text and project lenses. The separate `Studio browser QA (review only)` GitHub workflow starts local workerd with a **disposable CI-only** compatibility-date fallback, then waits for React hydration before testing editor round trips at 320, 390, 768, 1024 and 1440 px. Its actual screenshots and test outcome must be checked from the workflow run; do not infer browser acceptance from TypeScript or unit passes. This is never a production release test.
+
+
 Branch: `feat/studio-proof-20261122`. All reported results must be linked to command logs or GitHub Actions results.
 
 ## Verified GitHub CI

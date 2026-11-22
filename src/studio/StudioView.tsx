@@ -1,4 +1,5 @@
 import type { CSSProperties, ReactNode } from 'react'
+import { Github } from 'lucide-react'
 import { safeUrl } from '@/lib/portfolio'
 import type { DocumentLink, Project, ProjectLens, RichParagraph, RichRun, StudioBlock, StudioDocument } from './document'
 
@@ -109,6 +110,27 @@ export function StudioView({ document: doc, editing = false, selectedId, onSelec
       }
       case 'project-list': return identify(block, <section className="stx-project-list"><h2>Selected work</h2>{block.projectIds.map((id,i)=>{const project=items.projects.find(p=>p.id===id);return project&&<div key={id}><span>0{i+1}</span><strong>{project.title}</strong><span>{project.year}</span></div>})}</section>)
       case 'skills': return identify(block,<section className="stx-skills"><div className="stx-section-index">In practice / Tools</div><div><h2>What I work with</h2><ul>{block.skillIds.map((id,i)=>{const skill=items.skills.find(x=>x.id===id);return skill&&<li key={id}><span>{String(i+1).padStart(2,'0')}</span><strong>{skill.label}</strong><small>{skill.category}</small></li>})}</ul></div></section>)
+      case 'achievements': return identify(block, <section className={'stx-achievements stx-achievements-' + block.display} aria-label="Achievements">
+        <div className="stx-section-index">Recognition / Milestones</div>
+        <div><h2>Things worth <em>remembering.</em></h2>
+          <ol>{block.achievementIds.map((id, index) => {
+            const achievement = (items.achievements ?? []).find(item => item.id === id)
+            if (!achievement) return null
+            const href = achievement.evidenceUrl?.startsWith('https://') ? safeUrl(achievement.evidenceUrl) : undefined
+            return <li key={id} className={'stx-achievement-entry' + (achievement.category === 'github' ? ' is-github' : '')}>
+              <div className="stx-achievement-mark" aria-hidden="true">{achievement.category === 'github' ? <Github size={24} strokeWidth={1.5} /> : String(index + 1).padStart(2, '0')}</div>
+              <div className="stx-achievement-info">
+                <span className="stx-achievement-meta">{achievement.category === 'github' ? 'GitHub profile badge · creator-supplied' : achievement.category} {achievement.date ? ' / ' + achievement.date : ''}</span>
+                <h3>{achievement.title || 'Untitled achievement'}</h3>
+                {achievement.issuer && <p className="stx-achievement-issuer">{achievement.issuer}</p>}
+                {achievement.description && <p className="stx-achievement-description">{achievement.description}</p>}
+                {href && <a href={href} target="_blank" rel="noopener noreferrer" className="stx-achievement-proof">{achievement.category === 'github' ? 'View linked GitHub evidence' : 'See supporting evidence'} <span aria-hidden="true">↗</span></a>}
+              </div>
+            </li>
+          })}</ol>
+          {!block.achievementIds.length && <p className="stx-achievement-empty">Your achievements will appear here once added in the editor.</p>}
+        </div>
+      </section>)
       case 'links': return identify(block,<footer className="stx-footer"><span>There is always more to make.</span><div className="stx-footer-links">{block.linkIds.map(id=>{const link=doc.identity.links.find(l=>l.id===id);return link&&<ExternalLink link={link} key={id}/>})}</div><div className="stx-footer-bottom"><span>{doc.identity.displayName} / Selected work</span><span>Made with care, not a template.</span></div></footer>)
       case 'divider': return identify(block, <hr className={'stx-divider stx-divider-'+block.weight}/>)
       case 'code': return identify(block, <figure className="stx-code"><figcaption>{block.caption || block.language}</figcaption><pre><code>{block.source}</code></pre></figure>)

@@ -10,6 +10,8 @@ export type DocumentLink = { id: Identifier; label: string; url: string; rel: 'p
 export type Skill = { id: Identifier; label: string; category: 'development' | 'design' | 'research' | 'writing' | 'professional' | 'other'; iconKey?: string }
 export type Experience = { id: Identifier; role: string; organisation: string; start: string; end: string | null; summary: string; highlights: string[] }
 export type Education = { id: Identifier; qualification: string; institution: string; period: string; details: string }
+/** A creator-authored accomplishment, never an auto-generated verified credential. */
+export type Achievement = { id: Identifier; title: string; category: 'award' | 'certification' | 'competition' | 'milestone' | 'publication' | 'github' | 'other'; issuer: string; date: string; description: string; evidenceUrl: string | null }
 export type StudioMetric = { id: Identifier; label: string; value: string; context: string }
 export type ProjectLens = 'story' | 'spec' | 'board' | 'demo'
 export type Project = {
@@ -36,6 +38,7 @@ export type StudioBlock =
   | { id: Identifier; type: 'project'; style: BlockStyle; projectId: Identifier; defaultLens: ProjectLens }
   | { id: Identifier; type: 'project-list'; style: BlockStyle; projectIds: Identifier[]; display: 'index' | 'featured' | 'gallery' }
   | { id: Identifier; type: 'skills'; style: BlockStyle; skillIds: Identifier[]; display: 'text' | 'list' | 'icons' }
+  | { id: Identifier; type: 'achievements'; style: BlockStyle; achievementIds: Identifier[]; display: 'timeline' | 'list' | 'cards' }
   | { id: Identifier; type: 'timeline'; style: BlockStyle; collection: 'experience' | 'education'; itemIds: Identifier[] }
   | { id: Identifier; type: 'media'; style: BlockStyle; assetId: Identifier; caption: string; fit: 'contain' | 'cover' }
   | { id: Identifier; type: 'links'; style: BlockStyle; linkIds: Identifier[] }
@@ -58,7 +61,7 @@ export type StudioDocument = {
   documentId: Identifier
   revision: number
   identity: { displayName: string; roles: string[]; headline: string; bio: string; location: string; availability: string; links: DocumentLink[] }
-  content: { skills: Skill[]; projects: Project[]; experience: Experience[]; education: Education[] }
+  content: { skills: Skill[]; projects: Project[]; experience: Experience[]; education: Education[]; achievements?: Achievement[] }
   pages: StudioPage[]
   assets: Asset[]
   presentation: Presentation
