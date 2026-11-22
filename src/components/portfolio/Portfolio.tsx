@@ -1,4 +1,4 @@
-import { useEffect, useState, type CSSProperties, type MouseEvent, type ReactNode } from 'react'
+import { useEffect, type CSSProperties, type MouseEvent, type ReactNode } from 'react'
 import { useLocation } from '@tanstack/react-router'
 import { ArrowDown, ArrowUp, ArrowUpRight, Plus, X } from 'lucide-react'
 
@@ -17,15 +17,17 @@ import {
 import { cn } from '@/lib/utils'
 import { Field } from './Field'
 import { ImageSlot } from './ImageSlot'
-import { Reveal, SplitText } from './effects'
+import { SkillAutocomplete } from './SkillAutocomplete'
+import { Reveal } from './effects'
 
 type Props = {
   data: PortfolioData
   editing: boolean
   onChange?: (next: PortfolioData) => void
+  onOpenCommands?: () => void
 }
 
-export function Portfolio({ data, editing, onChange }: Props) {
+export function Portfolio({ data, editing, onChange, onOpenCommands }: Props) {
   const set = <K extends keyof PortfolioData>(key: K, value: PortfolioData[K]) =>
     onChange?.({ ...data, [key]: value })
 
@@ -57,13 +59,6 @@ export function Portfolio({ data, editing, onChange }: Props) {
   const shown = (key: PortfolioData['hidden'][number]) => !data.hidden.includes(key)
   const setLabel = (key: keyof Labels, value: string) => set('labels', { ...data.labels, [key]: value })
   const labels = data.labels
-  const initials =
-    data.name
-      .split(/\s+/)
-      .filter(Boolean)
-      .slice(0, 2)
-      .map((w) => w[0]?.toUpperCase())
-      .join('') || '○'
   const emailHref = mailtoHref(data.email)
   const hasContact = Boolean(emailHref) || socials.length > 0
 
@@ -93,30 +88,39 @@ export function Portfolio({ data, editing, onChange }: Props) {
     <div
       className="portfolio"
       data-font={data.theme.font}
+      data-layout={data.theme.layout}
       data-scale={data.theme.scale}
       data-align={data.theme.align}
       style={{ '--accent-c': data.accent } as CSSProperties}
     >
       <header className="pf-nav">
-        <ScrollLink to="top" className="pf-mono-badge" aria-label="Back to top">
-          <span>{initials}</span>
+        <ScrollLink to="top" className="pf-identity" aria-label="Back to top">
+          {editing ? (
+            <span className="pf-identity-brand">fleed<span aria-hidden="true">.</span></span>
+          ) : (
+            <span className="pf-identity-name">{data.name.trim() || 'Portfolio'}</span>
+          )}
         </ScrollLink>
         <nav className="pf-main-nav" aria-label="Portfolio sections">
-          {nav.map((n) => (
-            <ScrollLink key={n.id} to={n.id} className="pf-nav-link">
-              {n.label}
+          {nav.map((item) => (
+            <ScrollLink key={item.id} to={item.id} className="pf-nav-link">
+              {item.label}
             </ScrollLink>
           ))}
         </nav>
-        <div className="pf-meta">
-          <span>{data.location || (editing ? 'Editing your portfolio' : 'Selected work')}</span>
-        </div>
+        {onOpenCommands ? (
+          <button type="button" className="pf-command-trigger" onClick={onOpenCommands} aria-label="Open command menu">
+            <span>Quick actions</span><kbd>Ctrl K</kbd>
+          </button>
+        ) : (
+          <span className="pf-header-rule" aria-hidden="true" />
+        )}
       </header>
 
       {/* Hero */}
       <section id="top" className={cn('pf-hero slot-host', data.photo && 'has-photo')}>
         <div className="pf-hero-main">
-        {editing && <p className="pf-editor-eyebrow">01 / Introduction</p>}
+        {editing && <p className="pf-editor-eyebrow">YOUR SPACE / START HERE</p>}
         {(editing || data.status) && (
           <div className="pf-status">
             {editing ? (
@@ -143,7 +147,7 @@ export function Portfolio({ data, editing, onChange }: Props) {
               maxLength={80}
             />
           ) : data.name ? (
-            <SplitText key={data.name} text={data.name} />
+            data.name
           ) : (
             <span className="opacity-30">Untitled</span>
           )}
@@ -216,7 +220,7 @@ export function Portfolio({ data, editing, onChange }: Props) {
       {/* Skills */}
       {shown('skills') && (
         editing ? (
-          <SkillEditor skills={data.skills} onChange={(s) => set('skills', s)} />
+          <SkillAutocomplete skills={data.skills} onChange={(s) => set('skills', s)} />
         ) : data.skills.length > 0 ? (
           <section className="pf-skills" aria-label="Skills">
             <span className="pf-skills-heading">Skills & tools</span>
@@ -729,60 +733,6 @@ function Section({
       </Reveal>
       {children}
     </section>
-  )
-}
-
-function SkillEditor({
-  skills,
-  onChange,
-}: {
-  skills: string[]
-  onChange: (skills: string[]) => void
-}) {
-  const [draft, setDraft] = useState('')
-  const add = () => {
-    const parts = draft
-      .split(',')
-      .map((s) => s.trim())
-      .filter(Boolean)
-    if (parts.length) onChange([...skills, ...parts].slice(0, 40))
-    setDraft('')
-  }
-  return (
-    <div className="pf-skill-editor">
-      <span className="pf-label">Skills</span>
-      <div className="flex flex-wrap items-center gap-2">
-        {skills.map((s, i) => (
-          <span key={`${s}-${i}`} className="pf-chip">
-            {s}
-            <button
-              type="button"
-              aria-label={`Remove ${s}`}
-              onClick={() => onChange(skills.filter((_, j) => j !== i))}
-            >
-              <X className="size-3" />
-            </button>
-          </span>
-        ))}
-        <input
-          value={draft}
-          maxLength={80}
-          onChange={(e) => setDraft(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ',') {
-              e.preventDefault()
-              add()
-            } else if (e.key === 'Backspace' && !draft && skills.length) {
-              onChange(skills.slice(0, -1))
-            }
-          }}
-          onBlur={add}
-          placeholder={skills.length ? 'Add another…' : 'Type a skill, press Enter'}
-          className="pf-chip-input"
-        />
-      </div>
-      <p className="pf-hint">Press Enter or separate skills with commas. They appear as a simple list on your published page.</p>
-    </div>
   )
 }
 

@@ -5,6 +5,10 @@ import { blankPortfolio, mailtoHref, normalizePortfolio, reorderItems, safeImage
 import { createPortfolioBackup, parsePortfolioBackup } from '../src/lib/portfolio-backup.ts'
 import { normalizeCustomSlug, portfolioPublicPath } from '../src/lib/portfolio-slug.ts'
 import { portfolioCvText } from '../src/lib/cv.ts'
+import { DESIGN_PRESETS, applyDesignPreset } from '../src/lib/design-presets.ts'
+import { suggestSkills } from '../src/lib/skill-catalog.ts'
+import { addPortfolioElement } from '../src/lib/portfolio-elements.ts'
+import { publicPortfolioDocument } from '../src/lib/public-data.ts'
 
 test('safeUrl rejects executable or unsupported protocols', () => {
   for (const value of ['javascript:alert(1)', 'data:text/html,x', 'vbscript:msgbox(1)', 'file:///etc/passwd']) {
@@ -128,4 +132,86 @@ test('portfolio project order can be changed without mutating the original conte
   assert.deepEqual(projects.map(p => p.id), ['a', 'b', 'c'])
   assert.deepEqual(reorderItems(projects, 0, -1).map(p => p.id), ['a', 'b', 'c'])
   assert.deepEqual(reorderItems(projects, 2, 1).map(p => p.id), ['a', 'b', 'c'])
+})
+
+test('design library preserves user content and offers distinct, editable recipes', () => {
+  const draft = blankPortfolio()
+  draft.name = 'Creator'
+  draft.skills = ['Python']
+  const presets = DESIGN_PRESETS.map(p => p.id)
+  assert.equal(new Set(presets).size, presets.length)
+  for (const preset of DESIGN_PRESETS) {
+    const result = applyDesignPreset(draft, preset)
+    assert.equal(result.name, 'Creator')
+    assert.deepEqual(result.skills, ['Python'])
+    assert.equal(result.theme.font, preset.font)
+    assert.equal(result.theme.palette, preset.palette)
+    assert.equal(result.theme.backdrop, false)
+  }
+})
+
+test('skills search ranks tech and creative matches while preventing duplicate suggestions', () => {
+  const names = suggestSkills('vi', []).map(s => s.name)
+  for (const name of ['Vite', 'Vim', 'Vitest', 'Visual Studio Code', 'Video Editing']) {
+    assert.ok(names.includes(name), name + ' should appear')
+  }
+  assert.ok(!suggestSkills('vi', ['Vite']).some(s => s.name === 'Vite'))
+  assert.deepEqual(suggestSkills('', []), [])
+  assert.deepEqual(suggestSkills('vi,foo', []), [])
+})
+
+test('elements library creates real portfolio content without losing existing fields', () => {
+  const original = blankPortfolio()
+  original.name = 'New Creator'
+  const added = addPortfolioElement(original, 'text')
+  assert.equal(added.extras.length, 1)
+  assert.equal(added.name, 'New Creator')
+  assert.equal(original.extras.length, 0)
+  const hidden = { ...original, hidden: ['work', 'skills'] }
+  assert.ok(!addPortfolioElement(hidden, 'project').hidden.includes('work'))
+  assert.ok(!addPortfolioElement(hidden, 'skills').hidden.includes('skills'))
+  const second = addPortfolioElement(
+    { ...original, projects: [{ ...original.projects[0], title: 'Project one' }] },
+    'project',
+  )
+  assert.equal(second.projects.length, 2)
+})
+
+test('layouts survive normalization and preserve old published portfolios', () => {
+  const legacy = blankPortfolio()
+  delete legacy.theme.layout
+  const restored = normalizePortfolio(legacy)
+  assert.equal(restored.theme.layout, 'folio')
+  assert.equal(normalizePortfolio({
+    ...legacy, theme: { ...legacy.theme, layout: 'studio' },
+  }).theme.layout, 'studio')
+  assert.equal(normalizePortfolio({
+    ...legacy, theme: { ...legacy.theme, layout: 'impossible' },
+  }).theme.layout, 'folio')
+  for (const design of DESIGN_PRESETS) {
+    const updated = applyDesignPreset(blankPortfolio(), design)
+    assert.equal(updated.theme.layout, design.layout)
+  }
+})
+
+test('the read-only public view never leaks edit credentials or internal aliases', () => {
+  const data = blankPortfolio()
+  data.name = 'Example'
+  const unsafe = {
+    ...data,
+    token: 'fake-private-token',
+    editToken: 'fake-edit-token',
+    __fleed_slug: 'private-alias-internal',
+    token_hash: 'fake-hash',
+    theme: { ...data.theme, layout: 'atelier' },
+  }
+  const result = publicPortfolioDocument(unsafe)
+  const json = JSON.stringify(result)
+  assert.equal(result.schemaVersion, 1)
+  assert.equal(result.portfolio.name, 'Example')
+  assert.equal(result.portfolio.theme.layout, 'atelier')
+  assert.ok(!json.includes('fake-private-token'))
+  assert.ok(!json.includes('fake-edit-token'))
+  assert.ok(!json.includes('private-alias-internal'))
+  assert.ok(!json.includes('fake-hash'))
 })

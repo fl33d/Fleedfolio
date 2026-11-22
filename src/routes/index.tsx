@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { CircleHelp, Eye, FileText, PenLine, RotateCcw, Send } from 'lucide-react'
+import { CircleHelp, Eye, FileText, Layers3, PenLine, Search, Send } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { Customize } from '@/components/portfolio/Customize'
@@ -8,6 +8,8 @@ import { ShareDialog } from '@/components/portfolio/ShareDialog'
 import { Walkthrough } from '@/components/portfolio/Walkthrough'
 import { Portfolio } from '@/components/portfolio/Portfolio'
 import { CvView } from '@/components/portfolio/CvView'
+import { CommandPalette, type CommandAction } from '@/components/portfolio/CommandPalette'
+import { ElementsShelf, type ElementKind, ELEMENT_KINDS } from '@/components/portfolio/ElementsShelf'
 import { Backdrop, ScrollProgress } from '@/components/portfolio/effects'
 import {
   blankPortfolio,
@@ -18,6 +20,7 @@ import {
 import { publishPortfolio } from '@/server/portfolio.functions'
 import { cn } from '@/lib/utils'
 import { normalizeCustomSlug, portfolioPublicPath } from '@/lib/portfolio-slug'
+import { addPortfolioElement } from '@/lib/portfolio-elements'
 
 export const Route = createFileRoute('/')({
   component: Editor,
@@ -40,8 +43,23 @@ function Editor() {
   const [publishing, setPublishing] = useState(false)
   const [shareOpen, setShareOpen] = useState(false)
   const [tourOpen, setTourOpen] = useState(false)
+  const [commandsOpen, setCommandsOpen] = useState(false)
+  const [customiseOpen, setCustomiseOpen] = useState(false)
+  const [elementsOpen, setElementsOpen] = useState(false)
+  const [dropTarget, setDropTarget] = useState(false)
   const loaded = useRef(false)
   const storageWarningShown = useRef(false)
+
+  useEffect(() => {
+    const onKeys = (event: KeyboardEvent) => {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault()
+        setCommandsOpen(open => !open)
+      }
+    }
+    window.addEventListener('keydown', onKeys)
+    return () => window.removeEventListener('keydown', onKeys)
+  }, [])
 
   useEffect(() => {
     try {
@@ -180,6 +198,52 @@ function Editor() {
     ? window.location.origin + portfolioPublicPath(published.id, published.slug)
     : undefined
 
+  const addElement = (kind: ElementKind) => {
+    setCvOpen(false)
+    setEditing(true)
+    setElementsOpen(false)
+    setDropTarget(false)
+    setData(current => addPortfolioElement(current, kind))
+    const target = kind === 'text' ? '[id^="extra-"]' : kind === 'project' ? '#work' : kind === 'experience' ? '#experience' : kind === 'education' ? '#education' : kind === 'skills' ? '.pf-skill-editor' : '#contact'
+    window.setTimeout(() => {
+      const elements = document.querySelectorAll<HTMLElement>(target)
+      elements[elements.length - 1]?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }, 75)
+  }
+
+  const commands: CommandAction[] = [
+    { id: 'edit', title: 'Edit portfolio', description: 'Return to writing directly on the page.', group: 'Create', run: () => switchMode(true) },
+    { id: 'preview', title: 'Preview portfolio', description: 'See what visitors will see.', group: 'Create', run: () => switchMode(false) },
+    { id: 'customise', title: 'Open design library', description: 'Change your theme and sections.', group: 'Appearance', run: () => { setCvOpen(false); setCustomiseOpen(true) } },
+    { id: 'cv', title: 'Open CV', description: 'Print or download a clean résumé.', group: 'Create', run: () => { setCvOpen(true); window.scrollTo({ top: 0 }) } },
+    { id: 'tour', title: 'Show beginner guide', description: 'Walk through the basics again.', group: 'Create', run: () => setTourOpen(true) },
+    { id: 'elements', title: 'Open elements library', description: 'Add text, projects and other sections.', group: 'Create', run: () => { setCvOpen(false); setElementsOpen(true) } },
+    { id: 'skills', title: 'Go to skills', group: 'Navigate', run: () => {
+      setCvOpen(false)
+      window.setTimeout(() => document.querySelector<HTMLElement>('.pf-skill-editor, .pf-skills')?.scrollIntoView({ behavior: 'smooth' }), 35)
+    } },
+    { id: 'work', title: 'Go to selected work', group: 'Navigate', run: () => {
+      setCvOpen(false)
+      window.setTimeout(() => document.getElementById('work')?.scrollIntoView({ behavior: 'smooth' }), 35)
+    } },
+    { id: 'about', title: 'Go to about', group: 'Navigate', run: () => {
+      setCvOpen(false)
+      window.setTimeout(() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' }), 35)
+    } },
+    { id: 'light', title: 'Switch to paper', description: 'A quiet light palette.', group: 'Appearance', run: () =>
+      setData(current => ({ ...current, theme: { ...current.theme, palette: 'paper' } })) },
+    { id: 'dark', title: 'Switch to ink', description: 'A precise dark palette.', group: 'Appearance', run: () =>
+      setData(current => ({ ...current, theme: { ...current.theme, palette: 'ink' } })) },
+    { id: 'publish', title: published ? 'Update portfolio' : 'Publish portfolio', group: 'Share', run: () => { void publish() } },
+    ...(publicUrl ? [{
+      id: 'copy', title: 'Copy public link', description: publicUrl, group: 'Share' as const,
+      run: () => { void navigator.clipboard.writeText(publicUrl).then(
+        () => toast.success('Link copied.'),
+        () => toast.error('Unable to copy. Open Share to copy the address.'),
+      ) },
+    }] : []),
+  ]
+
   return (
     <div className={cn('app', cvOpen ? 'mode-cv' : editing ? 'mode-edit' : 'mode-view')} {...themeProps(data)}>
       {!cvOpen && !editing && data.theme.backdrop && <Backdrop />}
@@ -188,8 +252,32 @@ function Editor() {
       {cvOpen ? (
         <CvView data={data} publicUrl={publicUrl} onBack={() => setCvOpen(false)} />
       ) : (
-        <div key={editing ? 'edit' : 'view'} className="mode-swap">
-          <Portfolio data={data} editing={editing} onChange={setData} />
+        <div
+          key={editing ? 'edit' : 'view'}
+          className={cn('mode-swap', dropTarget && 'is-drop-target')}
+          onDragOver={(event) => {
+            if (!editing || !event.dataTransfer.types.includes('application/x-fleed-element')) return
+            event.preventDefault()
+            event.dataTransfer.dropEffect = 'copy'
+            setDropTarget(true)
+          }}
+          onDragLeave={(event) => {
+            if (!event.currentTarget.contains(event.relatedTarget as Node)) setDropTarget(false)
+          }}
+          onDrop={(event) => {
+            setDropTarget(false)
+            const kind = event.dataTransfer.getData('application/x-fleed-element')
+            if (!editing || !ELEMENT_KINDS.includes(kind as ElementKind)) return
+            event.preventDefault()
+            addElement(kind as ElementKind)
+          }}
+        >
+          <Portfolio
+            data={data}
+            editing={editing}
+            onChange={setData}
+            onOpenCommands={() => setCommandsOpen(true)}
+          />
         </div>
       )}
 
@@ -206,9 +294,19 @@ function Editor() {
         </div>
 
         <span className="dock-sep" />
+        <button
+          type="button"
+          className={cn('dock-icon', elementsOpen && 'is-active')}
+          aria-label="Open elements library"
+          aria-expanded={elementsOpen}
+          title="Elements"
+          onClick={() => { setCvOpen(false); setEditing(true); setElementsOpen(value => !value) }}
+        >
+          <Layers3 className="size-4" />
+        </button>
 
         {!cvOpen && (
-          <Customize data={data} onChange={setData} onImport={importDraft} customSlug={customSlug} onSlugChange={setCustomSlug} />
+          <Customize data={data} onChange={setData} onImport={importDraft} customSlug={customSlug} onSlugChange={setCustomSlug} open={customiseOpen} onOpenChange={setCustomiseOpen} onReset={reset} />
         )}
 
         <button
@@ -223,12 +321,12 @@ function Editor() {
           <span>CV</span>
         </button>
 
-        <button className="dock-icon" onClick={() => setTourOpen(true)} aria-label="How to use Fleedfolio" title="How it works">
-          <CircleHelp className="size-4" />
+        <button className="dock-icon" onClick={() => setCommandsOpen(true)} aria-label="Open command palette" title="Quick actions · Ctrl+K">
+          <Search className="size-4" />
         </button>
 
-        <button className="dock-icon" onClick={reset} aria-label="Reset draft" title="Reset draft">
-          <RotateCcw className="size-4" />
+        <button className="dock-icon" onClick={() => setTourOpen(true)} aria-label="How to use Fleedfolio" title="How it works">
+          <CircleHelp className="size-4" />
         </button>
 
         <button className="dock-publish" onClick={() => { void publish() }} disabled={publishing}>
@@ -236,6 +334,8 @@ function Editor() {
           {publishing ? 'Publishing…' : published ? 'Update' : 'Publish'}
         </button>
       </div>
+
+      <ElementsShelf open={elementsOpen} onClose={() => setElementsOpen(false)} onAdd={addElement} />
 
       <ShareDialog
         open={shareOpen}
@@ -245,6 +345,7 @@ function Editor() {
         onSaveAddress={publish}
       />
       <Walkthrough open={tourOpen} onClose={closeTour} />
+      <CommandPalette open={commandsOpen} onOpenChange={setCommandsOpen} actions={commands} />
     </div>
   )
 }

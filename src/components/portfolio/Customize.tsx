@@ -17,6 +17,7 @@ import {
 import { cn } from '@/lib/utils'
 import { createPortfolioBackup, parsePortfolioBackup } from '@/lib/portfolio-backup.ts'
 import { normalizeCustomSlug } from '@/lib/portfolio-slug'
+import { applyDesignPreset, DESIGN_PRESETS } from '@/lib/design-presets'
 
 const SECTIONS: { key: SectionKey; label: string }[] = [
   { key: 'skills', label: 'Skills & tools' },
@@ -34,14 +35,26 @@ export function Customize({
   onImport,
   customSlug,
   onSlugChange,
+  open: externalOpen,
+  onOpenChange,
+  onReset,
 }: {
   data: Portfolio
   onChange: (fn: (d: Portfolio) => Portfolio) => void
   onImport: (draft: Portfolio) => boolean
   customSlug: string
   onSlugChange: (slug: string) => void
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+  onReset?: () => void
 }) {
-  const [open, setOpen] = useState(false)
+  const [localOpen, setLocalOpen] = useState(false)
+  const open = externalOpen ?? localOpen
+  const setOpen = (next: boolean | ((current: boolean) => boolean)) => {
+    const resolved = typeof next === 'function' ? next(open) : next
+    if (onOpenChange) onOpenChange(resolved)
+    else setLocalOpen(resolved)
+  }
   const root = useRef<HTMLDivElement>(null)
   const fileInput = useRef<HTMLInputElement>(null)
 
@@ -111,12 +124,68 @@ export function Customize({
       >
         <SlidersHorizontal className="size-4" />
         <span className="cz-trigger-label">Customise</span>
-        <span className="cz-trigger-dot" />
         <ChevronDown className="size-3.5 cz-chevron" />
       </button>
 
       {open && (
         <div className="cz-panel" role="dialog" aria-label="Customise">
+          <Group title="Design library">
+            <p className="cz-group-intro">Five distinct compositions. Your words stay put while the design changes.</p>
+            <div className="cz-designs" aria-label="Choose a design">
+              {DESIGN_PRESETS.map((preset) => {
+                const selected = data.theme.layout === preset.layout &&
+                  data.theme.palette === preset.palette && data.theme.font === preset.font
+                const swatch = PALETTES[preset.palette]
+                return (
+                  <button
+                    key={preset.id}
+                    type="button"
+                    className={cn('cz-design', 'cz-design--' + preset.id, selected && 'is-active')}
+                    aria-pressed={selected}
+                    onClick={() => onChange((portfolio) => applyDesignPreset(portfolio, preset))}
+                    title={preset.description}
+                  >
+                    <span
+                      className="cz-design-art"
+                      data-layout={preset.layout}
+                      style={{
+                        background: swatch.paper,
+                        color: swatch.ink,
+                        fontFamily: FONTS[preset.font].family,
+                        ['--sample-accent' as string]: preset.accent,
+                      }}
+                    >
+                      <span className="cz-design-art-head"><b>fleed.</b><i>01—05</i></span>
+                      <strong className="cz-design-art-name">{data.name.trim() || 'Your name'}</strong>
+                      <span className="cz-design-art-role">{data.role.trim() || 'Make something worth sharing.'}</span>
+                      <span className="cz-design-art-work">
+                        <i />
+                        <b>{data.projects.find(project => project.title.trim())?.title || 'Selected work'}</b>
+                        <i />
+                      </span>
+                      <span className="cz-design-art-stamp">/ {preset.id}</span>
+                    </span>
+                    <span className="cz-design-info">
+                      <span><strong>{preset.name}</strong><span className="cz-design-check">{selected ? 'Selected' : 'Explore'}</span></span>
+                      <small>{preset.description}</small>
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
+          </Group>
+          <Group title="Composition">
+            <div className="cz-layouts" aria-label="Choose page composition">
+              {DESIGN_PRESETS.map((preset) => (
+                <button
+                  key={preset.layout}
+                  type="button"
+                  aria-pressed={theme.layout === preset.layout}
+                  onClick={() => setTheme('layout', preset.layout)}
+                >{preset.name}</button>
+              ))}
+            </div>
+          </Group>
           <Group title="Tone">
             <div className="cz-palettes">
               {(Object.keys(PALETTES) as PaletteKey[]).map((key) => {
@@ -281,6 +350,12 @@ export function Customize({
               }}
             />
           </Group>
+
+          {onReset && (
+            <button className="cz-reset" type="button" onClick={onReset}>
+              Start over with a blank page
+            </button>
+          )}
 
           <button
             className="cz-reset"

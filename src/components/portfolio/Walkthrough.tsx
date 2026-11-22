@@ -22,14 +22,14 @@ import {
 
 const STEPS: { title: string; description: string; example: string; icon: LucideIcon }[] = [
   {
-    title: 'Start with your story.',
-    description: 'Click any placeholder and write directly on the page. Add your name, what you do, and the projects you want to lead with. Use the small arrows to reorder projects.',
+    title: 'Create freely, no account required.',
+    description: 'Fleed starts with a blank page. No sign-up, no setup. Click any placeholder to write your name and begin building a portfolio you can publish when ready.',
     example: 'Click “Your name” to begin',
     icon: MousePointer2,
   },
   {
     title: 'Make it your own.',
-    description: 'Open Customise in the dock to change the colours, typeface, layout and sections. Choose a memorable /@username link here too.',
+    description: 'Browse five designed starting points in Customise, then change their colours, typography and layout. Your content stays yours when you switch.',
     example: 'Customise → Your link → @yourname',
     icon: SlidersHorizontal,
   },
@@ -53,7 +53,7 @@ const STEPS: { title: string; description: string; example: string; icon: Lucide
   },
   {
     title: 'Keep a copy of your work.',
-    description: 'Your draft saves in this browser. Export a JSON backup from Customise so you can recover your content or move it to another device.',
+    description: 'Guest drafts save in this browser. Export a JSON backup to move between devices or keep a secure copy. An account is never required to begin.',
     example: 'Customise → Your work → Export backup',
     icon: Download,
   },
@@ -74,7 +74,7 @@ export function Walkthrough({ open, onClose }: { open: boolean; onClose: () => v
     <Dialog open={open} onOpenChange={(next) => { if (!next) onClose() }}>
       <DialogContent className="tour-dialog">
         <div className="tour-topline">
-          <span>Get to know Fleedfolio</span>
+          <span>Get to know fleed</span>
           <span>{String(stepIndex + 1).padStart(2, '0')} / {String(STEPS.length).padStart(2, '0')}</span>
         </div>
         <div className="tour-progress" style={{ gridTemplateColumns: `repeat(${STEPS.length}, 1fr)` }} aria-label={`Step ${stepIndex + 1} of ${STEPS.length}`}>
@@ -82,14 +82,16 @@ export function Walkthrough({ open, onClose }: { open: boolean; onClose: () => v
             <span key={item.title} className={index <= stepIndex ? 'is-complete' : undefined} />
           ))}
         </div>
-        <div className="tour-icon" aria-hidden><Icon className="size-6" strokeWidth={1.5} /></div>
-        <DialogHeader>
-          <DialogTitle className="tour-heading">{step.title}</DialogTitle>
-          <DialogDescription className="tour-description">{step.description}</DialogDescription>
-        </DialogHeader>
-        <div className="tour-example">
-          <span className="tour-example-label">Try this</span>
-          <span>{step.example}</span>
+        <div className="tour-step" key={stepIndex}>
+          <div className="tour-icon" aria-hidden><Icon className="size-6" strokeWidth={1.5} /></div>
+          <DialogHeader>
+            <DialogTitle className="tour-heading">{step.title}</DialogTitle>
+            <DialogDescription className="tour-description">{step.description}</DialogDescription>
+          </DialogHeader>
+          <div className="tour-example">
+            <span className="tour-example-label">Try this</span>
+            <span>{step.example}</span>
+          </div>
         </div>
         <div className="tour-controls">
           <button className="tour-skip" type="button" onClick={onClose}>{last ? 'Close guide' : 'Skip tour'}</button>

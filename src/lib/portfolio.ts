@@ -54,7 +54,10 @@ export const FONTS = {
 } as const
 export type FontKey = keyof typeof FONTS
 
+export type LayoutKey = 'folio' | 'atelier' | 'index' | 'studio' | 'terminal'
+
 export type Theme = {
+  layout: LayoutKey
   palette: PaletteKey
   font: FontKey
   scale: 'quiet' | 'regular' | 'grand'
@@ -87,8 +90,9 @@ export const DEFAULT_LABELS: Labels = {
 }
 
 export const DEFAULT_THEME: Theme = {
+  layout: 'folio',
   palette: 'ink',
-  font: 'serif',
+  font: 'sans',
   scale: 'regular',
   align: 'left',
   motion: true,
@@ -302,6 +306,7 @@ export function normalizePortfolio(input: any): Portfolio {
     aboutImage: safeImage(p.aboutImage),
     accent: normalizeAccent(p.accent),
     theme: {
+      layout: pick(t.layout, ['folio', 'atelier', 'index', 'studio', 'terminal'], DEFAULT_THEME.layout),
       palette: pick(t.palette, Object.keys(PALETTES) as PaletteKey[], DEFAULT_THEME.palette),
       font: pick(t.font, Object.keys(FONTS) as FontKey[], DEFAULT_THEME.font),
       scale: pick(t.scale, ['quiet', 'regular', 'grand'], DEFAULT_THEME.scale),
@@ -329,6 +334,7 @@ export function themeProps(p: Portfolio) {
   const palette = PALETTES[p.theme.palette]
   return {
     'data-palette': p.theme.palette,
+    'data-layout': p.theme.layout,
     'data-motion': p.theme.motion ? 'on' : 'still',
     style: {
       '--accent-c': p.accent,

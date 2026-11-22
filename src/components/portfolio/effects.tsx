@@ -44,40 +44,6 @@ export function Reveal({
   )
 }
 
-/** Splits text into letters that drift in one by one. */
-export function SplitText({ text, className }: { text: string; className?: string }) {
-  return (
-    <span className={cn('split-text', className)} aria-label={text}>
-      {text.split(' ').map((word, w, words) => (
-        <span key={w} className="inline-block whitespace-nowrap" aria-hidden>
-          {word.split('').map((char, i) => {
-            const index = words.slice(0, w).join(' ').length + i
-            return (
-              <span
-                key={i}
-                className="split-char"
-                style={{ animationDelay: `${index * 55}ms` }}
-              >
-                {char}
-              </span>
-            )
-          })}
-          {w < words.length - 1 && <span>&nbsp;</span>}
-        </span>
-      ))}
-    </span>
-  )
-}
-
-/** An open brush circle. `pathLength` lets CSS draw it with dash offsets. */
-export function Enso({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 100 100" className={className} aria-hidden>
-      <circle cx="50" cy="50" r="46" pathLength={100} />
-    </svg>
-  )
-}
-
 /** The fleed wordmark. */
 export function Wordmark({ className }: { className?: string }) {
   return (
