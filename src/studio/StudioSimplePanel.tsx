@@ -59,10 +59,8 @@ function AchievementEvidence({ value, onSave }: { value: string | null; onSave: 
  */
 export function StudioSimplePanel({ doc, onCommit, onOpenStudio, onExport, onImport, onNew }: Props) {
   const [newSkill, setNewSkill] = useState('')
-  const [evidenceDrafts, setEvidenceDrafts] = useState<Record<string,string>>({})
   const story = readSimpleIntro(doc)
   const shownSkills = visibleSimpleSkills(doc)
-  const shownAchievements = visibleSimpleAchievements(doc)
   const shownAchievements = visibleSimpleAchievements(doc)
   const updateIdentity = (key: 'displayName' | 'headline' | 'location' | 'availability', value: string) =>
     onCommit(next => { next.identity[key] = value })
@@ -76,10 +74,8 @@ export function StudioSimplePanel({ doc, onCommit, onOpenStudio, onExport, onImp
     setNewSkill('')
   }
   const removeSkill = (id: string) => onCommit(next => { hideSimpleSkill(next, id) })
-  const addAchievement = (kind: 'milestone' | 'github') => onCommit(next => { addSimpleAchievement(next, makeId, kind) })
-  const updateAchievement = (id: string, key: 'title' | 'category' | 'issuer' | 'date' | 'description' | 'evidenceUrl', value: string) => onCommit(next => { updateSimpleAchievement(next, id, key, value) })
-  const removeAchievement = (id: string) => onCommit(next => { hideSimpleAchievement(next, id) })
-  const addAchievement = () => onCommit(next => { addSimpleAchievement(next, makeId) })
+  const addAchievement = (kind: 'milestone' | 'github' = 'milestone') =>
+    onCommit(next => { addSimpleAchievement(next, makeId, kind) })
   const editAchievement = (id: string, key: 'title' | 'category' | 'issuer' | 'date' | 'description' | 'evidenceUrl', value: string | null) =>
     onCommit(next => { updateSimpleAchievement(next, id, key, value) })
   const removeAchievement = (id: string) => onCommit(next => { hideSimpleAchievement(next, id) })
@@ -127,49 +123,22 @@ export function StudioSimplePanel({ doc, onCommit, onOpenStudio, onExport, onImp
     </section>
     <section className="stx-quick-section" aria-labelledby="stx-your-achievements">
       <h3 id="stx-your-achievements"><span>05</span> Achievements</h3>
-      <p className="stx-quick-lede">Awards, certifications, competitions and milestones. Add evidence when you have it; Fleed doesn't issue verification badges.</p>
+      <p className="stx-quick-lede">Awards, certificates, creative milestones and GitHub profile badges. Only show accomplishments you've genuinely earned; evidence is optional and not verified by Fleedfolio.</p>
       {shownAchievements.map((achievement: Achievement, index) => <div className="stx-quick-project" key={achievement.id}>
-        <div className="stx-quick-project-label">ACHIEVEMENT {String(index + 1).padStart(2, '0')}</div>
+        <div className="stx-quick-project-label">{achievement.category === 'github' ? 'GITHUB BADGE' : 'ACHIEVEMENT'} {String(index + 1).padStart(2, '0')}</div>
         <Field name="Title" value={achievement.title} onChange={value => editAchievement(achievement.id, 'title', value)} placeholder="What did you achieve?"/>
         <label className="stx-quick-field"><span>Type</span>
           <select value={achievement.category} onChange={event => editAchievement(achievement.id, 'category', event.target.value)}>
             <option value="award">Award</option><option value="certification">Certification</option>
             <option value="competition">Competition</option><option value="milestone">Milestone</option>
-            <option value="publication">Publication</option><option value="other">Other</option>
+            <option value="publication">Publication</option><option value="github">GitHub profile badge</option><option value="other">Other</option>
           </select>
         </label>
         <Field name="Issuer or organisation (optional)" value={achievement.issuer} onChange={value => editAchievement(achievement.id, 'issuer', value)}/>
         <Field name="Date or year" value={achievement.date} onChange={value => editAchievement(achievement.id, 'date', value)} placeholder="2026"/>
         <Field name="Details" value={achievement.description} onChange={value => editAchievement(achievement.id, 'description', value)} multiline/>
+        {achievement.category === 'github' && <p className="stx-quick-evidence-note">Creator-declared: Fleedfolio has not verified this GitHub achievement.</p>}
         <AchievementEvidence value={achievement.evidenceUrl} onSave={value => editAchievement(achievement.id, 'evidenceUrl', value)}/>
-        <button type="button" className="stx-quick-hide" onClick={() => removeAchievement(achievement.id)}>Hide from this page</button>
-      </div>)}
-      <button type="button" className="stx-add-simple" onClick={addAchievement}>+ Add an achievement</button>
-    </section>
-    <section className="stx-quick-section" aria-labelledby="stx-your-achievements">
-      <h3 id="stx-your-achievements"><span>05</span> Achievements</h3>
-      <p className="stx-quick-achievement-intro">Awards, certificates, meaningful milestones and GitHub profile badges belong here. You decide which to show.</p>
-      {shownAchievements.map((achievement, index) => <div className="stx-quick-project stx-quick-achievement" key={achievement.id}>
-        <div className="stx-quick-project-label">{achievement.category === 'github' ? 'GITHUB BADGE' : 'ACHIEVEMENT'} {String(index + 1).padStart(2,'0')}</div>
-        <Field name="Name" value={achievement.title} onChange={value => updateAchievement(achievement.id, 'title', value)} placeholder={achievement.category === 'github' ? 'e.g. Pull Shark (only if earned)' : 'Award or accomplishment'} />
-        <label className="stx-quick-field"><span>Type</span>
-          <select value={achievement.category} onChange={event => updateAchievement(achievement.id, 'category', event.target.value)}>
-            <option value="award">Award</option><option value="certification">Certification</option>
-            <option value="competition">Competition</option><option value="milestone">Milestone</option>
-            <option value="publication">Publication</option><option value="github">GitHub profile badge</option><option value="other">Other</option>
-          </select>
-        </label>
-        <Field name="Issuer / organiser" value={achievement.issuer} onChange={value => updateAchievement(achievement.id, 'issuer', value)} placeholder="e.g. GitHub" />
-        <Field name="Date / year (optional)" value={achievement.date} onChange={value => updateAchievement(achievement.id, 'date', value)} placeholder="e.g. 2026" />
-        <Field name="What it represents" value={achievement.description} onChange={value => updateAchievement(achievement.id, 'description', value)} multiline placeholder="What did you accomplish?" />
-        <label className="stx-quick-field"><span>Evidence link (optional, HTTPS)</span>
-          <input type="url" inputMode="url" value={evidenceDrafts[achievement.id] ?? achievement.evidenceUrl ?? ''} placeholder="https://github.com/your-profile" onChange={event => {
-            const value = event.target.value
-            setEvidenceDrafts(current => ({ ...current, [achievement.id]: value }))
-            if (!value || /^https:\/\/[^\s<>]+$/.test(value)) updateAchievement(achievement.id, 'evidenceUrl', value)
-          }} />
-        </label>
-        {achievement.category === 'github' && <p className="stx-quick-evidence-note">This displays a badge you say you've earned. GitHub has not verified it through Fleedfolio.</p>}
         <button type="button" className="stx-quick-hide" onClick={() => removeAchievement(achievement.id)}>Hide from this page</button>
       </div>)}
       <div className="stx-quick-achievement-actions">
