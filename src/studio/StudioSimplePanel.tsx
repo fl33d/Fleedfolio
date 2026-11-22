@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import type { StudioDocument, Project, StudioBlock } from './document'
+import type { StudioDocument } from './document'
+import { addSimpleProject, addSimpleSkill, hideSimpleSkill, readSimpleIntro, visibleSimpleSkills, writeSimpleIntro } from './shared-editor'
 
 type Update = (change: (doc: StudioDocument) => void) => void
 type Props = {
@@ -32,58 +33,20 @@ function Field({ name, value, onChange, multiline = false, placeholder = '' }: {
  */
 export function StudioSimplePanel({ doc, onCommit, onOpenStudio, onExport, onImport, onNew }: Props) {
   const [newSkill, setNewSkill] = useState('')
-  const page = doc.pages.find(p => p.id === doc.settings.defaultPageId)
-  const intro = page?.blocks.find((block): block is Extract<StudioBlock, { type: 'rich-text' }> => block.type === 'rich-text')
-  const story = intro?.paragraphs.map(p => p.runs.map(run => run.text).join('')).join('\n\n') ?? ''
+  const story = readSimpleIntro(doc)
+  const shownSkills = visibleSimpleSkills(doc)
   const updateIdentity = (key: 'displayName' | 'headline' | 'location' | 'availability', value: string) =>
     onCommit(next => { next.identity[key] = value })
   const updateProject = (id: string, key: 'title' | 'summary' | 'year' | 'contribution', value: string) =>
     onCommit(next => { const project = next.content.projects.find(item => item.id === id); if (project) project[key] = value })
-  const updateStory = (value: string) => onCommit(next => {
-    const targetPage = next.pages.find(p => p.id === next.settings.defaultPageId)
-    const block = targetPage?.blocks.find((b): b is Extract<StudioBlock, { type: 'rich-text' }> => b.type === 'rich-text')
-    if (block) block.paragraphs = value.split(/\n\n+/).slice(0, 20).map(text => ({ kind: 'paragraph', runs: [{ text }] }))
-    // Never delete or rewrite other, more advanced blocks.
-  })
-  const addProject = () => onCommit(next => {
-    const id = makeId('proj'), blockId = makeId('blk')
-    const project: Project = {
-      id, title: '', summary: '', year: '', contribution: '', skillIds: [], links: [], coverAssetId: null,
-      lenses: {
-        story: { enabled: true, sections: [{ id: makeId('section'), heading: 'What I made', paragraphs: [{ kind: 'paragraph', runs: [{ text: '' }] }] }] },
-        spec: { enabled: false, problem: '', approach: '', decisions: [], tradeoffs: [], metrics: [], architectureAssetId: null },
-        board: { enabled: false, assetIds: [], caption: '' },
-        demo: { enabled: false, url: null, fallbackText: '', launchLabel: 'View demo' },
-      },
-    }
-    next.content.projects.push(project)
-    const targetPage = next.pages.find(p => p.id === next.settings.defaultPageId)
-    targetPage?.blocks.push({ id: blockId, type: 'project', projectId: id, defaultLens: 'story', style: { variant: 'standard', emphasis: 'normal' } })
-  })
-  const visibleIds = (page?.blocks.find(b => b.type === 'skills') as Extract<StudioBlock, { type: 'skills' }> | undefined)?.skillIds ?? []
-  const shownSkills = visibleIds.map(id => doc.content.skills.find(s => s.id === id)).filter((s): s is StudioDocument['content']['skills'][number] => !!s)
+  const updateStory = (value: string) => onCommit(next => { writeSimpleIntro(next, value) })
+  const addProject = () => onCommit(next => { addSimpleProject(next, makeId) })
   const addSkill = () => {
-    const label = newSkill.trim().slice(0, 70)
-    if (!label || shownSkills.some(s => s.label.toLowerCase() === label.toLowerCase())) { setNewSkill(''); return }
-    onCommit(next => {
-      let skill = next.content.skills.find(s => s.label.toLowerCase() === label.toLowerCase())
-      if (!skill) {
-        skill = { id: makeId('skill'), label, category: 'other' }
-        next.content.skills.push(skill)
-      }
-      const targetPage = next.pages.find(p => p.id === next.settings.defaultPageId)
-      const block = targetPage?.blocks.find((b): b is Extract<StudioBlock, { type: 'skills' }> => b.type === 'skills')
-      if (block && !block.skillIds.includes(skill.id)) block.skillIds.push(skill.id)
-      else if (!block) targetPage?.blocks.push({ id: makeId('blk'), type: 'skills', style: { variant: 'standard', emphasis: 'normal' }, skillIds: [skill.id], display: 'text' })
-    })
+    if (!newSkill.trim()) return
+    onCommit(next => { addSimpleSkill(next, newSkill, makeId) })
     setNewSkill('')
   }
-  const removeSkill = (skillId: string) => onCommit(next => {
-    const targetPage = next.pages.find(p => p.id === next.settings.defaultPageId)
-    const block = targetPage?.blocks.find((b): b is Extract<StudioBlock, { type: 'skills' }> => b.type === 'skills')
-    if (block) block.skillIds = block.skillIds.filter(id => id !== skillId)
-    // Retain canonical skill records: other pages and projects might reference them.
-  })
+  const removeSkill = (id: string) => onCommit(next => { hideSimpleSkill(next, id) })
 
   return <aside className="stx-simple-panel" aria-label="Simple portfolio editor">
     <div className="stx-simple-opening">
@@ -105,7 +68,7 @@ export function StudioSimplePanel({ doc, onCommit, onOpenStudio, onExport, onImp
     </section>
     <section className="stx-quick-section" aria-labelledby="stx-your-story">
       <h3 id="stx-your-story"><span>02</span> Your story</h3>
-      {intro ? <Field name="Introduction" value={story} onChange={updateStory} multiline placeholder="What's important to you and your work?" /> :
+      {story !== null ? <Field name="Introduction" value={story} onChange={updateStory} multiline placeholder="What's important to you and your work?" /> :
         <div className="stx-quick-preserve">Your introduction is arranged in advanced blocks. Open Studio to change its layout without losing anything.</div>}
     </section>
     <section className="stx-quick-section" aria-labelledby="stx-your-projects">
