@@ -20,6 +20,25 @@ A Netlify-branded 404 means requests are still reaching Netlify or a Netlify-rel
 4. If the domain's authoritative nameservers are still elsewhere, resolve that separately. Moving the domain registrar is not required just to serve a Cloudflare Worker.
 5. Verify both the root domain and any `www` hostname you intend to support.
 
+## Personal URLs: no schema migration
+
+The personal-link feature reuses the existing `portfolios` table. It does **not** require a new D1 table, an API token, or production database migration.
+
+1. Verify the Cloudflare deployment is connected to `fl33d/Fleedfolio` and its production branch is `main`.
+2. After GitHub CI succeeds, merge the feature branch. Confirm Cloudflare Workers Builds deploys the exact new commit.
+3. Verify an existing generated `/p/{id}` link still opens.
+4. In **Customise → Your link**, type a name and publish; verify `/@name` works on the existing `workers.dev` URL.
+5. Attempt a duplicate name from a second browser. It must not overwrite the original portfolio; test renaming and updating an existing page.
+6. Fix `fleed.online` DNS/custom-domain routing separately; its current Netlify 404 is unrelated to this feature.
+
+### Implementation details
+
+- The main portfolio is still stored at its original generated `id`, with an optional internal `__fleed_slug` field.
+- A separate row in the same existing D1 table uses `id = '@' || username`, containing a small pointer to the portfolio ID. It shares a hashed publishing token with the owner row.
+- The existing primary-key constraint protects unique usernames. D1 transaction batches update portfolios and aliases together, so duplicate-name conflicts roll back.
+- This avoids changing the production schema but is temporary table overloading. A future dedicated alias table should be considered only with a reviewed migration and verified backup.
+- Old `/p/{id}` URLs remain supported. Renaming removes the old custom alias but keeps the generated ID.
+
 ## Before each release
 
 - [ ] `pnpm install --frozen-lockfile`

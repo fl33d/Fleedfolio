@@ -8,8 +8,8 @@ Fleedfolio is a browser-based editor with a small server-side publishing layer. 
 2. Changes update React state and are saved under the legacy `blank:draft` localStorage key. That key must remain compatible with existing drafts.
 3. **Customise → Your work** exports the draft as versioned JSON, without publishing credentials. An imported backup restores content only.
 4. **Publish / Update** calls `publishPortfolio` in `src/server/portfolio.functions.ts`.
-5. `src/server/portfolio.server.ts` validates publishing credentials and writes published JSON to the existing D1 table `portfolios`.
-6. Visitors open `/p/{id}`; the route loads and normalizes the stored portfolio, then renders the same `Portfolio` component in read-only mode.
+5. `src/server/portfolio.server.ts` validates publishing credentials and writes published JSON to the existing D1 table `portfolios`. Optional personal links use `@name` alias rows in the existing `portfolios` D1 table, with unique IDs and hashed-token ownership checks; no schema migration is needed.
+6. Existing visitors use `/p/{id}` while custom-link visitors use `/@{name}`. Both routes resolve the same stored portfolio and render it read-only.
 
 ## Storage and trust boundaries
 
@@ -36,6 +36,9 @@ Only the server accesses D1 through the `fleed_portfolios` binding. Incoming por
 - `src/components/portfolio/Customize.tsx`: theme, section and backup controls.
 - `src/lib/portfolio.ts`: types, defaults, normalization and URL helpers.
 - `src/lib/portfolio-backup.ts`: portable, versioned JSON backup format.
+- `src/lib/portfolio-slug.ts`: custom link format, normalization, reserved names and public link generation.
+- `src/routes/@{$slug}.tsx`: dedicated `/@name` public portfolio route.
+- Alias rows use `id = '@' || username` and a pointer to an existing portfolio; generated IDs stay unchanged.
 - `src/server/portfolio.functions.ts`: typed server function boundary.
 - `src/server/portfolio.server.ts`: D1 reads and writes.
 - `wrangler.jsonc`: Worker configuration and the existing database binding.

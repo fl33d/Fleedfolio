@@ -22,6 +22,7 @@ import {
 } from '@/lib/portfolio'
 import { publishPortfolio } from '@/server/portfolio.functions'
 import { cn } from '@/lib/utils'
+import { normalizeCustomSlug, portfolioPublicPath } from '@/lib/portfolio-slug'
 
 export const Route = createFileRoute('/')({
   component: Editor,
@@ -31,8 +32,9 @@ export const Route = createFileRoute('/')({
 const DRAFT_KEY = 'blank:draft'
 const PUBLISHED_KEY = 'blank:published'
 const HINT_KEY = 'blank:hint-dismissed'
+const CUSTOM_SLUG_KEY = 'fleedfolio:custom-slug'
 
-type Published = { id: string; token: string }
+type Published = { id: string; token: string; slug?: string }
 
 function completeness(p: PortfolioData) {
   const checks = [
@@ -110,6 +112,7 @@ function Editor() {
   const [data, setData] = useState<PortfolioData>(blankPortfolio)
   const [editing, setEditing] = useState(true)
   const [published, setPublished] = useState<Published | null>(null)
+  const [customSlug, setCustomSlug] = useState('')
   const [publishing, setPublishing] = useState(false)
   const [shareOpen, setShareOpen] = useState(false)
   const [copied, setCopied] = useState(false)
@@ -122,7 +125,13 @@ function Editor() {
       const draft = localStorage.getItem(DRAFT_KEY)
       if (draft) setData(normalizePortfolio(JSON.parse(draft)))
       const pub = localStorage.getItem(PUBLISHED_KEY)
-      if (pub) setPublished(JSON.parse(pub))
+      if (pub) {
+        const restored: Published = JSON.parse(pub)
+        setPublished(restored)
+        setCustomSlug(restored.slug ?? '')
+      }
+      const pendingSlug = localStorage.getItem(CUSTOM_SLUG_KEY)
+      if (pendingSlug !== null) setCustomSlug(pendingSlug)
     } catch {
       // ignore malformed local data
     }
@@ -142,9 +151,20 @@ function Editor() {
     }
   }, [data])
 
+  useEffect(() => {
+    if (!loaded.current) return
+    try {
+      localStorage.setItem(CUSTOM_SLUG_KEY, customSlug)
+    } catch {
+      // Draft contents can still be exported if browser storage is unavailable.
+    }
+  }, [customSlug])
+
   const percent = useMemo(() => completeness(data), [data])
   const shareUrl =
-    published && typeof window !== 'undefined' ? `${location.origin}/p/${published.id}` : ''
+    published && typeof window !== 'undefined'
+      ? `${location.origin}${portfolioPublicPath(published.id, published.slug)}`
+      : ''
 
   const switchMode = (next: boolean) => {
     setEditing(next)
@@ -157,16 +177,26 @@ function Editor() {
       switchMode(true)
       return
     }
+    if (customSlug.trim() && !normalizeCustomSlug(customSlug)) {
+      toast.error('Choose 3–30 letters, numbers or single hyphens for your custom link.')
+      return
+    }
     setPublishing(true)
     try {
       const result = await publishPortfolio({
-        data: { id: published?.id, token: published?.token, portfolio: data },
+        data: { id: published?.id, token: published?.token, slug: customSlug, portfolio: data },
       })
       setPublished(result)
-      localStorage.setItem(PUBLISHED_KEY, JSON.stringify(result))
+      setCustomSlug(result.slug ?? '')
+      try {
+        localStorage.setItem(PUBLISHED_KEY, JSON.stringify(result))
+      } catch {
+        toast.error('Published, but the editing key could not be saved. Keep this browser open.')
+      }
       setShareOpen(true)
-    } catch {
-      toast.error('Publishing failed. Try again in a moment.')
+    } catch (error) {
+      const message = error instanceof Error ? error.message : ''
+      toast.error(message.includes('taken') ? 'That custom link is taken. Choose another.' : 'Publishing failed. Try again in a moment.')
     } finally {
       setPublishing(false)
     }
@@ -178,8 +208,10 @@ function Editor() {
     }
     setData(draft)
     setPublished(null)
+    setCustomSlug('')
     try {
       localStorage.removeItem(PUBLISHED_KEY)
+      localStorage.removeItem(CUSTOM_SLUG_KEY)
     } catch {
       // Import still works if browser storage is unavailable.
     }
@@ -190,6 +222,14 @@ function Editor() {
   const reset = () => {
     if (!confirm('Clear every line and begin again from a blank page?')) return
     setData(blankPortfolio())
+    setPublished(null)
+    setCustomSlug('')
+    try {
+      localStorage.removeItem(PUBLISHED_KEY)
+      localStorage.removeItem(CUSTOM_SLUG_KEY)
+    } catch {
+      // Continue resetting the draft if storage is unavailable.
+    }
     switchMode(true)
   }
 
@@ -219,7 +259,7 @@ function Editor() {
 
         <span className="dock-sep" />
 
-        <Customize data={data} onChange={setData} onImport={importDraft} />
+        <Customize data={data} onChange={setData} onImport={importDraft} customSlug={customSlug} onSlugChange={setCustomSlug} />
 
         <div className="dock-progress" title={`${percent}% filled in`}>
           <svg viewBox="0 0 36 36" className="size-9 -rotate-90">

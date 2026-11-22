@@ -3,6 +3,7 @@ import assert from 'node:assert/strict'
 
 import { blankPortfolio, mailtoHref, normalizePortfolio, safeImage, safeUrl } from '../src/lib/portfolio.ts'
 import { createPortfolioBackup, parsePortfolioBackup } from '../src/lib/portfolio-backup.ts'
+import { normalizeCustomSlug, portfolioPublicPath } from '../src/lib/portfolio-slug.ts'
 
 test('safeUrl rejects executable or unsupported protocols', () => {
   for (const value of ['javascript:alert(1)', 'data:text/html,x', 'vbscript:msgbox(1)', 'file:///etc/passwd']) {
@@ -64,4 +65,19 @@ test('unknown backup formats and malformed JSON cannot replace a draft', () => {
   for (const raw of ['{}', '{"format":"fleedfolio-draft","version":2}', '[]', '{malformed']) {
     assert.throws(() => parsePortfolioBackup(raw))
   }
+})
+
+test('personal links accept canonical names and reject reserved or ambiguous names', () => {
+  assert.equal(normalizeCustomSlug('  Hamood '), 'hamood')
+  assert.equal(normalizeCustomSlug('alice-2026'), 'alice-2026')
+  for (const slug of ['ab', 'a'.repeat(31), '-alice', 'alice-', 'alice--bob', 'fleed', 'admin', '1234abcd5678', 'user/name', 'with space', '%0a']) {
+    assert.equal(normalizeCustomSlug(slug), null, 'Rejected: ' + slug)
+  }
+})
+
+test('named links use the root-level /@name format while generated IDs stay at /p', () => {
+  assert.equal(portfolioPublicPath('0ea7cf64947b', 'example'), '/@example')
+  assert.equal(portfolioPublicPath('0ea7cf64947b', 'Hamood'), '/@hamood')
+  assert.equal(portfolioPublicPath('0ea7cf64947b'), '/p/0ea7cf64947b')
+  assert.equal(portfolioPublicPath('0ea7cf64947b', 'admin'), '/p/0ea7cf64947b')
 })
