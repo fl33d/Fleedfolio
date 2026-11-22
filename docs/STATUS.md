@@ -1,5 +1,10 @@
 # Fleedfolio Studio — milestone status
 
+## PR #7 integration checkpoint (22 November 2026)
+
+On review-only branch `feat/studio-shared-editing-20261122`, stacked on PR #6: Simple, Studio and Preview share one Studio Document/history; the original Classic editor remains available at `/` with separate legacy local storage. Changes in Simple do not flatten advanced rich text. A distinct Achievements block, editor, and optional canonical `achievements` collection support awards, certifications, milestones and **GitHub profile badges** with user-supplied HTTPS evidence links. GitHub badges are not API-synced or platform verified. Older v1 archives without the optional collection remain valid. No production deployment, database migration or legacy credential changes occurred. The browser visual verification is being evaluated separately from green source CI.
+
+
 Updated: 2026-11-22. Branch: `feat/studio-proof-20261122`.
 Derived from draft PR #5 head `ca17187659aabd4e0e85723eed01e64b952282d2`.
 This branch is **review-only and not a production release**.
