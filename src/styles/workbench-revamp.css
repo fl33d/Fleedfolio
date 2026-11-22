@@ -167,6 +167,30 @@
 .mode-edit .pf-skill-editor .pf-suggestion small { font-size:12px; }
 .mode-edit .pf-skill-popover { max-height:315px; overflow-y:auto; }
 
+/* Labels and inline add controls should read like human UI, not terminal metadata. */
+.mode-edit .pf-add,
+.mode-edit .pf-add-inline,
+.mode-edit .pf-add-section .pf-add {
+  font:600 13px 'Instrument Sans',sans-serif;
+  letter-spacing:0;
+  text-transform:none;
+  min-height:38px;
+  gap:10px;
+}
+.mode-edit .pf-add-icon { width:30px; height:30px; }
+.mode-edit .pf-footer {
+  font:500 12px 'Instrument Sans',sans-serif;
+  letter-spacing:0;
+  text-transform:none;
+}
+.mode-edit .pf-work-year,.mode-edit .pf-row-period,.mode-edit .pf-meta {
+  font-family:'Instrument Sans',sans-serif;
+  font-size:13px;
+  letter-spacing:0;
+  text-transform:none;
+}
+.mode-edit .pf-link { font-family:'Instrument Sans',sans-serif; font-size:13px; letter-spacing:0; text-transform:none; }
+
 /* Technology mark fallback remains visible if an external logo fails to load. */
 .pf-skill-mark { position:relative; display:inline-grid; place-items:center; flex:none; border-radius:7px; border:1px solid color-mix(in srgb,var(--ink) 16%,transparent); background:color-mix(in srgb,var(--paper) 84%,transparent); overflow:hidden; }
 .pf-skill-mark-fallback { font:650 12px 'Instrument Sans',sans-serif; line-height:1; color:var(--accent-c); }
@@ -186,7 +210,7 @@
 .pf-identity-photo { width:42px; height:42px; object-fit:cover; border-radius:11px; border:1px solid var(--hair); }
 .pf-identity-name { font-size:15px; font-weight:650; letter-spacing:-.025em; }
 
-@media(max-width:1450px) {
+@media(max-width:1140px) {
   .ff-workbench-topbar { grid-template-columns:minmax(215px,1fr) auto minmax(320px,1fr); gap:12px; }
   .ff-workbench-search kbd { display:none; }
   .ff-workbench-studio { display:none; }
