@@ -31,3 +31,13 @@ After tests and visual fixes: complete reliable block editing and document histo
 
 ## Approval
 Never merge `main`, PR #5 or this branch, deploy, change Worker/DNS, write live D1, add secrets or incur paid services without explicit owner approval.
+
+
+## Continuation from PR #9
+Review PR: https://github.com/fl33d/Fleedfolio/pull/9 (draft; targets PR #6 branch).
+1. Use the `design/creator-studio-refinement-20261122` branch; do not move to `main` or deploy.
+2. Run the commands in `docs/TESTING.md`. Record real terminal logs and exact SHA.
+3. Open the React editor in a browser at multiple widths. Compare the eight-element library visually and functionally, especially its mobile position and contrast.
+4. Fix actual editor defects first; complete links/skills/timeline record editing only when safe canonical references are maintained.
+5. Test one true creator portfolio and the legacy guest/public/CV routes. Do not treat the separate HTML prototype as production code.
+6. Only after all pass, request review with screenshots and evidence. Never touch Worker/D1/DNS without explicit approval.
