@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as StudioRouteImport } from './routes/studio'
 import { Route as ApiUploadRouteImport } from './routes/api/upload'
 import { Route as ImgKeyRouteImport } from './routes/img/$key'
 import { Route as PIdRouteImport } from './routes/p.$id'
@@ -18,6 +19,11 @@ import { Route as AtSlugRouteImport } from './routes/@{$slug}'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StudioRoute = StudioRouteImport.update({
+  id: '/studio',
+  path: '/studio',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiUploadRoute = ApiUploadRouteImport.update({
@@ -45,6 +51,7 @@ const AtSlugRoute = AtSlugRouteImport.update({
 export interface FileRoutesByFullPath {
   '/@{$slug}': typeof AtSlugRoute
   '/': typeof IndexRoute
+  '/studio': typeof StudioRoute
   '/api/upload': typeof ApiUploadRoute
   '/img/$key': typeof ImgKeyRoute
   '/p/$id': typeof PIdRoute
@@ -52,6 +59,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/@{$slug}': typeof AtSlugRoute
   '/': typeof IndexRoute
+  '/studio': typeof StudioRoute
   '/api/upload': typeof ApiUploadRoute
   '/img/$key': typeof ImgKeyRoute
   '/p/$id': typeof PIdRoute
@@ -60,21 +68,23 @@ export interface FileRoutesById {
   '/@{$slug}': typeof AtSlugRoute
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/studio': typeof StudioRoute
   '/api/upload': typeof ApiUploadRoute
   '/img/$key': typeof ImgKeyRoute
   '/p/$id': typeof PIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/@{$slug}' | '/api/upload' | '/img/$key' | '/p/$id'
+  fullPaths: '/' | '/studio' | '/@{$slug}' | '/api/upload' | '/img/$key' | '/p/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/@{$slug}' | '/api/upload' | '/img/$key' | '/p/$id'
-  id: '__root__' | '/' | '/@{$slug}' | '/api/upload' | '/img/$key' | '/p/$id'
+  to: '/' | '/studio' | '/@{$slug}' | '/api/upload' | '/img/$key' | '/p/$id'
+  id: '__root__' | '/' | '/studio' | '/@{$slug}' | '/api/upload' | '/img/$key' | '/p/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   AtSlugRoute: typeof AtSlugRoute
   IndexRoute: typeof IndexRoute
+  StudioRoute: typeof StudioRoute
   ApiUploadRoute: typeof ApiUploadRoute
   ImgKeyRoute: typeof ImgKeyRoute
   PIdRoute: typeof PIdRoute
@@ -94,6 +104,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/studio': {
+      id: '/studio'
+      path: '/studio'
+      fullPath: '/studio'
+      preLoaderRoute: typeof StudioRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/upload': {
@@ -123,6 +140,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   AtSlugRoute: AtSlugRoute,
   IndexRoute: IndexRoute,
+  StudioRoute: StudioRoute,
   ApiUploadRoute: ApiUploadRoute,
   ImgKeyRoute: ImgKeyRoute,
   PIdRoute: PIdRoute,

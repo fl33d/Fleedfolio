@@ -1,0 +1,212 @@
+{
+  "format": "fleedfolio-studio",
+  "schemaVersion": 1,
+  "documentId": "doc_demo_studio",
+  "revision": 0,
+  "identity": {
+    "displayName": "Rowan Park",
+    "roles": [
+      "Full-stack developer",
+      "Systems researcher"
+    ],
+    "headline": "Building tools that make difficult systems easier to understand.",
+    "bio": "I work at the intersection of readable interfaces and dependable infrastructure.",
+    "location": "London",
+    "availability": "Open to selected collaborations",
+    "links": [
+      {
+        "id": "lnk_github",
+        "label": "Source code",
+        "url": "https://github.com/example/example",
+        "rel": "source"
+      },
+      {
+        "id": "lnk_mail",
+        "label": "Contact",
+        "url": "mailto:hello@example.com",
+        "rel": "contact"
+      }
+    ]
+  },
+  "content": {
+    "skills": [
+      {
+        "id": "sk_python",
+        "label": "Python",
+        "category": "development",
+        "iconKey": "python"
+      },
+      {
+        "id": "sk_cloudflare",
+        "label": "Cloudflare Workers",
+        "category": "development",
+        "iconKey": "cloudflare"
+      }
+    ],
+    "projects": [
+      {
+        "id": "proj_harbour",
+        "title": "Harbour — systems observability",
+        "summary": "A study of reliable data pipelines and transparent operational decisions.",
+        "year": "2026",
+        "contribution": "Designed the interface, API and monitoring demonstration.",
+        "skillIds": [
+          "sk_python",
+          "sk_cloudflare"
+        ],
+        "links": [
+          {
+            "id": "lnk_harbour",
+            "label": "Project repository",
+            "url": "https://github.com/example/harbour",
+            "rel": "source"
+          }
+        ],
+        "coverAssetId": null,
+        "lenses": {
+          "story": {
+            "enabled": true,
+            "sections": [
+              {
+                "id": "sec_origin",
+                "heading": "Why I built it",
+                "paragraphs": [
+                  {
+                    "kind": "paragraph",
+                    "runs": [
+                      {
+                        "text": "Monitoring becomes useful when decisions and trade-offs are visible to the people making them."
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "spec": {
+            "enabled": true,
+            "problem": "The source system made failures difficult to diagnose.",
+            "approach": "Used explicit event stages and small, inspectable interfaces.",
+            "decisions": [
+              "Separate write acknowledgement from public status."
+            ],
+            "tradeoffs": [
+              "Prefer clear observability over decorative dashboards."
+            ],
+            "metrics": [
+              {
+                "id": "metric_example",
+                "label": "Pipeline stages",
+                "value": "4",
+                "context": "Illustrative figure, not a measured production claim."
+              }
+            ],
+            "architectureAssetId": null
+          },
+          "board": {
+            "enabled": false,
+            "assetIds": [],
+            "caption": ""
+          },
+          "demo": {
+            "enabled": false,
+            "url": null,
+            "fallbackText": "A public walkthrough will be linked here when ready.",
+            "launchLabel": "View demonstration"
+          }
+        }
+      }
+    ],
+    "experience": [],
+    "education": []
+  },
+  "pages": [
+    {
+      "id": "page_home",
+      "slug": "/",
+      "title": "Home",
+      "blocks": [
+        {
+          "id": "blk_identity17",
+          "type": "identity",
+          "style": {
+            "variant": "hero",
+            "emphasis": "normal"
+          },
+          "scale": "hero"
+        },
+        {
+          "id": "blk_rich_text113",
+          "type": "rich-text",
+          "style": {
+            "variant": "lead",
+            "emphasis": "normal"
+          },
+          "paragraphs": [
+            {
+              "kind": "paragraph",
+              "runs": [
+                {
+                  "text": "Selected work, written with context and intention."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "blk_project53",
+          "type": "project",
+          "style": {
+            "variant": "case-study",
+            "emphasis": "featured"
+          },
+          "projectId": "proj_harbour",
+          "defaultLens": "story"
+        },
+        {
+          "id": "blk_skills63",
+          "type": "skills",
+          "style": {
+            "variant": "list",
+            "emphasis": "normal"
+          },
+          "skillIds": [
+            "sk_python",
+            "sk_cloudflare"
+          ],
+          "display": "text"
+        },
+        {
+          "id": "blk_links39",
+          "type": "links",
+          "style": {
+            "variant": "footer",
+            "emphasis": "normal"
+          },
+          "linkIds": [
+            "lnk_github",
+            "lnk_mail"
+          ]
+        }
+      ]
+    }
+  ],
+  "assets": [],
+  "presentation": {
+    "system": "atelier",
+    "typography": "editorial",
+    "density": "balanced",
+    "surface": "paper",
+    "accent": "#B86F50",
+    "motion": "system"
+  },
+  "settings": {
+    "visibility": "draft",
+    "discoverable": false,
+    "defaultPageId": "page_home",
+    "seo": {
+      "title": "Rowan Park — Developer",
+      "description": "Selected software and research projects."
+    }
+  }
+}
