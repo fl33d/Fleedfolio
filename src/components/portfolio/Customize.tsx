@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 import { ChevronDown, CircleHelp, Download, FileText, RotateCcw, SlidersHorizontal, Upload } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -65,6 +66,9 @@ export function Customize({
 }) {
   const [open, setOpen] = useState(false)
   const root = useRef<HTMLDivElement>(null)
+  const trigger = useRef<HTMLButtonElement>(null)
+  const panel = useRef<HTMLDivElement>(null)
+  const [placement, setPlacement] = useState({ left: 12, bottom: 88, width: 420, maxHeight: 550 })
   const fileInput = useRef<HTMLInputElement>(null)
 
   const exportDraft = () => {
@@ -98,12 +102,48 @@ export function Customize({
     }
   }
 
+  // Floating chrome is portalled to an APP-LEVEL SIBLING of the dock.
+  // Nested backdrop-filter surfaces cannot sample the page behind the
+  // filtered ancestor on Safari. Keep both independent, without CSS hacks.
+  useLayoutEffect(() => {
+    if (!open) return
+    const place = () => {
+      const anchor = trigger.current?.getBoundingClientRect()
+      const dock = root.current?.closest('.dock')?.getBoundingClientRect()
+      if (!anchor) return
+      const vw = window.innerWidth
+      const vh = window.innerHeight
+      const width = Math.min(440, Math.max(260, vw - 24))
+      const preferredLeft = vw <= 640 ? (vw - width) / 2 : anchor.left + anchor.width / 2 - width / 2
+      const left = Math.max(12, Math.min(preferredLeft, vw - width - 12))
+      const bottom = Math.max(12, vh - (dock?.top ?? anchor.top) + 12)
+      const maxHeight = Math.max(160, Math.min(610, vh - bottom - 16))
+      setPlacement(old => old.left === left && old.bottom === bottom &&
+        old.width === width && old.maxHeight === maxHeight
+        ? old : { left, bottom, width, maxHeight })
+    }
+    place()
+    window.addEventListener('resize', place)
+    window.visualViewport?.addEventListener('resize', place)
+    window.addEventListener('scroll', place, true)
+    return () => {
+      window.removeEventListener('resize', place)
+      window.visualViewport?.removeEventListener('resize', place)
+      window.removeEventListener('scroll', place, true)
+    }
+  }, [open])
+
   useEffect(() => {
     if (!open) return
     const onDown = (e: PointerEvent) => {
-      if (!root.current?.contains(e.target as Node)) setOpen(false)
+      if (!root.current?.contains(e.target as Node) && !panel.current?.contains(e.target as Node)) setOpen(false)
     }
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false)
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return
+      e.stopPropagation()
+      setOpen(false)
+      trigger.current?.focus()
+    }
     document.addEventListener('pointerdown', onDown)
     document.addEventListener('keydown', onKey)
     return () => {
@@ -135,14 +175,19 @@ export function Customize({
     }))
   }
 
+  const overlayHost = typeof document === 'undefined' ? null :
+    document.getElementById('fleed-overlay-root')
+
   return (
     <div ref={root} className="cz">
       <button
+        ref={trigger}
         className={cn('cz-trigger', open && 'is-open')}
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
         aria-label="Customise your portfolio"
         aria-haspopup="dialog"
+        aria-controls="fleed-customise-panel"
       >
         <SlidersHorizontal className="size-4" />
         <span className="cz-trigger-label">Customise</span>
@@ -150,8 +195,21 @@ export function Customize({
         <ChevronDown className="size-3.5 cz-chevron" />
       </button>
 
-      {open && (
-        <div className="cz-panel" role="dialog" aria-label="Customise">
+      {open && overlayHost && createPortal(
+        <div
+          ref={panel}
+          id="fleed-customise-panel"
+          className="cz-panel fleed-customize-panel"
+          role="dialog"
+          aria-label="Customise"
+          tabIndex={-1}
+          style={{
+            left: placement.left,
+            bottom: placement.bottom,
+            width: placement.width,
+            maxHeight: placement.maxHeight,
+          }}
+        >
           <div className="cz-panel-intro"><span>Make it yours.</span><p>Start with a feeling. Change anything later.</p></div>
           <Group title="Expression">
             <div className="cz-looks">
@@ -426,7 +484,7 @@ export function Customize({
           </button>
             </div>
           </details>
-        </div>
+        </div>, overlayHost
       )}
     </div>
   )
