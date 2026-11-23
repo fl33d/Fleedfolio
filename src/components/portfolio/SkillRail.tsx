@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type CSSProperties } from 'react'
-import { Github, LoaderCircle } from 'lucide-react'
+import { ChevronDown, Github, LoaderCircle } from 'lucide-react'
 
 const LANGUAGE_COLOURS: Record<string, string> = {
   python:'#3572A5', javascript:'#f1e05a', typescript:'#3178c6',
@@ -27,7 +27,7 @@ export function SkillRail({ skills }: { skills: string[] }) {
       <span className="pf-reel-dot" aria-hidden="true" />{skill}
     </span>
   ))
-  return <div className={'pf-skill-reel'+(moving?' is-moving':'')} aria-label={'Skills: '+skills.join(', ')}>
+  return <div role="group" className={'pf-skill-reel'+(moving?' is-moving':'')} aria-label={'Skills: '+skills.join(', ')}>
     <div className="pf-reel-track" aria-hidden="true">
       <div className="pf-reel-group">{badges()}</div>
       {moving && <div className="pf-reel-group">{badges()}</div>}
@@ -96,6 +96,7 @@ export function GithubLanguages({ skills, socials, onChange }: {
   const [pending,setPending] = useState(false)
   const [notice,setNotice] = useState('')
   const [suggestionOpen,setSuggestionOpen] = useState(false)
+  const [importOpen,setImportOpen] = useState(false)
 
   useEffect(()=>{ if(linkedUsername && !username) setUsername(linkedUsername) },[linkedUsername])
   const importGithub = async () => {
@@ -128,8 +129,14 @@ export function GithubLanguages({ skills, socials, onChange }: {
     } finally {window.clearTimeout(timeout);setPending(false)}
   }
   const available = suggested.filter(name=>!skills.some(skill=>skill.toLowerCase()===name.toLowerCase()))
-  return <div className="pf-github-import">
-    <div className="pf-github-heading"><Github size={17} aria-hidden="true"/><strong>Languages from GitHub</strong></div>
+  return <div className="pf-github-shell">
+    <button type="button" className="pf-github-disclosure" aria-expanded={importOpen} onClick={()=>setImportOpen(value=>!value)}>
+      <Github size={17} aria-hidden="true" />
+      <span>Import languages or browse suggestions</span>
+      <ChevronDown size={16} aria-hidden="true" />
+    </button>
+    {importOpen && <div className="pf-github-import">
+    <div className="pf-github-heading"><strong>Languages from GitHub</strong></div>
     <p>Use the main language detected in your public repositories. Review before adding anything.</p>
     <div className="pf-github-row">
       <label className="sr-only" htmlFor="fleed-github-user">GitHub username</label>
@@ -159,5 +166,6 @@ export function GithubLanguages({ skills, socials, onChange }: {
             disabled={skills.length>=40}>+ {name}</button>)}
       </div>}
     </div>
+    </div>}
   </div>
 }
