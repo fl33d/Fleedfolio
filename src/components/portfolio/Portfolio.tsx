@@ -67,13 +67,7 @@ export function Portfolio({ data, editing, onChange }: Props) {
   const showEducation = shown('education') && (editing || education.length > 0)
   const showContact = shown('contact') && (editing || hasContact)
 
-  const nav = [
-    { id: 'about', label: labels.about || 'About', show: showAbout },
-    { id: 'work', label: labels.work || 'Work', show: showWork },
-    { id: 'experience', label: labels.experience || 'Experience', show: showExperience },
-    { id: 'education', label: labels.education || 'Education', show: showEducation },
-    { id: 'contact', label: labels.contact || 'Contact', show: showContact },
-  ].filter((n) => n.show)
+  const firstSection = showAbout ? 'about' : showWork ? 'work' : showExperience ? 'experience' : showEducation ? 'education' : showContact ? 'contact' : 'top'
 
   // Old shared links may still carry #top and friends; tidy them away
   useEffect(() => {
@@ -91,38 +85,10 @@ export function Portfolio({ data, editing, onChange }: Props) {
       data-align={data.theme.align}
       style={{ '--accent-c': data.accent } as CSSProperties}
     >
-      <header className="pf-nav">
-        <nav className="pf-main-nav" aria-label="Portfolio sections">
-          {nav.map((n) => (
-            <ScrollLink key={n.id} to={n.id} className="pf-nav-link">
-              {n.label}
-            </ScrollLink>
-          ))}
-        </nav>
-        <div className="pf-meta">
-          <span>{data.location || (editing ? 'Make it yours' : 'Selected work')}</span>
-        </div>
-      </header>
-
       {/* Hero */}
       <section id="top" className={cn('pf-hero slot-host', data.photo && 'has-photo')}>
         <div className="pf-hero-main">
-        {editing && <p className="pf-editor-eyebrow">Start with your story</p>}
-        {(editing || data.status) && (
-          <div className="pf-status">
-            {editing ? (
-              <Field
-                value={data.status}
-                onChange={(v) => set('status', v)}
-                placeholder="Availability (optional)"
-                label="Availability"
-                maxLength={80}
-              />
-            ) : (
-              data.status
-            )}
-          </div>
-        )}
+        {editing && <span className="pf-canvas-start" aria-hidden="true">make this yours<span>.</span></span>}
 
         <h1 className="pf-name">
           {editing ? (
@@ -172,18 +138,25 @@ export function Portfolio({ data, editing, onChange }: Props) {
           </Reveal>
         </div>
 
-        {editing && (
+        {editing ? (
           <Reveal delay={150} className="pf-inline-meta">
-            <span className="pf-label">Based in</span>
-            <Field
-              value={data.location}
-              onChange={(v) => set('location', v)}
-              placeholder="City or region (optional)"
-              label="Location"
-              maxLength={80}
-            />
+            <span className="pf-mini-field">
+              <Field value={data.location} onChange={(v) => set('location', v)}
+                placeholder="Location (optional)" label="Location" maxLength={80} />
+            </span>
+            <span className="pf-meta-dot" aria-hidden="true">/</span>
+            <span className="pf-mini-field">
+              <Field value={data.status} onChange={(v) => set('status', v)}
+                placeholder="Availability (optional)" label="Availability" maxLength={80} />
+            </span>
           </Reveal>
-        )}
+        ) : (data.location || data.status) ? (
+          <p className="pf-public-meta">
+            {data.location && <span>{data.location}</span>}
+            {data.location && data.status && <span aria-hidden="true">·</span>}
+            {data.status && <span>{data.status}</span>}
+          </p>
+        ) : null}
 
         </div>
 
@@ -198,7 +171,7 @@ export function Portfolio({ data, editing, onChange }: Props) {
           />
         </Reveal>
 
-        <ScrollLink to={nav[0]?.id ?? 'top'} className="pf-scroll">
+        <ScrollLink to={firstSection} className="pf-scroll">
           <span className="pf-scroll-line" />
           Scroll
         </ScrollLink>
