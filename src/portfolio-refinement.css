@@ -339,3 +339,40 @@
   .pf-skill-reel.is-moving .pf-reel-group:nth-child(2) {display:none}
   .pf-github-import * {transition:none!important}
 }
+
+/* Advanced language controls are present, but don't dominate the blank editor. */
+.pf-github-shell {max-width:37rem;min-width:0}
+.pf-github-disclosure {
+  width:fit-content;max-width:100%;
+  display:flex;align-items:center;gap:.65rem;
+  padding:10px 13px;
+  border:1px solid color-mix(in oklab,var(--ink) 19%,transparent);
+  border-radius:11px;
+  color:var(--ink);
+  background:color-mix(in oklab,var(--ink) 4%,transparent);
+  font:550 .85rem/1.4 var(--font-sans);
+}
+.pf-github-disclosure svg:last-child{margin-left:auto;transition:transform .2s}
+.pf-github-disclosure[aria-expanded='true'] svg:last-child{transform:rotate(180deg)}
+.pf-github-disclosure:hover{background:color-mix(in oklab,var(--ink) 8%,transparent)}
+.pf-github-disclosure:focus-visible{outline:2px solid var(--accent-c);outline-offset:3px}
+.pf-github-import{margin-top:.8rem}
+.pf-skill-reel:not(.is-moving) {
+  overflow:visible;-webkit-mask-image:none;mask-image:none;
+}
+.pf-skill-reel:not(.is-moving) .pf-reel-track,
+.app[data-motion='still'] .pf-reel-track{
+  width:auto;max-width:100%;flex-wrap:wrap;transform:none!important;
+}
+.pf-skill-reel:not(.is-moving) .pf-reel-group,
+.app[data-motion='still'] .pf-reel-group {
+  flex-wrap:wrap;
+}
+.app[data-motion='still'] .pf-skill-reel {
+  overflow:visible;-webkit-mask-image:none;mask-image:none;
+}
+@media(prefers-reduced-motion:reduce){
+  .pf-skill-reel {overflow:visible;-webkit-mask-image:none;mask-image:none}
+  .pf-reel-track {width:auto;max-width:100%;flex-wrap:wrap;transform:none!important}
+  .pf-reel-group {flex-wrap:wrap}
+}
