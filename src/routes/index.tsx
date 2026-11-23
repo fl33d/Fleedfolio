@@ -211,7 +211,8 @@ function Editor() {
 
         {!cvOpen && editing && <Elements data={data} onChange={setData} />}
         {!cvOpen && (
-          <Customize data={data} onChange={setData} onImport={importDraft} customSlug={customSlug} onSlugChange={setCustomSlug} />
+          <Customize data={data} onChange={setData} onImport={importDraft} customSlug={customSlug} onSlugChange={setCustomSlug}
+            onPreviewCv={() => setCvOpen(true)} onHelp={() => setTourOpen(true)} onResetDraft={reset} />
         )}
 
         <button
