@@ -25,12 +25,47 @@ export function Field({
 }) {
   const ref = useRef<HTMLTextAreaElement>(null)
 
-  useLayoutEffect(() => {
+  const fitHeight = () => {
     const el = ref.current
     if (!el) return
+    // Reset before measuring, otherwise switching to a smaller typeface leaves
+    // oversized whitespace. This runs for visual expression changes as well.
     el.style.height = '0px'
     el.style.height = `${el.scrollHeight}px`
-  }, [value])
+  }
+
+  // The exact same field participates in every visual expression.
+  // Updating a theme can change font metrics without changing the text.
+  useLayoutEffect(fitHeight)
+
+  useLayoutEffect(() => {
+    const el = ref.current
+    const wrapper = el?.parentElement
+    if (!el || !wrapper) return
+
+    let active = true
+    let observedWidth = -1
+    const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver((entries) => {
+      const width = entries[0]?.contentRect.width ?? -1
+      if (width >= 0 && Math.abs(width - observedWidth) > 0.5) {
+        observedWidth = width
+        fitHeight()
+      }
+    })
+    observer?.observe(wrapper)
+    window.addEventListener('resize', fitHeight, { passive: true })
+    // Web fonts may finish loading after initial hydration.
+    if (document.fonts) {
+      void document.fonts.ready.then(() => {
+        if (active) fitHeight()
+      })
+    }
+    return () => {
+      active = false
+      observer?.disconnect()
+      window.removeEventListener('resize', fitHeight)
+    }
+  }, [])
 
   return (
     <span className={cn('field', !value && 'is-empty')}>
