@@ -17,6 +17,7 @@ import {
 import { cn } from '@/lib/utils'
 import { Field } from './Field'
 import { ImageSlot } from './ImageSlot'
+import { GithubLanguages, SkillRail } from './SkillRail'
 import { Reveal, SplitText } from './effects'
 
 type Props = {
@@ -206,15 +207,11 @@ export function Portfolio({ data, editing, onChange }: Props) {
       {/* Skills */}
       {shown('skills') && (
         editing ? (
-          <SkillEditor skills={data.skills} onChange={(s) => set('skills', s)} />
+          <SkillEditor skills={data.skills} socials={data.socials} onChange={(s) => set('skills', s)} />
         ) : data.skills.length > 0 ? (
-          <section className="pf-skills" aria-label="Skills">
+          <section className="pf-skills" aria-label="Skills and tools">
             <span className="pf-skills-heading">Skills & tools</span>
-            <div className="pf-skills-list">
-              {data.skills.map((skill, index) => (
-                <span key={`${skill}-${index}`}>{skill}</span>
-              ))}
-            </div>
+            <SkillRail skills={data.skills} />
           </section>
         ) : null
       )}
@@ -724,9 +721,11 @@ function Section({
 
 function SkillEditor({
   skills,
+  socials,
   onChange,
 }: {
   skills: string[]
+  socials: PortfolioData['socials']
   onChange: (skills: string[]) => void
 }) {
   const [draft, setDraft] = useState('')
@@ -771,7 +770,9 @@ function SkillEditor({
           className="pf-chip-input"
         />
       </div>
-      <p className="pf-hint">Press Enter or separate skills with commas. They appear as a simple list on your published page.</p>
+      <p className="pf-hint">Type a skill and press Enter, or pick one from the suggestions below.</p>
+      {skills.length>0 && <div className="pf-reel-preview"><span>How they look</span><SkillRail skills={skills}/></div>}
+      <GithubLanguages skills={skills} socials={socials} onChange={onChange} />
     </div>
   )
 }
