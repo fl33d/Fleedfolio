@@ -62,7 +62,7 @@ with sync_playwright() as p:
             assert bounds, "Library is not laid out"
             assert bounds["x"] >= -2 and bounds["x"] + bounds["width"] <= width + 2, f"Library outside viewport: {bounds}"
             page.screenshot(path=str(OUT / f"shelf-{width}.png"))
-            page.get_by_role("textbox", name="Find an element").fill("Freeform")
+            panel.locator("input[type=search]").fill("Freeform")
             assert page.locator(".el-options>button:visible").count() == 1
             page.locator(".el-options>button").first.click()
             assert page.locator("[id^=section-]").count() >= 1, "Freeform section did not get added"
