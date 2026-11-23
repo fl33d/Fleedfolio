@@ -1,0 +1,314 @@
+/* Fleedfolio / tactile studio-quality defaults.
+ * No top bar, no sidebar, no extra app shell. UI details use a native
+ * Helvetica stack; portfolio typography remains entirely author-controlled.
+ * All controls live in the existing bottom-dock popovers.
+ */
+:root {
+  --fleed-ui: "Helvetica Neue", Helvetica, Arial, ui-sans-serif, system-ui, sans-serif;
+  --fleed-spring: cubic-bezier(.2,.8,.2,1);
+}
+.app .dock,
+.app .dock button,
+.app .cz-panel,
+.app .cz-panel button,
+.app .cz-panel input,
+.app .cz-panel summary,
+.app .el-panel,
+.app .el-panel button,
+.app .el-panel input,
+.app .pf-block-appearance,
+.app .pf-block-appearance button,
+.app .pf-github-shell,
+.app .pf-github-shell button {
+  font-family: var(--fleed-ui);
+  letter-spacing: -.015em;
+}
+.app .dock.chrome {
+  border-radius: 19px;
+  background: rgba(25, 27, 26, .78);
+  backdrop-filter: blur(26px) saturate(1.35);
+  -webkit-backdrop-filter: blur(26px) saturate(1.35);
+  border: 1px solid rgba(255,255,255,.19);
+  box-shadow: 0 14px 52px rgba(0,0,0,.24), 0 2px 8px rgba(0,0,0,.14),
+              inset 0 1px 0 rgba(255,255,255,.18);
+}
+.app .dock .dock-icon, .app .dock .cz-trigger,
+.app .dock .dock-toggle button, .app .dock .dock-publish {
+  transition: background .18s var(--fleed-spring), color .18s,
+              transform .22s var(--fleed-spring), box-shadow .2s;
+}
+@media(hover:hover) {
+  .app .dock .dock-icon:hover, .app .dock .cz-trigger:hover {
+    transform: translateY(-2px);
+  }
+  .app .dock .dock-publish:hover {transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.15)}
+}
+.app .dock :is(button,input):focus-visible,
+.app .el-panel :is(button,input):focus-visible,
+.app .cz-panel :is(button,input,summary):focus-visible,
+.app .pf-block-appearance button:focus-visible {
+  outline: 2px solid #d3e7c5;
+  outline-offset: 3px;
+}
+.app .cz-panel,
+.app .el-panel {
+  border-color: rgba(255,255,255,.2);
+  border-radius: 21px;
+  background: rgba(28,29,28,.94);
+  backdrop-filter: blur(30px) saturate(1.4);
+  -webkit-backdrop-filter: blur(30px) saturate(1.4);
+  box-shadow: 0 35px 95px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.16);
+}
+.app .cz-title {
+  font: 600 12px/1.3 var(--fleed-ui);
+  letter-spacing: .025em;
+  color:#d2d8d0;
+  text-transform:none;
+}
+.app .cz-panel-intro > span {font-size:clamp(1.75rem,3.6vw,2.15rem)}
+.app .cz-panel-intro > p {font:400 13px/1.5 var(--fleed-ui)}
+.app .cz-look {transition:transform .25s var(--fleed-spring),background .2s,border-color .2s}
+@media(hover:hover) {
+  .app .cz-look:hover {transform:translateY(-2px)}
+}
+.app .cz-look[aria-pressed=true] {
+  box-shadow:0 0 0 1px rgba(216,230,201,.5),inset 0 1px 0 rgba(255,255,255,.12);
+}
+.app .cz-look-preview {transition:filter .3s,transform .36s var(--fleed-spring)}
+.app .cz-look:hover .cz-look-preview {filter:saturate(1.1)}
+.app .cz-look-title{font-family:var(--fleed-ui);font-weight:600;font-size:13px}
+.app .cz-look-hint {font-family:var(--fleed-ui);font-size:12px;line-height:1.55}
+.app .cz-palette,.app .cz-accents button {transition:transform .2s var(--fleed-spring),box-shadow .2s}
+.app .cz-palette:hover {transform:translateY(-2px)}
+.app .cz-layout-picks {
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;
+}
+.app .cz-layout-picks > button {
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  border-radius:12px;
+  padding:8px 7px 10px;
+  border:1px solid rgba(255,255,255,.15);
+  background:rgba(255,255,255,.03);
+  color:#e7e8e0;
+  font:500 12px/1.3 var(--fleed-ui);
+  transition:background .2s,border-color .2s,transform .2s var(--fleed-spring);
+}
+.app .cz-layout-picks > button:hover {
+  background:rgba(255,255,255,.1);transform:translateY(-2px);
+}
+.app .cz-layout-picks > button[aria-pressed=true] {
+  border-color:#dfe9d0;
+  background:rgba(214,231,207,.14);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.13);
+}
+.app .cz-layout-preview {
+  width:100%;height:54px;border-radius:7px;
+  background:#e7e5df;
+  padding:9px;display:grid;gap:5px;align-content:center;overflow:hidden;
+}
+.app .cz-layout-preview > i {background:#333a37;border-radius:2px;min-width:0;min-height:0}
+.app .cz-layout-list{grid-template-columns:1fr;grid-template-rows:repeat(3,8px)}
+.app .cz-layout-grid{grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(2,1fr)}
+.app .cz-layout-grid i:first-child{grid-row:1 / 3}
+.app .cz-layout-spotlight{grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(2,1fr)}
+.app .cz-layout-spotlight i:first-child{grid-column:1/3;background:#9aaf95}
+.app .cz-layout-spotlight i:nth-child(n+2){background:#404746}
+.app .cz-seg button{min-height:36px;font:500 13px/1.2 var(--fleed-ui)}
+.app .cz-panel .cz-utility{font:500 13px/1.5 var(--fleed-ui);min-height:43px}
+.app .el-panel-header small {font:500 12px/1.3 var(--fleed-ui);letter-spacing:0;text-transform:none;color:#c4d5c0}
+.app .el-panel-header h2 {font-size:clamp(1.95rem,4vw,2.3rem)}
+.app .el-tabs {display:flex;gap:5px;margin:12px 0 6px;padding:4px;border-radius:11px;background:rgba(255,255,255,.06)}
+.app .el-tabs button {
+  flex:1;min-height:34px;border-radius:8px;color:#c9d1c6;
+  font:600 12px/1.2 var(--fleed-ui);
+  transition:background .18s,color .18s,box-shadow .18s;
+}
+.app .el-tabs button:hover {color:#fff}
+.app .el-tabs button[aria-pressed=true] {
+  background:#e6e9df;color:#252e29;
+  box-shadow:0 2px 8px rgba(0,0,0,.15);
+}
+.app .el-options{gap:2px}
+.app .el-options > button {
+  grid-template-columns:39px minmax(0,1fr) 16px;
+  gap:12px;min-height:66px;padding:9px 9px;
+  transition:background .18s,transform .2s var(--fleed-spring);
+}
+.app .el-options > button:not(:disabled):hover {
+  background:rgba(255,255,255,.095);
+  transform:translateX(2px);
+}
+.app .el-option-icon {
+  width:38px;height:38px;border-radius:11px;
+  background:linear-gradient(150deg,rgba(208,228,199,.24),rgba(211,230,208,.055));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.13);
+  color:#e2f1d9;
+}
+.app .el-options strong {font:600 14px/1.25 var(--fleed-ui);letter-spacing:-.016em}
+.app .el-options small {font:400 12px/1.45 var(--fleed-ui);color:#b8c4b6}
+.app .el-options > button > svg:last-child{color:#c7d9c0;opacity:.6;transition:opacity .2s,transform .2s}
+.app .el-options > button:hover > svg:last-child{opacity:1;transform:rotate(90deg)}
+.app .el-footnote {display:flex;align-items:center;gap:7px;font:400 12px/1.4 var(--fleed-ui);color:#b9c8ba}
+.app .el-panel input[type=search] {font-family:var(--fleed-ui)}
+.app .pf-block-appearance {
+  display:flex;width:max-content;max-width:100%;
+  gap:3px;padding:3px;margin:-.5rem 0 1.5rem;
+  background:color-mix(in oklab,var(--ink) 7%,transparent);
+  border:1px solid color-mix(in oklab,var(--ink) 10%,transparent);
+  border-radius:11px;
+}
+.app .pf-block-appearance button {
+  border-radius:8px;padding:7px 12px;min-height:32px;
+  color:var(--dim);font:600 12px/1.3 var(--fleed-ui);
+  transition:background .2s,color .2s,box-shadow .2s;
+}
+.app .pf-block-appearance button[aria-pressed=true] {
+  background:var(--ink);color:var(--paper);
+  box-shadow:0 2px 9px color-mix(in oklab,var(--ink) 12%,transparent);
+}
+.app .pf-block-appearance button:not([aria-pressed=true]):hover{
+  color:var(--ink);background:color-mix(in oklab,var(--ink) 8%,transparent);
+}
+
+/* Three real project compositions, independent of the eight aesthetic looks. */
+.app[data-work-layout='grid'] .pf-works,
+.app[data-work-layout='spotlight'] .pf-works {
+  border:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  align-items:stretch;gap:clamp(13px,2vw,24px);
+}
+.app[data-work-layout='grid'] .pf-work,
+.app[data-work-layout='spotlight'] .pf-work {
+  display:grid;grid-template-columns:minmax(0,1fr) auto;
+  grid-template-areas:'index year' 'body body';
+  align-content:start;gap:12px;
+  margin:0;min-width:0;min-height:210px;
+  padding:clamp(17px,2.5vw,30px);
+  border:1px solid color-mix(in oklab,var(--ink) 17%,transparent);
+  border-radius:var(--fleed-corners,20px);
+  background:color-mix(in oklab,var(--ink) 4%,var(--paper));
+  box-shadow:0 14px 40px -35px color-mix(in oklab,var(--ink) 40%,transparent);
+  transition:border-color .26s,box-shadow .3s var(--fleed-spring),transform .3s var(--fleed-spring);
+}
+.app[data-work-layout='grid'] .pf-work-body,
+.app[data-work-layout='spotlight'] .pf-work-body {gap:clamp(.8rem,1.6vw,1.2rem);display:grid;align-content:start}
+.app[data-work-layout='grid'] .pf-work-title,
+.app[data-work-layout='spotlight'] .pf-work-title {
+  font-size:clamp(1.7rem,3vw,2.7rem);line-height:1.02;
+  overflow-wrap:anywhere;
+}
+.app[data-work-layout='grid'] .pf-work-image.img-frame,
+.app[data-work-layout='spotlight'] .pf-work-image.img-frame{
+  width:100%;max-width:100%;margin:0;
+  aspect-ratio:16/10;border-radius:calc(var(--fleed-corners,20px) * .65);
+}
+.app[data-work-layout='grid'] .pf-work-image img,
+.app[data-work-layout='spotlight'] .pf-work-image img {width:100%;height:100%;object-fit:cover}
+.app[data-work-layout='grid'] .pf-work-year,
+.app[data-work-layout='spotlight'] .pf-work-year {font-size:12px}
+.app[data-work-layout='grid'] .pf-work-index,
+.app[data-work-layout='spotlight'] .pf-work-index {font-size:12px}
+.app[data-work-layout='spotlight'] .pf-work:first-child {
+  grid-column:1/-1;
+  display:grid;grid-template-columns:minmax(0,1fr) auto;
+  grid-template-areas:'index year' 'body body';
+  padding:clamp(21px,4vw,60px);
+  min-height:320px;
+  background:linear-gradient(135deg,
+    color-mix(in oklab,var(--accent-c) 13%,var(--paper)),
+    color-mix(in oklab,var(--ink) 3%,var(--paper)));
+}
+.app[data-work-layout='spotlight'] .pf-work:first-child .pf-work-title {
+  font-size:clamp(2.5rem,5.7vw,5.5rem);
+  letter-spacing:-.06em;line-height:.94;
+}
+.app[data-work-layout='spotlight'] .pf-work:first-child .pf-work-image.img-frame {
+  aspect-ratio:21/9;
+}
+@media(hover:hover) {
+  .app[data-work-layout='grid'].mode-view .pf-work:hover,
+  .app[data-work-layout='spotlight'].mode-view .pf-work:hover {
+    transform:translateY(-5px);
+    border-color:color-mix(in oklab,var(--accent-c) 54%,var(--ink));
+    box-shadow:0 25px 45px -30px color-mix(in oklab,var(--ink) 45%,transparent);
+  }
+}
+
+/* Section treatments share the same content and IDs.
+   Nothing gets destroyed when the author changes the treatment. */
+.app .pf-narrative-statement {position:relative}
+.app .pf-narrative-statement .pf-extra-body {
+  font-family:var(--font-display);
+  font-size:clamp(2.1rem,5.2vw,5.8rem);line-height:1.06;
+  letter-spacing:-.055em;font-weight:400;
+  max-width:63rem;color:var(--ink);
+}
+.app .pf-narrative-statement .pf-extra-body p:first-child::before {
+  content:'“';color:var(--accent-c);margin-left:-.03em;
+}
+.app .pf-narrative-statement .pf-extra-body p:last-child::after {
+  content:'”';color:var(--accent-c);
+}
+.app .pf-narrative-statement .pf-about-wrap {
+  border-block:1px solid color-mix(in oklab,var(--ink) 18%,transparent);
+  padding:clamp(25px,4vw,60px) 0;
+}
+.app .pf-narrative-feature .pf-about-wrap{
+  background:linear-gradient(145deg,
+    color-mix(in oklab,var(--accent-c) 9%,var(--paper)),
+    color-mix(in oklab,var(--ink) 2%,var(--paper)));
+  border:1px solid color-mix(in oklab,var(--ink) 14%,transparent);
+  border-radius:var(--fleed-corners,24px);
+  padding:clamp(24px,4vw,64px);
+  box-shadow:0 24px 90px -65px color-mix(in oklab,var(--ink) 55%,transparent);
+}
+.app .pf-narrative-feature .pf-extra-body{
+  font-family:var(--font-display);
+  font-size:clamp(1.8rem,3.2vw,3.25rem);
+  line-height:1.18;letter-spacing:-.032em;
+  max-width:48rem;color:var(--ink);
+}
+.app .pf-narrative-feature .pf-about-image.img-frame{border-radius:var(--fleed-corners,24px)}
+.app .pf-narrative-feature .pf-about-image img{object-fit:cover}
+
+/* Users combine these independently with look, texture, font and colour. */
+.app[data-spacing='compact'] .pf-section{padding-top:clamp(2rem,4vw,3.25rem)}
+.app[data-spacing='compact'] .pf-hero{min-height:0}
+.app[data-spacing='compact'].mode-view .pf-hero{min-height:clamp(380px,55svh,540px)}
+.app[data-spacing='compact'] .pf-work{padding-block:clamp(1.15rem,2vw,1.8rem)}
+.app[data-spacing='airy'] .pf-section{padding-top:clamp(6.5rem,11vw,11rem)}
+.app[data-spacing='airy'].mode-view .pf-hero{min-height:clamp(640px,92svh,930px)}
+.app[data-spacing='airy'] .pf-work{padding-block:clamp(2.5rem,4vw,4rem)}
+.app[data-spacing='compact'][data-work-layout='grid'] .pf-work,
+.app[data-spacing='compact'][data-work-layout='spotlight'] .pf-work {padding:clamp(15px,2vw,23px)}
+.app[data-spacing='airy'][data-work-layout='grid'] .pf-work,
+.app[data-spacing='airy'][data-work-layout='spotlight'] .pf-work {padding:clamp(24px,3.5vw,48px)}
+.app[data-corners='sharp']{--fleed-corners:0px}
+.app[data-corners='soft']{--fleed-corners:18px}
+.app[data-corners='round']{--fleed-corners:35px}
+.app[data-corners='sharp'] :is(.pf-work,.pf-work-image.img-frame,.pf-hero-photo .img-frame,.pf-narrative-feature .pf-about-wrap) {border-radius:0}
+.app[data-corners='round'] :is(.pf-work,.pf-work-image.img-frame,.pf-hero-photo .img-frame,.pf-narrative-feature .pf-about-wrap) {border-radius:var(--fleed-corners)}
+.app[data-corners='soft'] :is(.pf-work-image.img-frame,.pf-hero-photo .img-frame){border-radius:11px}
+
+/* Touch surfaces are large but compact and readable. */
+@media(max-width:700px){
+  .app[data-work-layout='grid'] .pf-works,
+  .app[data-work-layout='spotlight'] .pf-works{
+    grid-template-columns:minmax(0,1fr);
+    gap:12px;
+  }
+  .app[data-work-layout='spotlight'] .pf-work:first-child {grid-column:auto;min-height:250px}
+  .app[data-work-layout='grid'] .pf-work,
+  .app[data-work-layout='spotlight'] .pf-work {min-height:0}
+  .app[data-work-layout='spotlight'] .pf-work:first-child .pf-work-title {font-size:clamp(2.2rem,8vw,3.5rem)}
+  .app[data-work-layout='spotlight'] .pf-work:first-child .pf-work-image.img-frame {aspect-ratio:16/10}
+  .app .pf-narrative-statement .pf-extra-body {font-size:clamp(2rem,8.2vw,3.6rem)}
+  .app .pf-narrative-feature .pf-about-wrap {padding:clamp(20px,5vw,35px)}
+  .app .cz-layout-preview{height:45px}
+  .app .el-panel{padding:15px}
+  .app .el-options > button {min-height:60px}
+}
+@media (prefers-reduced-motion:reduce){
+  .app :is(.cz-look,.el-options>button,.dock button,.pf-work,.pf-block-appearance button){
+    transition:none!important;animation:none!important;transform:none!important;
+  }
+}
