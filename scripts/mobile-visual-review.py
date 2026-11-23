@@ -37,6 +37,8 @@ with sync_playwright() as p:
         page.wait_for_load_state("networkidle", timeout=30000)
         page.wait_for_timeout(700)
         assert not page.locator(".pf-mono-badge").count(), "Decorative badge has returned"
+        assert page.locator(".pf-nav").count() == 0, "Portfolio top navigation has returned"
+        assert page.locator(".pf-canvas-start").count() == 0, "Extra header caption has returned"
         assert page.get_by_role("button", name="Edit portfolio").count() == 1
         assert page.get_by_role("button", name="Preview portfolio").count() == 1
         assert page.get_by_role("button", name="Add an element").count() == 1
@@ -101,6 +103,13 @@ with sync_playwright() as p:
             assert page.locator(".pf-reel-preview .pf-reel-badge").count() == 6
             skills = page.evaluate("JSON.parse(localStorage.getItem('blank:draft')).skills")
             assert skills == ["Python","Rust","TypeScript"], f"Unexpected imported languages: {skills}"
+            icon_hrefs = page.locator(".pf-reel-preview .pf-language-icon use").evaluate_all(
+                "(els) => els.map(el=>el.getAttribute('href'))"
+            )
+            assert len(icon_hrefs) >= 3, f"Missing local SVG language icons: {icon_hrefs}"
+            assert any("lang-python" in (x or "") for x in icon_hrefs)
+            sprite = context.request.get(BASE + "/icons/languages-core.svg")
+            assert sprite.status == 200 and 'id="lang-python"' in sprite.text(), "Local Devicon symbols unavailable"
             page.screenshot(path=str(OUT / "skills-editor-390.png"))
             page.get_by_role("button", name="Preview portfolio").click()
             rail = page.locator(".pf-skills .pf-skill-reel.is-moving")
@@ -113,6 +122,26 @@ with sync_playwright() as p:
             assert page.evaluate("document.documentElement.scrollWidth") <= width + 2
             print("PASS mocked GitHub language import, published-look rail and reduced motion")
 
+
+        if width == 1440:
+            page.get_by_role("textbox", name="Name").fill("Alex Morgan")
+            page.get_by_role("textbox", name="Role").fill("Creative engineer")
+            page.get_by_role("textbox", name="Tagline").fill("Making digital things worth feeling.")
+            page.get_by_role("button", name="Customise your portfolio").click()
+            looks = {
+                "classic":"Original", "editorial":"Editorial",
+                "glass":"Liquid", "brutal":"Brutal",
+                "aero":"Aero", "print":"Print",
+                "neo":"Digital", "playful":"Playground",
+            }
+            for look,label in looks.items():
+                page.get_by_role("button", name=label + " expression").click()
+                assert page.locator(".app").get_attribute("data-look") == look
+                assert page.get_by_role("textbox", name="Name").input_value() == "Alex Morgan", "Look switch erased content"
+                assert page.evaluate("document.documentElement.scrollWidth") <= width + 2, f"Overflow in {look}"
+                page.screenshot(path=str(OUT / f"look-{look}-1440.png"))
+            page.get_by_role("button", name="Customise your portfolio").click()
+            print("PASS eight looks, retained content, and horizontal overflow checks")
 
         assert not errors, f"Uncaught browser errors at {width}: {errors}"
         context.close()
