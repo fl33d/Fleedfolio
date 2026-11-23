@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, type CSSProperties } from 'react'
 import { Github, LoaderCircle } from 'lucide-react'
 
 const LANGUAGE_COLOURS: Record<string, string> = {
@@ -20,17 +20,17 @@ const LANGUAGES = [
 /** Only existing user-selected skills enter the reel. No invented skills. */
 export function SkillRail({ skills }: { skills: string[] }) {
   const moving = skills.length >= 3
-  const badges = (clone = false) => skills.map((skill, index) => (
+  const badges = () => skills.map((skill, index) => (
     <span className="pf-reel-badge" key={index} style={{
       '--language-colour': LANGUAGE_COLOURS[skill.toLowerCase()] || '#a9b79c',
-    } as React.CSSProperties}>
+    } as CSSProperties}>
       <span className="pf-reel-dot" aria-hidden="true" />{skill}
     </span>
   ))
   return <div className={'pf-skill-reel'+(moving?' is-moving':'')} aria-label={'Skills: '+skills.join(', ')}>
     <div className="pf-reel-track" aria-hidden="true">
       <div className="pf-reel-group">{badges()}</div>
-      {moving && <div className="pf-reel-group">{badges(true)}</div>}
+      {moving && <div className="pf-reel-group">{badges()}</div>}
     </div>
   </div>
 }
@@ -49,7 +49,7 @@ export function languagesFromRepositories(repos: unknown, username: string): str
       typeof item.language !== 'string' ||
       item.language.length > 40 ||
       !item.language.trim() ||
-      item.owner?.login?.toString().toLowerCase() !== username.toLowerCase()) continue
+      (typeof item.owner?.login !== 'string' || item.owner.login.toLowerCase() !== username.toLowerCase())) continue
     const label = item.language.trim()
     const key = label.toLowerCase()
     const found = frequencies.get(key)
