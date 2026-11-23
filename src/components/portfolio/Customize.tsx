@@ -333,6 +333,20 @@ export function Customize({
             </div>
           </Group>
 
+          <Group title="Skills presentation">
+            <span className="cz-skill-label">Layout</span>
+            <Segmented value={theme.skillLayout}
+              options={ [['rail','Flow'],['grid','Cards'],['list','List']] }
+              onChange={v=>setTheme('skillLayout',v)}
+            />
+            <span className="cz-skill-label">Show</span>
+            <Segmented value={theme.skillLabels}
+              options={ [['both','Logo + name'],['icons','Logos'],['text','Names']] }
+              onChange={v=>setTheme('skillLabels',v)}
+            />
+            <p className="cz-skill-tip">Your skills and SVG logos stay intact. Only the presentation changes.</p>
+          </Group>
+
           <details className="cz-advanced">
             <summary>More control <ChevronDown className="size-4" aria-hidden="true"/></summary>
             <div className="cz-advanced-content">

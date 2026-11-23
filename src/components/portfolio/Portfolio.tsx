@@ -186,11 +186,13 @@ export function Portfolio({ data, editing, onChange }: Props) {
       {/* Skills */}
       {shown('skills') && (
         editing ? (
-          <SkillEditor skills={data.skills} socials={data.socials} onChange={(s) => set('skills', s)} />
+          <SkillEditor skills={data.skills} socials={data.socials}
+            layout={data.theme.skillLayout} labels={data.theme.skillLabels}
+            onChange={(s) => set('skills', s)} />
         ) : data.skills.length > 0 ? (
           <section className="pf-skills" aria-label="Skills and tools">
             <span className="pf-skills-heading">Skills & tools</span>
-            <SkillRail skills={data.skills} />
+            <SkillRail skills={data.skills} layout={data.theme.skillLayout} labels={data.theme.skillLabels} />
           </section>
         ) : null
       )}
@@ -724,10 +726,14 @@ function Section({
 function SkillEditor({
   skills,
   socials,
+  layout,
+  labels,
   onChange,
 }: {
   skills: string[]
   socials: PortfolioData['socials']
+  layout: PortfolioData['theme']['skillLayout']
+  labels: PortfolioData['theme']['skillLabels']
   onChange: (skills: string[]) => void
 }) {
   const [draft, setDraft] = useState('')
@@ -773,7 +779,7 @@ function SkillEditor({
         />
       </div>
       <p className="pf-hint">Type a skill and press Enter, or pick one from the suggestions below.</p>
-      {skills.length>0 && <div className="pf-reel-preview"><span>How they look</span><SkillRail skills={skills}/></div>}
+      {skills.length>0 && <div className="pf-reel-preview"><span>How they look</span><SkillRail skills={skills} layout={layout} labels={labels}/></div>}
       <GithubLanguages skills={skills} socials={socials} onChange={onChange} />
     </div>
   )

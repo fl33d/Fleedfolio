@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState, type CSSProperties } from 'react'
 import { ChevronDown, Github, LoaderCircle } from 'lucide-react'
+import type { Theme } from '@/lib/portfolio'
 
 const LANGUAGE_COLOURS: Record<string, string> = {
   python:'#3572A5', javascript:'#f1e05a', typescript:'#3178c6',
@@ -58,16 +59,37 @@ const LANGUAGES = [
 ]
 
 /** Only existing user-selected skills enter the reel. No invented skills. */
-export function SkillRail({ skills }: { skills: string[] }) {
-  const moving = skills.length >= 3
-  const badges = () => skills.map((skill, index) => (
-    <span className="pf-reel-badge" key={index} style={{
-      '--language-colour': LANGUAGE_COLOURS[skill.toLowerCase()] || '#a9b79c',
-    } as CSSProperties}>
-      <LanguageIcon name={skill} /><span className="pf-reel-fallback" aria-hidden="true"/> {skill}
-    </span>
-  ))
-  return <div role="group" className={'pf-skill-reel'+(moving?' is-moving':'')} aria-label={'Skills: '+skills.join(', ')}>
+/** One set of real skills; three visitor arrangements and three label modes.
+ * Existing portfolios default to the same animated rail and always retain
+ * an accessible text name for unrecognised languages.
+ */
+export function SkillRail({
+  skills, layout = 'rail', labels = 'both',
+}: {
+  skills: string[]
+  layout?: Theme['skillLayout']
+  labels?: Theme['skillLabels']
+}) {
+  const moving = layout === 'rail' && skills.length >= 3
+  const badges = () => skills.map((skill, index) => {
+    const knownIcon = Boolean(ICONS[skill.trim().toLowerCase()])
+    const icon = labels !== 'text' && knownIcon
+    const text = labels !== 'icons' || !knownIcon
+    return (
+      <span className="pf-reel-badge" key={index} style={{
+        '--language-colour': LANGUAGE_COLOURS[skill.toLowerCase()] || '#a9b79c',
+      } as CSSProperties}>
+        {icon && <LanguageIcon name={skill} />}
+        <span className="pf-reel-fallback" aria-hidden="true" />
+        {text ? <span className="pf-reel-name">{skill}</span> :
+          <span className="sr-only">{skill}</span>}
+      </span>
+    )
+  })
+  return <div role="group"
+    className={'pf-skill-reel' + (moving ? ' is-moving' : '') +
+      (layout === 'rail' ? '' : ' is-' + layout) + ' pf-skill-labels-' + labels}
+    aria-label={'Skills: ' + skills.join(', ')}>
     <div className="pf-reel-track" aria-hidden="true">
       <div className="pf-reel-group">{badges()}</div>
       {moving && <div className="pf-reel-group">{badges()}</div>}

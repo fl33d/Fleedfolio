@@ -91,6 +91,8 @@ export type Theme = {
   workLayout: 'list' | 'grid' | 'spotlight'
   spacing: 'compact' | 'balanced' | 'airy'
   corners: 'soft' | 'sharp' | 'round'
+  skillLayout: 'rail' | 'grid' | 'list'
+  skillLabels: 'both' | 'icons' | 'text'
 }
 
 export type SectionKey = 'skills' | 'about' | 'work' | 'experience' | 'education' | 'contact'
@@ -130,6 +132,8 @@ export const DEFAULT_THEME: Theme = {
   workLayout: 'list',
   spacing: 'balanced',
   corners: 'soft',
+  skillLayout: 'rail',
+  skillLabels: 'both',
 }
 
 export type Portfolio = {
@@ -356,6 +360,8 @@ export function normalizePortfolio(input: any): Portfolio {
       workLayout: pick(t.workLayout, ['list','grid','spotlight'], DEFAULT_THEME.workLayout),
       spacing: pick(t.spacing, ['compact','balanced','airy'], DEFAULT_THEME.spacing),
       corners: pick(t.corners, ['soft','sharp','round'], DEFAULT_THEME.corners),
+      skillLayout: pick(t.skillLayout, ['rail','grid','list'], DEFAULT_THEME.skillLayout),
+      skillLabels: pick(t.skillLabels, ['both','icons','text'], DEFAULT_THEME.skillLabels),
     },
     labels: {
       about: label(l.about, 60, DEFAULT_LABELS.about),
