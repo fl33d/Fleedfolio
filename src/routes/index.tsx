@@ -42,7 +42,7 @@ function Editor() {
   const [publishing, setPublishing] = useState(false)
   const [shareOpen, setShareOpen] = useState(false)
   const [tourOpen, setTourOpen] = useState(false)
-  const loaded = useRef(false)
+  const [hydrated, setHydrated] = useState(false)
   const storageWarningShown = useRef(false)
 
   // The first page is the editor. The walkthrough is discoverable through
@@ -73,11 +73,11 @@ function Editor() {
     } catch {
       // ignore malformed local data
     }
-    loaded.current = true
+    setHydrated(true)
   }, [])
 
   useEffect(() => {
-    if (!loaded.current) return
+    if (!hydrated) return
     try {
       localStorage.setItem(DRAFT_KEY, JSON.stringify(data))
       storageWarningShown.current = false
@@ -87,16 +87,16 @@ function Editor() {
         storageWarningShown.current = true
       }
     }
-  }, [data])
+  }, [data, hydrated])
 
   useEffect(() => {
-    if (!loaded.current) return
+    if (!hydrated) return
     try {
       localStorage.setItem(CUSTOM_SLUG_KEY, customSlug)
     } catch {
       // Draft contents can still be exported if browser storage is unavailable.
     }
-  }, [customSlug])
+  }, [customSlug, hydrated])
 
   const switchMode = (next: boolean) => {
     setCvOpen(false)
