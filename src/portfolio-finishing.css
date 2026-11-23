@@ -201,3 +201,35 @@
   [data-slot='dialog-overlay'].fleed-frosted-overlay { backdrop-filter: none; }
   .made-with { background: #202729; }
 }
+
+/* ONE consistent tinted-glass material across the three circled controls.
+   Keep the page's hue visible through the surface, not a black opaque card. */
+.app .cz-panel {
+  background: rgba(27, 32, 36, .57);
+  border: 1px solid rgba(255,255,255,.24);
+  -webkit-backdrop-filter: blur(42px) saturate(1.55);
+  backdrop-filter: blur(42px) saturate(1.55);
+  box-shadow: 0 22px 65px rgba(0,0,0,.23), inset 0 1px rgba(255,255,255,.16);
+}
+.app .dock.chrome {
+  background: rgba(25, 31, 36, .52);
+  border: 1px solid rgba(255,255,255,.23);
+  -webkit-backdrop-filter: blur(35px) saturate(1.5);
+  backdrop-filter: blur(35px) saturate(1.5);
+  box-shadow: 0 12px 38px rgba(0,0,0,.2), inset 0 1px rgba(255,255,255,.15);
+}
+@media (max-width: 440px) {
+  .app .cz-panel {
+    background: rgba(27,32,36,.59);
+    -webkit-backdrop-filter: blur(42px) saturate(1.55);
+    backdrop-filter: blur(42px) saturate(1.55);
+  }
+  .app .dock.chrome {
+    background: rgba(25,31,36,.53);
+    -webkit-backdrop-filter: blur(35px) saturate(1.5);
+    backdrop-filter: blur(35px) saturate(1.5);
+  }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .app .cz-panel, .app .dock.chrome { background: #24292d; }
+}
