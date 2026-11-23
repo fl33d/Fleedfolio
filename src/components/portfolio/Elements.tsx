@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Plus, Search, X } from 'lucide-react'
+import { AlignLeft, BookOpenText, BriefcaseBusiness, Contact, FolderOpen, GraduationCap, Image, Link2, Plus, Quote, Search, Shapes, Sparkles, X, type LucideIcon } from 'lucide-react'
 
 import {
   emptyCustomSection,
@@ -10,18 +10,21 @@ import {
   type Portfolio,
 } from '@/lib/portfolio'
 
-type ItemKind = 'text' | 'project' | 'skills' | 'about' | 'experience' | 'education' | 'contact' | 'link'
-type LibraryItem = { kind: ItemKind; name: string; description: string; target?: string }
+type ItemKind = 'text' | 'statement' | 'feature' | 'project' | 'skills' | 'about' | 'experience' | 'education' | 'contact' | 'link'
+type ItemCategory = 'All' | 'Write' | 'Show' | 'About'
+type LibraryItem = { kind: ItemKind; name: string; description: string; category: Exclude<ItemCategory,'All'>; icon: LucideIcon; target?: string }
 
 const LIBRARY: LibraryItem[] = [
-  { kind: 'text', name: 'Freeform section', description: 'Write anything, with an optional image.' },
-  { kind: 'project', name: 'Project', description: 'Show what you made and why.', target: 'work' },
-  { kind: 'skills', name: 'Skills', description: 'List the things you work with.', target: 'top' },
-  { kind: 'about', name: 'About', description: 'Tell your story in your own words.', target: 'about' },
-  { kind: 'experience', name: 'Experience', description: 'Add a position or collaboration.', target: 'experience' },
-  { kind: 'education', name: 'Education', description: 'Add a school, course or qualification.', target: 'education' },
-  { kind: 'contact', name: 'Contact', description: 'Make it easy to reach you.', target: 'contact' },
-  { kind: 'link', name: 'Social link', description: 'Add another place to find your work.', target: 'contact' },
+  { kind: 'text', name: 'Freeform section', description: 'A blank canvas for your words.', category:'Write', icon:AlignLeft },
+  { kind: 'statement', name: 'Statement', description: 'One thought, beautifully oversized.', category:'Write', icon:Quote },
+  { kind: 'feature', name: 'Feature story', description: 'Bring words and imagery together.', category:'Show', icon:Image },
+  { kind: 'project', name: 'Project', description: 'A piece of work worth showcasing.', category:'Show', icon:FolderOpen, target:'work' },
+  { kind: 'skills', name: 'Skills', description: 'Languages, tools and interests.', category:'About', icon:Shapes, target:'top' },
+  { kind: 'about', name: 'About', description: 'The person behind the work.', category:'About', icon:BookOpenText, target:'about' },
+  { kind: 'experience', name: 'Experience', description: 'Roles, collaborations and milestones.', category:'About', icon:BriefcaseBusiness, target:'experience' },
+  { kind: 'education', name: 'Education', description: 'Learning and qualifications.', category:'About', icon:GraduationCap, target:'education' },
+  { kind: 'contact', name: 'Contact', description: 'A welcoming place to say hello.', category:'About', icon:Contact, target:'contact' },
+  { kind: 'link', name: 'Social link', description: 'Another place to find you.', category:'About', icon:Link2, target:'contact' },
 ]
 
 /**
@@ -35,6 +38,7 @@ export function Elements({ data, onChange }: {
 }) {
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
+  const [category, setCategory] = useState<ItemCategory>('All')
   const root = useRef<HTMLDivElement>(null)
   const searchRef = useRef<HTMLInputElement>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
@@ -60,7 +64,8 @@ export function Elements({ data, onChange }: {
 
   const add = (kind: ItemKind) => {
     const item = LIBRARY.find(entry => entry.kind === kind)
-    const textAddition = kind === 'text' ? emptyCustomSection() : undefined
+    const textAddition = (kind === 'text' || kind === 'statement' || kind === 'feature')
+      ? emptyCustomSection(kind === 'statement' ? 'statement' : kind === 'feature' ? 'feature' : 'essay') : undefined
     const projectAddition = kind === 'project' ? emptyProject() : undefined
 
     onChange(current => {
@@ -70,7 +75,7 @@ export function Elements({ data, onChange }: {
         !(section === kind)
       )
 
-      if (kind === 'text' && textAddition && current.extras.length < 12)
+      if (textAddition && current.extras.length < 12)
         return { ...current, hidden, extras: [...current.extras, textAddition] }
       if (kind === 'project' && projectAddition && current.projects.length < 24)
         return { ...current, hidden, projects: [...current.projects, projectAddition] }
@@ -93,6 +98,7 @@ export function Elements({ data, onChange }: {
   }
 
   const results = LIBRARY.filter(item =>
+    (category === 'All' || item.category === category) &&
     (item.name + ' ' + item.description).toLowerCase().includes(query.toLowerCase().trim())
   )
 
@@ -112,7 +118,7 @@ export function Elements({ data, onChange }: {
 
     {open && <div role="dialog" aria-label="Add to your portfolio" className="el-panel">
       <div className="el-panel-header">
-        <div><small>On your page</small><h2>Add something.</h2></div>
+        <div><small>YOUR ELEMENTS</small><h2>Make it yours.</h2></div>
         <button type="button" className="el-close" aria-label="Close element library"
           onClick={() => { setOpen(false); triggerRef.current?.focus() }}><X className="size-4"/></button>
       </div>
@@ -122,22 +128,27 @@ export function Elements({ data, onChange }: {
         <input ref={searchRef} type="search" placeholder="Search elements" value={query}
           onChange={event => setQuery(event.target.value)}/>
       </label>
+      <div className="el-tabs" role="group" aria-label="Filter elements">
+        {(['All','Write','Show','About'] as const).map(tab=>
+          <button key={tab} type="button" aria-pressed={category===tab}
+            onClick={()=>setCategory(tab)}>{tab}</button>)}
+      </div>
       <div className="el-options">
-        {results.map((item, index) => <button key={item.kind} type="button"
+        {results.map((item) => <button key={item.kind} type="button"
           onClick={() => add(item.kind)} disabled={
-            (item.kind === 'text' && data.extras.length >= 12) ||
+            (['text','statement','feature'].includes(item.kind) && data.extras.length >= 12) ||
             (item.kind === 'project' && data.projects.length >= 24) ||
             (item.kind === 'experience' && data.experience.length >= 24) ||
             (item.kind === 'education' && data.education.length >= 24) ||
             (item.kind === 'link' && data.socials.length >= 24)
           }>
-          <span className="el-option-icon" aria-hidden="true">{String(index + 1).padStart(2,'0')}</span>
+          <span className="el-option-icon" aria-hidden="true"><item.icon size={19} strokeWidth={1.8}/></span>
           <span><strong>{item.name}</strong><small>{item.description}</small></span>
           <Plus className="size-4" aria-hidden="true"/>
         </button>)}
         {!results.length && <p className="el-empty">Nothing found. Try another word.</p>}
       </div>
-      <p className="el-footnote">Write directly on the page. Customise more whenever you like.</p>
+      <p className="el-footnote"><Sparkles size={14} aria-hidden="true"/> Anything here can be edited right on your page.</p>
     </div>}
   </div>
 }
