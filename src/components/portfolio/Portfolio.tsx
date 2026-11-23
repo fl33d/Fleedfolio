@@ -475,6 +475,7 @@ export function Portfolio({ data, editing, onChange }: Props) {
         <Section
           key={x.id}
           id={`section-${x.id}`}
+          className={cn('pf-narrative', 'pf-narrative-' + x.variant)}
           number={nextNumber()}
           title={x.title}
           editing={editing}
@@ -482,6 +483,15 @@ export function Portfolio({ data, editing, onChange }: Props) {
           titlePlaceholder="Section title"
           onRemove={() => removeItem('extras', x.id)}
         >
+          {editing && <div className="pf-block-appearance" role="group" aria-label={`Presentation for ${x.title || 'section'}`}>
+            {([
+              ['essay','Text'],
+              ['statement','Statement'],
+              ['feature','Feature'],
+            ] as const).map(([variant,label])=>
+              <button key={variant} type="button" aria-pressed={x.variant===variant}
+                onClick={()=>updateItem('extras',x.id,{variant})}>{label}</button>)}
+          </div>}
           <div className={cn('pf-about-wrap slot-host', x.image && 'has-image')}>
             {(editing || x.body) && (
               <Reveal className="pf-extra-body">
@@ -658,6 +668,7 @@ function Section({
   number,
   title,
   children,
+  className,
   editing,
   onTitle,
   onRemove,
@@ -667,13 +678,14 @@ function Section({
   number: string
   title: string
   children: ReactNode
+  className?: string
   editing?: boolean
   onTitle?: (value: string) => void
   onRemove?: () => void
   titlePlaceholder?: string
 }) {
   return (
-    <section id={id} className="pf-section">
+    <section id={id} className={cn('pf-section', className)}>
       <Reveal className="pf-section-head">
         <span className="pf-section-num">{number}</span>
         {editing && onTitle ? (
