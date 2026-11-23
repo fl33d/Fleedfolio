@@ -502,7 +502,7 @@ export function Portfolio({ data, editing, onChange }: Props) {
               onClick={()=>set('extras',reorderItems(data.extras,index,1))}>
               <ArrowDown size={15} aria-hidden="true"/>
             </button>
-          </div>
+          </div>}
           <div className={cn('pf-about-wrap slot-host', x.image && 'has-image')}>
             {(editing || x.body) && (
               <Reveal className="pf-extra-body">
