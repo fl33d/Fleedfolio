@@ -7,6 +7,7 @@ import '../styles.css'
 import '../portfolio-refinement.css'
 import '../portfolio-expression.css'
 import '../portfolio-delight.css'
+import '../portfolio-alignment.css'
 
 const siteName = 'fleed — make a portfolio that feels like you'
 const siteDescription =
