@@ -47,6 +47,28 @@ export const PALETTES = {
 } as const
 export type PaletteKey = keyof typeof PALETTES
 
+/** Presentation is composed from independent layers, not one locked template. */
+export const LOOKS = {
+  classic: { label: 'Original', subtitle: 'The familiar Fleed canvas' },
+  editorial: { label: 'Editorial', subtitle: 'Expressive type, restrained colour' },
+  glass: { label: 'Liquid', subtitle: 'Frosted, luminous surfaces' },
+  brutal: { label: 'Brutal', subtitle: 'Raw type and hard edges' },
+  aero: { label: 'Aero', subtitle: 'Gloss, depth and soft colour' },
+  print: { label: 'Print', subtitle: 'Tactile magazine composition' },
+  neo: { label: 'Digital', subtitle: 'Precision, contrast, neon' },
+  playful: { label: 'Playground', subtitle: 'Big shapes and joyful contrast' },
+} as const
+export type LookKey = keyof typeof LOOKS
+
+export const TEXTURES = {
+  none: 'None',
+  grain: 'Grain',
+  grid: 'Grid',
+  bloom: 'Glow',
+  halftone: 'Dots',
+} as const
+export type TextureKey = keyof typeof TEXTURES
+
 export const FONTS = {
   serif: { label: 'Serif', family: "'Instrument Serif', serif" },
   sans: { label: 'Grotesk', family: "'Instrument Sans', sans-serif" },
@@ -61,6 +83,10 @@ export type Theme = {
   align: 'left' | 'center'
   motion: boolean
   backdrop: boolean
+  look: LookKey
+  texture: TextureKey
+  background: string
+  foreground: string
 }
 
 export type SectionKey = 'skills' | 'about' | 'work' | 'experience' | 'education' | 'contact'
@@ -93,6 +119,10 @@ export const DEFAULT_THEME: Theme = {
   align: 'left',
   motion: true,
   backdrop: false,
+  look: 'classic',
+  texture: 'none',
+  background: '',
+  foreground: '',
 }
 
 export type Portfolio = {
@@ -206,7 +236,7 @@ export const blankPortfolio = (): Portfolio => ({
   extras: [],
   aboutImage: '',
   accent: ACCENTS[0],
-  theme: { ...DEFAULT_THEME },
+  theme: { ...DEFAULT_THEME, look: 'editorial', texture: 'bloom' },
   labels: { ...DEFAULT_LABELS },
   hidden: [],
 })
@@ -243,6 +273,8 @@ export function safeUrl(raw: string): string | undefined {
   }
 }
 
+const customColour = (v: unknown) =>
+  typeof v === 'string' && /^#[0-9a-f]{6}$/i.test(v) ? v : ''
 const str = (v: unknown, max: number) => (typeof v === 'string' ? v.slice(0, max) : '')
 const pick = <T extends string>(v: unknown, options: readonly T[], fallback: T): T =>
   options.includes(v as T) ? (v as T) : fallback
@@ -308,6 +340,10 @@ export function normalizePortfolio(input: any): Portfolio {
       align: pick(t.align, ['left', 'center'], DEFAULT_THEME.align),
       motion: typeof t.motion === 'boolean' ? t.motion : DEFAULT_THEME.motion,
       backdrop: typeof t.backdrop === 'boolean' ? t.backdrop : DEFAULT_THEME.backdrop,
+      look: pick(t.look, Object.keys(LOOKS) as LookKey[], DEFAULT_THEME.look),
+      texture: pick(t.texture, Object.keys(TEXTURES) as TextureKey[], DEFAULT_THEME.texture),
+      background: customColour(t.background),
+      foreground: customColour(t.foreground),
     },
     labels: {
       about: label(l.about, 60, DEFAULT_LABELS.about),
@@ -330,10 +366,12 @@ export function themeProps(p: Portfolio) {
   return {
     'data-palette': p.theme.palette,
     'data-motion': p.theme.motion ? 'on' : 'still',
+    'data-look': p.theme.look || 'classic',
+    'data-texture': p.theme.texture || 'none',
     style: {
       '--accent-c': p.accent,
-      '--paper': palette.paper,
-      '--ink': palette.ink,
+      '--paper': p.theme.background || palette.paper,
+      '--ink': p.theme.foreground || palette.ink,
       '--font-display': FONTS[p.theme.font].family,
     } as CSSProperties,
   }
