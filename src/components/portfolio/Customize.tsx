@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { ChevronDown, CircleHelp, Download, FileText, RotateCcw, SlidersHorizontal, Upload } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -8,6 +8,10 @@ import {
   DEFAULT_THEME,
   FONTS,
   PALETTES,
+  LOOKS,
+  TEXTURES,
+  type LookKey,
+  type TextureKey,
   type FontKey,
   type PaletteKey,
   type Portfolio,
@@ -18,6 +22,18 @@ import { cn } from '@/lib/utils'
 import { createPortfolioBackup, parsePortfolioBackup } from '@/lib/portfolio-backup.ts'
 import { normalizeCustomSlug } from '@/lib/portfolio-slug'
 
+const EXPRESSIONS: Record<LookKey, {
+  palette: PaletteKey; font: FontKey; accent: string; texture: TextureKey
+}> = {
+  classic: { palette: 'ink', font: 'serif', accent: '#a9b79c', texture: 'none' },
+  editorial: { palette: 'paper', font: 'serif', accent: '#c56f55', texture: 'bloom' },
+  glass: { palette: 'stone', font: 'sans', accent: '#92d9df', texture: 'bloom' },
+  brutal: { palette: 'paper', font: 'sans', accent: '#e85f47', texture: 'grid' },
+  aero: { palette: 'paper', font: 'sans', accent: '#69b8d3', texture: 'bloom' },
+  print: { palette: 'paper', font: 'serif', accent: '#ae665e', texture: 'halftone' },
+  neo: { palette: 'ink', font: 'mono', accent: '#c7fa50', texture: 'grid' },
+  playful: { palette: 'paper', font: 'sans', accent: '#ed7d59', texture: 'halftone' },
+}
 const SECTIONS: { key: SectionKey; label: string }[] = [
   { key: 'skills', label: 'Skills & tools' },
   { key: 'about', label: 'About' },
@@ -105,6 +121,19 @@ export function Customize({
       hidden: d.hidden.includes(key) ? d.hidden.filter((k) => k !== key) : [...d.hidden, key],
     }))
   const isCustomAccent = !ACCENTS.includes(data.accent)
+  const applyLook = (look: LookKey) => {
+    const preset = EXPRESSIONS[look]
+    onChange(current => ({
+      ...current, accent: preset.accent,
+      theme: {
+        ...current.theme, look,
+        palette: preset.palette,
+        font: preset.font,
+        texture: preset.texture,
+        background: '', foreground: '',
+      },
+    }))
+  }
 
   return (
     <div ref={root} className="cz">
@@ -123,7 +152,33 @@ export function Customize({
 
       {open && (
         <div className="cz-panel" role="dialog" aria-label="Customise">
-          <Group title="Tone">
+          <div className="cz-panel-intro"><span>Make it yours.</span><p>Start with a feeling. Change anything later.</p></div>
+          <Group title="Expression">
+            <div className="cz-looks">
+              {(Object.keys(LOOKS) as LookKey[]).map((key) => {
+                const option = LOOKS[key]
+                const preset = EXPRESSIONS[key]
+                return <button key={key} type="button"
+                  className={cn('cz-look', theme.look === key && 'is-active')}
+                  aria-label={option.label + ' expression'}
+                  aria-pressed={theme.look === key}
+                  onClick={() => applyLook(key)}>
+                  <span className="cz-look-preview" data-look={key}
+                    style={{
+                      '--look-paper':PALETTES[preset.palette].paper,
+                      '--look-ink':PALETTES[preset.palette].ink,
+                      '--look-accent':preset.accent,
+                    } as CSSProperties}
+                    aria-hidden="true">
+                    <i className="cz-look-orb"/><i className="cz-look-text">Aa</i><i className="cz-look-rule"/>
+                  </span>
+                  <span className="cz-look-title">{option.label}</span>
+                </button>
+              })}
+            </div>
+            <p className="cz-look-hint">Looks are starting points, not locked templates. Your words and projects stay exactly where they are.</p>
+          </Group>
+          <Group title="Colour story">
             <div className="cz-palettes">
               {(Object.keys(PALETTES) as PaletteKey[]).map((key) => {
                 const p = PALETTES[key]
@@ -133,7 +188,9 @@ export function Customize({
                     className={cn('cz-palette', theme.palette === key && 'is-active')}
                     aria-pressed={theme.palette === key}
                     aria-label={p.label + ' palette'}
-                    onClick={() => setTheme('palette', key)}
+                    onClick={() => onChange(current => ({
+                      ...current, theme:{ ...current.theme, palette:key, background:'',foreground:'' },
+                    }))}
                     style={{ background: p.paper, color: p.ink }}
                   >
                     <span className="cz-palette-aa">Aa</span>
@@ -171,7 +228,31 @@ export function Customize({
             </div>
           </Group>
 
-          <Group title="Typeface">
+          <Group title="Surface">
+            <div className="cz-surface-options">
+              {(Object.keys(TEXTURES) as TextureKey[]).map(key=>
+                <button key={key} type="button" aria-pressed={theme.texture===key}
+                  onClick={()=>setTheme('texture',key)}>{TEXTURES[key]}</button>)}
+            </div>
+          </Group>
+          <details className="cz-advanced">
+            <summary>More control <ChevronDown className="size-4" aria-hidden="true"/></summary>
+            <div className="cz-advanced-content">
+            <Group title="Background & text">
+              <div className="cz-colour-pair">
+                <label>Background<input type="color" aria-label="Custom background colour"
+                  value={theme.background || PALETTES[theme.palette].paper}
+                  onChange={e=>setTheme('background',e.target.value)}/></label>
+                <label>Text<input type="color" aria-label="Custom text colour"
+                  value={theme.foreground || PALETTES[theme.palette].ink}
+                  onChange={e=>setTheme('foreground',e.target.value)}/></label>
+              </div>
+              <button type="button" className="cz-muted-action" onClick={()=>
+                onChange(current=>({...current,theme:{...current.theme,background:'',foreground:''}}))}>
+                Reset custom colours
+              </button>
+            </Group>
+            <Group title="Typeface">
             <div className="cz-fonts">
               {(Object.keys(FONTS) as FontKey[]).map((key) => (
                 <button
@@ -311,6 +392,8 @@ export function Customize({
           >
             <RotateCcw className="size-3" /> Restore defaults
           </button>
+            </div>
+          </details>
         </div>
       )}
     </div>
