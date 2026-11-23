@@ -28,15 +28,16 @@ export function Field({
   const fitHeight = () => {
     const el = ref.current
     if (!el) return
-    // Reset before measuring, otherwise switching to a smaller typeface leaves
-    // oversized whitespace. This runs for visual expression changes as well.
-    el.style.height = '0px'
-    // Textareas under some Safari/Chromium font metrics report scrollHeight
-    // a few pixels short of the final painted glyphs, especially on a
-    // typography switch. Reserve a small cap rather than clipping descenders.
+    // Modern engines use their content to size an editable textarea.
+    // Safari 26.1 and earlier still require the measured-height fallback.
+    if (typeof CSS !== 'undefined' && CSS.supports('field-sizing', 'content')) {
+      el.style.removeProperty('height')
+      return
+    }
+    el.style.height = 'auto'
     const fontSize = Number.parseFloat(getComputedStyle(el).fontSize) || 16
-    const breathingRoom = Math.min(10, Math.max(6, Math.ceil(fontSize * .22)))
-    el.style.height = `${el.scrollHeight + breathingRoom}px`
+    const breathingRoom = Math.min(18, Math.max(12, Math.ceil(fontSize * .26)))
+    el.style.height = String(el.scrollHeight + breathingRoom) + 'px'
   }
 
   // The exact same field participates in every visual expression.
