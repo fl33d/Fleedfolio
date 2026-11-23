@@ -5,6 +5,7 @@ Run against `pnpm dev --host 127.0.0.1` on the review branch.
 """
 from __future__ import annotations
 import os
+import json
 from pathlib import Path
 import shutil
 from playwright.sync_api import sync_playwright
@@ -74,6 +75,43 @@ with sync_playwright() as p:
             page.wait_for_function("document.querySelector('textarea[aria-label=Name]')?.value === 'Mobile QA'", timeout=12000)
             assert page.locator("[id^=section-]").count() >= 1, "New block not persisted"
             print(f"PASS mobile shelf, insertion, editing and reload at {width}")
+
+        if width == 390:
+            # Import suggestions are deliberately opt-in, and this mock keeps
+            # a user profile and rate limits out of the CI environment.
+            repos = [
+                {"owner":{"login":"demoauthor"},"language":"Python","fork":False,"archived":False},
+                {"owner":{"login":"demoauthor"},"language":"TypeScript","fork":False,"archived":False},
+                {"owner":{"login":"demoauthor"},"language":"Rust","fork":False,"archived":False},
+                {"owner":{"login":"demoauthor"},"language":"Python","fork":False,"archived":False},
+                {"owner":{"login":"demoauthor"},"language":"Go","fork":True,"archived":False},
+                {"owner":{"login":"another"},"language":"Ruby","fork":False,"archived":False}
+            ]
+            page.route("**/users/demoauthor/repos?**",
+                lambda route: route.fulfill(
+                    status=200,content_type="application/json",body=json.dumps(repos)
+                ))
+            page.get_by_role("textbox", name="GitHub username").fill("demoauthor")
+            page.get_by_role("button", name="Find languages").click()
+            add_import = page.get_by_role("button", name="Add 3 new languages")
+            add_import.wait_for(state="visible", timeout=12000)
+            add_import.click()
+            page.locator(".pf-reel-preview .pf-skill-reel.is-moving").wait_for(state="visible")
+            assert page.locator(".pf-reel-preview .pf-reel-badge").count() == 6
+            skills = page.evaluate("JSON.parse(localStorage.getItem('blank:draft')).skills")
+            assert skills == ["Python","Rust","TypeScript"], f"Unexpected imported languages: {skills}"
+            page.screenshot(path=str(OUT / "skills-editor-390.png"))
+            page.get_by_role("button", name="Preview portfolio").click()
+            rail = page.locator(".pf-skills .pf-skill-reel.is-moving")
+            rail.wait_for(state="visible")
+            rail.screenshot(path=str(OUT / "skills-visitor-390.png"))
+            page.emulate_media(reduced_motion="reduce")
+            assert page.locator(".pf-skills .pf-reel-track").evaluate(
+                "(e)=>getComputedStyle(e).animationName"
+            ) == "none", "Reduced-motion preference ignored"
+            assert page.evaluate("document.documentElement.scrollWidth") <= width + 2
+            print("PASS mocked GitHub language import, published-look rail and reduced motion")
+
 
         assert not errors, f"Uncaught browser errors at {width}: {errors}"
         context.close()
