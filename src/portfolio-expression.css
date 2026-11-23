@@ -1,0 +1,335 @@
+/* Fleed expression system.
+ * The page remains the editor. Nothing is bolted onto its top or left.
+ * A visual expression changes composition, not the portfolio data itself.
+ * Every effect is optional; motion has a stable reduced-motion fallback.
+ */
+
+/* The unadorned portfolio is the first screen on every device. */
+.app .portfolio { isolation:isolate; }
+.app .pf-hero { min-width:0; }
+.app .pf-inline-meta {
+  display:flex;align-items:baseline;flex-wrap:wrap;gap:.75rem;
+  max-width: min(100%,34rem);margin-top:clamp(1.9rem,4vw,3.2rem);
+}
+.app .pf-mini-field {flex:0 1 auto;min-width:0;max-width:min(100%,16rem);font:500 .87rem/1.5 var(--font-sans);color:var(--dim)}
+.app .pf-mini-field .field-input {font:inherit;letter-spacing:0;min-width:0}
+.app .pf-meta-dot {color:var(--accent-c);opacity:.85}
+.app .pf-public-meta {display:flex;align-items:center;flex-wrap:wrap;gap:1rem;margin-top:2.5rem;font:500 .9rem/1.45 var(--font-sans);color:var(--dim)}
+.app[data-look] .mode-edit .pf-hero {padding-block:clamp(5rem,8vw,8.5rem) clamp(4rem,7vw,7rem)}
+.app[data-look] .mode-view .pf-hero {min-height:clamp(420px,77svh,720px)}
+.app[data-look] .pf-name {overflow-wrap:anywhere}
+.app[data-look] .pf-scroll,.app[data-look] .pf-social,
+.app[data-look] .pf-link,.app[data-look] .pf-section-head,
+.app[data-look] .pf-row-period,.app[data-look] .pf-work-index,
+.app[data-look] .pf-work-year,.app[data-look] .pf-footer,
+.app[data-look] .pf-skills-heading {
+  font-family:var(--font-sans);text-transform:none;letter-spacing:0;
+}
+.app[data-look]:not([data-look='classic']) .pf-section-num{display:none}
+.app[data-look]:not([data-look='classic']) .pf-section-head{font-size:1rem;font-weight:600;letter-spacing:-.025em}
+.app[data-look]:not([data-look='classic']) .pf-section-rule{opacity:.48}
+.app[data-look]:not([data-look='classic']) .pf-work-index{font-size:.83rem;font-weight:500}
+.app[data-look] .pf-scroll{font-size:.9rem;color:var(--dim);letter-spacing:0}
+
+/* Textures are independent of expressions. The overlay stays behind content. */
+.app[data-texture]:not([data-texture='none'])::before {
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  opacity:1;
+}
+.app[data-texture='grain']::before{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.6' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.4'/%3E%3C/svg%3E");
+  opacity:.085;
+}
+.app[data-texture='grid']::before {
+  background-image:linear-gradient(color-mix(in oklab,var(--ink) 10%,transparent) 1px,transparent 1px),
+    linear-gradient(90deg,color-mix(in oklab,var(--ink) 10%,transparent) 1px,transparent 1px);
+  background-size:56px 56px;
+  -webkit-mask-image:linear-gradient(150deg,black,transparent 85%);
+  mask-image:linear-gradient(150deg,black,transparent 85%);
+  opacity:.5;
+}
+.app[data-texture='halftone']::before {
+  background-image:radial-gradient(color-mix(in oklab,var(--ink) 16%,transparent) .8px,transparent .9px);
+  background-size:7px 7px;
+  opacity:.4;
+}
+.app[data-texture='bloom']::before {
+  background:
+    radial-gradient(circle at 80% 9%,color-mix(in oklab,var(--accent-c) 26%,transparent),transparent 33%),
+    radial-gradient(circle at 12% 82%,color-mix(in oklab,var(--accent-c) 10%,transparent),transparent 40%);
+  opacity:.82;
+}
+@media(hover:none) {
+ .app[data-texture='grain']::before,.app[data-texture='halftone']::before {opacity:.04}
+}
+
+/* ORIGINAL: leave historic portfolios visually recognisable. */
+.app[data-look='classic'] .portfolio {max-width:76rem}
+
+/* EDITORIAL: compelling hierarchy; paper, deliberate whitespace, warm accents. */
+.app[data-look='editorial'] .portfolio {max-width:80rem}
+.app[data-look='editorial'] .pf-hero {align-items:stretch}
+.app[data-look='editorial'] .pf-name {
+  font-weight:400;line-height:.86;letter-spacing:-.075em;
+  font-size:var(--name-size,clamp(5.6rem,12vw,12.8rem));
+  max-width:10.5ch;
+}
+.app[data-look='editorial'] .pf-role {font-size:clamp(1.8rem,3vw,3rem);font-style:italic}
+.app[data-look='editorial'] .pf-tagline {font-size:clamp(1.05rem,1.5vw,1.2rem);color:var(--ink);opacity:.72;line-height:1.6}
+.app[data-look='editorial'] .pf-hero-row {margin-top:clamp(2.8rem,7vw,6rem);gap:2rem 4rem}
+.app[data-look='editorial'] .pf-section-head {border-bottom:1px solid color-mix(in oklab,var(--ink) 17%,transparent);padding-bottom:1.1rem;margin-bottom:2.75rem}
+.app[data-look='editorial'] .pf-section-rule{display:none}
+.app[data-look='editorial'] .pf-about {line-height:1.33;max-width:45rem;font-size:clamp(1.65rem,2.8vw,2.7rem)}
+.app[data-look='editorial'] .pf-work-title {font-size:clamp(2.1rem,4vw,4rem);letter-spacing:-.055em}
+.app[data-look='editorial'] .pf-work {padding-block:clamp(2.4rem,5vw,4.3rem)}
+.app[data-look='editorial'] .pf-work-image.img-frame,.app[data-look='editorial'] .pf-hero-photo .img-frame {border-radius:3px}
+
+/* LIQUID: translucent sheets, luminous refracted edges. */
+.app[data-look='glass'] .pf-hero {
+  background:linear-gradient(133deg,
+    color-mix(in oklab,var(--ink) 10%,transparent),
+    color-mix(in oklab,var(--accent-c) 8%,transparent) 62%,
+    color-mix(in oklab,var(--ink) 5%,transparent));
+  border:1px solid color-mix(in oklab,var(--ink) 20%,transparent);
+  box-shadow:inset 0 1px 0 color-mix(in oklab,var(--ink) 32%,transparent),
+    0 32px 120px -70px color-mix(in oklab,var(--accent-c) 45%,transparent);
+  backdrop-filter:blur(18px) saturate(1.2);
+  -webkit-backdrop-filter:blur(18px) saturate(1.2);
+  border-radius:clamp(22px,4vw,48px);
+  padding:clamp(36px,6vw,82px)!important;
+  margin-top:clamp(28px,5vw,65px);
+}
+.app[data-look='glass'] .pf-name{font-size:var(--name-size,clamp(4rem,9vw,9.6rem));letter-spacing:-.065em;line-height:.91}
+.app[data-look='glass'] .pf-hero-photo .img-frame {border-radius:22px}
+.app[data-look='glass'] .pf-section-head {font-size:1rem}
+.app[data-look='glass'] .pf-work {
+  border:1px solid color-mix(in oklab,var(--ink) 17%,transparent);
+  border-radius:25px;
+  margin-top:1rem;padding:clamp(1.5rem,3vw,2.8rem);
+  background:color-mix(in oklab,var(--ink) 5%,transparent);
+  box-shadow:inset 0 1px 0 color-mix(in oklab,var(--ink) 8%,transparent);
+}
+.app[data-look='glass'] .pf-works,.app[data-look='glass'] .pf-work {border-top:0}
+.app[data-look='glass'] .pf-work-title {letter-spacing:-.055em}
+.app[data-look='glass'] .pf-work-image.img-frame {border-radius:16px}
+
+/* BRUTAL: framed grids, unapologetically physical type. */
+.app[data-look='brutal'] .portfolio {max-width:90rem}
+.app[data-look='brutal'] .pf-hero {
+  border-block:3px solid var(--ink);
+  margin-top:clamp(2.5rem,6vw,6rem);
+  padding-block:clamp(2.5rem,5vw,5rem);
+}
+.app[data-look='brutal'] .pf-name {
+  font-family:var(--font-sans);
+  font-weight:600;letter-spacing:-.1em;line-height:.85;
+  font-size:var(--name-size,clamp(4.3rem,13vw,14rem));
+  text-transform:uppercase;max-width:12ch;
+}
+.app[data-look='brutal'] .pf-role{font-family:var(--font-sans);font-weight:650;font-style:normal;text-transform:uppercase}
+.app[data-look='brutal'] .pf-hero-row {margin-top:clamp(2rem,4vw,4rem)}
+.app[data-look='brutal'] .pf-section-head {font-size:1.15rem!important;text-transform:uppercase!important;border-bottom:3px solid var(--ink);padding-bottom:.9rem}
+.app[data-look='brutal'] .pf-section-rule {display:none}
+.app[data-look='brutal'] .pf-work {border:2px solid var(--ink);margin-top:10px;padding:clamp(1.1rem,3vw,2.7rem)}
+.app[data-look='brutal'] .pf-works {border:0}
+.app[data-look='brutal'] .pf-work-title{font-family:var(--font-sans);font-weight:650;letter-spacing:-.07em;font-size:clamp(2.2rem,5vw,5rem)}
+.app[data-look='brutal'] :is(.pf-work-image.img-frame,.pf-hero-photo .img-frame) {border-radius:0;border:2px solid var(--ink)}
+.app[data-look='brutal'] .pf-chip {border-radius:2px}
+
+/* AERO: light, coloured volume with soft translucency. */
+.app[data-look='aero'] .portfolio {max-width:78rem}
+.app[data-look='aero'] .pf-hero {position:relative;padding-inline:clamp(22px,4vw,60px);margin-top:clamp(16px,5vw,60px)}
+.app[data-look='aero'] .pf-hero::before {
+  content:'';position:absolute;inset:5% -1.5% 8%;pointer-events:none;z-index:-1;
+  border-radius:36px;
+  background:
+    radial-gradient(ellipse at 93% 14%,color-mix(in oklab,var(--accent-c) 28%,transparent),transparent 45%),
+    radial-gradient(ellipse at 6% 95%,#cbdcf5 0%,transparent 54%),
+    linear-gradient(135deg,color-mix(in oklab,var(--ink) 3%,transparent),transparent);
+  border:1px solid color-mix(in oklab,var(--ink) 12%,transparent);
+  box-shadow:inset 0 1px 0 #ffffff90,0 25px 90px -55px #7ba6da9e;
+}
+.app[data-look='aero'] .pf-name{
+  font-family:var(--font-sans);font-weight:600;letter-spacing:-.085em;line-height:.91;
+  font-size:var(--name-size,clamp(4rem,10vw,10rem));
+}
+.app[data-look='aero'] .pf-role {font-family:var(--font-sans);font-weight:500;font-style:normal}
+.app[data-look='aero'] .pf-work {
+  padding:clamp(1.4rem,4vw,3rem);
+  margin-block:1.15rem;border-radius:28px;
+  background:color-mix(in oklab,var(--accent-c) 7%,transparent);
+  border:1px solid color-mix(in oklab,var(--ink) 15%,transparent);
+  box-shadow:0 14px 55px -42px color-mix(in oklab,var(--ink) 35%,transparent);
+}
+.app[data-look='aero'] .pf-works {border-top:0}
+.app[data-look='aero'] .pf-work-image.img-frame,
+.app[data-look='aero'] .pf-hero-photo .img-frame {border-radius:19px}
+
+/* PRINT: generous editorial columns with ink, marginal notes, rich images. */
+.app[data-look='print'] .portfolio {max-width:85rem}
+.app[data-look='print'] .pf-name{
+  font-family:var(--font-display);font-weight:400;font-style:italic;
+  font-size:var(--name-size,clamp(5rem,11vw,11.4rem));
+  line-height:.89;letter-spacing:-.06em;max-width:11ch;
+}
+.app[data-look='print'] .pf-hero {
+  border-bottom:1.5px solid var(--ink);
+  padding-top:clamp(4rem,8vw,7rem);
+}
+.app[data-look='print'] .pf-role {font-family:var(--font-sans);font-weight:600;font-style:normal;font-size:1.4rem}
+.app[data-look='print'] .pf-section-head {letter-spacing:.035em!important;font-size:1rem!important;text-transform:uppercase!important}
+.app[data-look='print'] .pf-work-title {font-style:italic;letter-spacing:-.035em;font-size:clamp(2.3rem,4vw,4rem)}
+.app[data-look='print'] .pf-about {font-size:clamp(1.7rem,2.8vw,2.8rem)}
+.app[data-look='print'] .pf-work {border-bottom:1.5px solid var(--ink);padding-block:3.5rem}
+.app[data-look='print'] :is(.pf-work-image.img-frame,.pf-hero-photo .img-frame) {border-radius:0}
+
+/* DIGITAL: grid-aligned, iridescent dark glow, sharp neon details. */
+.app[data-look='neo'] .portfolio {max-width:86rem}
+.app[data-look='neo'] .pf-hero {
+  border-bottom:1px solid var(--accent-c);
+  margin-top:clamp(2rem,4vw,4rem);
+}
+.app[data-look='neo'] .pf-name {
+  font-family:var(--font-mono);
+  font-weight:500;letter-spacing:-.09em;line-height:.99;
+  font-size:var(--name-size,clamp(3.1rem,9vw,9.2rem));
+  color:var(--ink);text-shadow:0 0 70px color-mix(in oklab,var(--accent-c) 20%,transparent)
+}
+.app[data-look='neo'] .pf-role {
+  font-family:var(--font-mono);font-style:normal;font-size:1.35rem;
+}
+.app[data-look='neo'] .pf-hero-row{margin-top:clamp(3rem,6vw,6rem)}
+.app[data-look='neo'] .pf-work {
+  border-left:2px solid var(--accent-c);
+  border-bottom:1px solid color-mix(in oklab,var(--ink) 15%,transparent);
+  margin-block:1rem;padding:2rem;
+  background:linear-gradient(100deg,color-mix(in oklab,var(--accent-c) 4%,transparent),transparent 80%);
+}
+.app[data-look='neo'] .pf-work-title {font-family:var(--font-mono);font-weight:500;letter-spacing:-.06em;font-size:clamp(1.7rem,3.3vw,3rem)}
+.app[data-look='neo'] .pf-section-rule {background:var(--accent-c);opacity:.6}
+.app[data-look='neo'] .pf-work-image.img-frame {border-radius:4px}
+
+/* PLAYGROUND: oversized, expressive, deliberately bright geometry. */
+.app[data-look='playful'] .portfolio {max-width:82rem}
+.app[data-look='playful'] .pf-hero {position:relative;padding-inline:clamp(12px,3vw,46px)}
+.app[data-look='playful'] .pf-hero::before {
+  content:'';position:absolute;right:-1%;top:7%;z-index:-1;
+  width:min(55vw,480px);height:min(55vw,480px);border-radius:37% 63% 49% 51% / 55% 35% 65% 45%;
+  background:radial-gradient(circle at 35% 24%,color-mix(in oklab,var(--accent-c) 76%,white),var(--accent-c) 70%,transparent 100%);
+  opacity:.4;pointer-events:none;
+}
+.app[data-look='playful'] .pf-name {
+  font-family:var(--font-sans);font-weight:600;letter-spacing:-.11em;line-height:.85;
+  font-size:var(--name-size,clamp(4.4rem,11vw,11.6rem));
+}
+.app[data-look='playful'] .pf-role {font-family:var(--font-sans);font-style:normal;font-weight:600;font-size:clamp(1.65rem,3vw,3rem)}
+.app[data-look='playful'] .pf-section-head {font-size:1.16rem!important}
+.app[data-look='playful'] .pf-work {
+  border:2px solid color-mix(in oklab,var(--ink) 23%,transparent);
+  border-radius:26px;margin-block:1.2rem;padding:clamp(1.4rem,3vw,2.7rem);
+  background:color-mix(in oklab,var(--accent-c) 10%,transparent);
+}
+.app[data-look='playful'] .pf-works {border-top:0}
+.app[data-look='playful'] .pf-work-title {font-family:var(--font-sans);font-weight:600;font-size:clamp(2rem,3.8vw,3.6rem);letter-spacing:-.07em}
+.app[data-look='playful'] :is(.pf-work-image.img-frame,.pf-hero-photo .img-frame) {border-radius:24px}
+.app[data-look='playful'] .pf-chip {border-radius:12px}
+
+/* An intentionally compact, visual palette, not a sidebar or inspector. */
+.app .cz-panel {width:min(26rem,calc(100vw - 1.5rem));gap:1.1rem;padding:1.2rem;}
+.app .cz-panel-intro{padding-bottom:2px}
+.app .cz-panel-intro>span{display:block;font:400 2.1rem/.98 var(--font-display);letter-spacing:-.055em;color:#f4f3ee}
+.app .cz-panel-intro>p{font:400 .84rem/1.5 var(--font-sans);color:#b9c2b6;margin-top:8px}
+.app .cz-looks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.app .cz-look{
+  min-width:0;display:grid;gap:7px;text-align:left;padding:6px;
+  border-radius:11px;border:1px solid transparent;
+  color:#eaebe4;transition:border-color .2s,background .2s;
+}
+.app .cz-look:hover{background:rgb(255 255 255 / .065)}
+.app .cz-look[aria-pressed='true']{border-color:#d9e4c5;background:rgb(255 255 255 / .085)}
+.app .cz-look-preview{
+  display:block;height:94px;position:relative;overflow:hidden;border-radius:7px;
+  background:var(--look-paper);color:var(--look-ink);
+  border:1px solid rgb(255 255 255 / .1);
+}
+.app .cz-look-title {padding:0 2px 2px;font:500 .84rem/1.25 var(--font-sans);letter-spacing:0}
+.app .cz-look-orb{position:absolute;right:3px;top:3px;width:70px;height:70px;border-radius:50%;background:var(--look-accent);opacity:.32}
+.app .cz-look-text{position:absolute;left:12px;bottom:17px;font:400 58px/.8 Georgia,serif;letter-spacing:-.09em}
+.app .cz-look-rule{position:absolute;bottom:9px;left:10px;right:12px;height:2px;background:var(--look-accent);opacity:.8}
+.app .cz-look-preview[data-look='classic'] .cz-look-text{font-size:49px}
+.app .cz-look-preview[data-look='editorial'] .cz-look-text{font-size:67px;font-style:italic;bottom:12px}
+.app .cz-look-preview[data-look='glass']{
+  background:linear-gradient(120deg,var(--look-paper),color-mix(in oklab,var(--look-accent) 28%,var(--look-paper)));
+}
+.app .cz-look-preview[data-look='glass'] .cz-look-orb{
+  right:10px;top:8px;border-radius:17px;width:62px;height:68px;
+  opacity:.5;background:color-mix(in oklab,var(--look-accent) 43%,transparent);
+  border:1px solid color-mix(in oklab,var(--look-ink) 30%,transparent);
+  box-shadow:inset 0 1px 0 #ffffff7a;
+}
+.app .cz-look-preview[data-look='brutal'] .cz-look-text{font:bold 58px/.9 var(--font-sans);bottom:12px;letter-spacing:-.1em}
+.app .cz-look-preview[data-look='brutal'] .cz-look-orb{border-radius:0;right:10px;top:9px;width:45px;height:45px;opacity:.82}
+.app .cz-look-preview[data-look='brutal'] .cz-look-rule{height:4px;background:var(--look-ink)}
+.app .cz-look-preview[data-look='aero']{background:linear-gradient(140deg,#dfebff,#c7eaf4 46%,#fff9ee)}
+.app .cz-look-preview[data-look='aero'] .cz-look-orb{opacity:.7;filter:blur(8px)}
+.app .cz-look-preview[data-look='aero'] .cz-look-text{font:600 57px/.85 var(--font-sans)}
+.app .cz-look-preview[data-look='print'] .cz-look-text{font:italic 65px/.85 Georgia,serif}
+.app .cz-look-preview[data-look='print'] .cz-look-rule{height:1px;background:var(--look-ink)}
+.app .cz-look-preview[data-look='neo']{
+  background-color:#13191c;
+  background-image:linear-gradient(#2b3f36 1px,transparent 1px),linear-gradient(90deg,#2b3f36 1px,transparent 1px);
+  background-size:22px 22px;
+}
+.app .cz-look-preview[data-look='neo'] .cz-look-text{font:500 57px/.9 var(--font-mono);color:var(--look-ink)}
+.app .cz-look-preview[data-look='playful'] .cz-look-orb{opacity:.85;width:85px;height:85px;top:-12px;right:-10px;border-radius:32% 68% 46% 54%}
+.app .cz-look-preview[data-look='playful'] .cz-look-text{font:bold 62px/.8 var(--font-sans);bottom:16px}
+.app .cz-look-hint {font:.75rem/1.55 var(--font-sans);color:#b6c2b6;margin-top:9px}
+.app .cz-surface-options{display:flex;flex-wrap:wrap;gap:7px}
+.app .cz-surface-options button{
+  border:1px solid rgb(255 255 255 / .2);border-radius:99px;
+  min-height:34px;padding:7px 11px;color:#e8ebe0;
+  font:500 .81rem/1.3 var(--font-sans);
+}
+.app .cz-surface-options button[aria-pressed='true']{background:#e0e8d7;color:#1d2e24;border-color:#e0e8d7}
+.app .cz-surface-options button:hover:not([aria-pressed='true']){background:rgb(255 255 255 / .1)}
+.app .cz-advanced{border-top:1px solid rgb(255 255 255 / .15);margin-top:.15rem}
+.app .cz-advanced>summary{
+  list-style:none;display:flex;align-items:center;justify-content:space-between;
+  gap:9px;cursor:pointer;
+  min-height:46px;
+  color:#e9eee2;font:600 .9rem/1.3 var(--font-sans);
+}
+.app .cz-advanced>summary::-webkit-details-marker{display:none}
+.app .cz-advanced>summary svg{transition:transform .2s}
+.app .cz-advanced[open]>summary svg{transform:rotate(180deg)}
+.app .cz-advanced>summary:focus-visible{outline:2px solid #d9e6c4;outline-offset:2px}
+.app .cz-advanced-content{display:grid;gap:1.3rem;padding-block:12px 8px}
+.app .cz-colour-pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.app .cz-colour-pair label{display:flex;align-items:center;justify-content:space-between;font:.81rem var(--font-sans);color:#e9ebdf}
+.app .cz-colour-pair input{width:44px;height:40px;padding:3px;border-radius:8px;border:1px solid rgb(255 255 255 / .2);background:transparent}
+.app .cz-muted-action{display:block;margin-top:7px;font:.77rem var(--font-sans);color:#c8d4bf;text-decoration:underline;text-underline-offset:4px}
+.app .cz-look:focus-visible,.app .cz-surface-options button:focus-visible,.app .cz-muted-action:focus-visible{
+  outline:2px solid #d4e4c3;outline-offset:2px;
+}
+
+/* The workbench does not inherit a look's palette: only the portfolio does. */
+.app .dock.chrome{background:rgba(28,30,28,.86)}
+.app .el-panel,.app .cz-panel{background:rgba(29,30,29,.965)}
+.app .cz-panel .cz-palette-name{font-size:.78rem}
+
+@media(max-width:700px){
+  .app[data-look] .mode-edit .pf-hero {padding-top:clamp(3.8rem,12vw,5.5rem)}
+  .app[data-look] .mode-view .pf-hero {min-height:clamp(420px,72svh,620px)}
+  .app[data-look='glass'] .pf-hero {padding:clamp(28px,5vw,46px)!important}
+  .app[data-look='brutal'] .pf-name {font-size:clamp(3.1rem,13vw,6.3rem)}
+  .app[data-look='editorial'] .pf-name {font-size:clamp(3.85rem,14vw,7rem)}
+  .app[data-look='playful'] .pf-name {font-size:clamp(3.85rem,14vw,7rem)}
+  .app[data-look='print'] .pf-name {font-size:clamp(3.6rem,14vw,7rem)}
+  .app[data-look='aero'] .pf-hero {padding-inline:12px}
+  .app .cz-panel{width:calc(100vw - 1.5rem);max-width:410px;padding:16px}
+  .app .cz-look-preview{height:83px}
+}
+@media(prefers-reduced-motion:reduce){
+  .app[data-look] .pf-work,.app[data-look] .pf-work-title {transition:none!important;animation:none!important}
+  .app .cz-look,.app .cz-advanced>summary svg {transition:none!important}
+}
