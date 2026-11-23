@@ -57,13 +57,6 @@ export function Portfolio({ data, editing, onChange }: Props) {
   const shown = (key: PortfolioData['hidden'][number]) => !data.hidden.includes(key)
   const setLabel = (key: keyof Labels, value: string) => set('labels', { ...data.labels, [key]: value })
   const labels = data.labels
-  const initials =
-    data.name
-      .split(/\s+/)
-      .filter(Boolean)
-      .slice(0, 2)
-      .map((w) => w[0]?.toUpperCase())
-      .join('') || '○'
   const emailHref = mailtoHref(data.email)
   const hasContact = Boolean(emailHref) || socials.length > 0
 
@@ -98,9 +91,6 @@ export function Portfolio({ data, editing, onChange }: Props) {
       style={{ '--accent-c': data.accent } as CSSProperties}
     >
       <header className="pf-nav">
-        <ScrollLink to="top" className="pf-mono-badge" aria-label="Back to top">
-          <span>{initials}</span>
-        </ScrollLink>
         <nav className="pf-main-nav" aria-label="Portfolio sections">
           {nav.map((n) => (
             <ScrollLink key={n.id} to={n.id} className="pf-nav-link">
@@ -109,14 +99,14 @@ export function Portfolio({ data, editing, onChange }: Props) {
           ))}
         </nav>
         <div className="pf-meta">
-          <span>{data.location || (editing ? 'Editing your portfolio' : 'Selected work')}</span>
+          <span>{data.location || (editing ? 'Make it yours' : 'Selected work')}</span>
         </div>
       </header>
 
       {/* Hero */}
       <section id="top" className={cn('pf-hero slot-host', data.photo && 'has-photo')}>
         <div className="pf-hero-main">
-        {editing && <p className="pf-editor-eyebrow">01 / Introduction</p>}
+        {editing && <p className="pf-editor-eyebrow">Start with your story</p>}
         {(editing || data.status) && (
           <div className="pf-status">
             {editing ? (
