@@ -144,3 +144,57 @@
 @media(prefers-reduced-motion:reduce) {
   .app .fleed-customize-panel .cz-look { transition:none!important; }
 }
+
+/* Progressive disclosure: a generous first impression with depth on demand. */
+.app .fleed-customize-panel .cz-panel-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.app .fleed-customize-panel .cz-sheet-close {
+  flex: 0 0 auto;
+  width: 36px; height: 36px;
+  display: grid; place-items: center;
+  border-radius: 11px;
+  border: 1px solid rgba(255,255,255,.16);
+  background: rgba(255,255,255,.09);
+  color: #f3f5ee;
+  transition: background .18s, transform .18s;
+}
+.app .fleed-customize-panel .cz-sheet-close:hover { background: rgba(255,255,255,.18); transform: rotate(8deg); }
+.app .fleed-customize-panel .cz-depth-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 14px;
+  background: rgba(5,9,12,.29);
+  border: 1px solid rgba(255,255,255,.12);
+}
+.app .fleed-customize-panel .cz-depth-tabs > button {
+  min-height: 42px;
+  border-radius: 10px;
+  font: 600 13px/1.25 "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: rgba(235,240,233,.72);
+  transition: background .18s, color .18s, box-shadow .18s;
+}
+.app .fleed-customize-panel .cz-depth-tabs > button[aria-selected=true] {
+  color: #1e2826;
+  background: rgba(242,247,238,.95);
+  box-shadow: 0 2px 10px rgba(0,0,0,.16);
+}
+.app .fleed-customize-panel .cz-depth-tabs > button:not([aria-selected=true]):hover {
+  color: #fff;
+  background: rgba(255,255,255,.09);
+}
+.app .fleed-customize-panel .cz-sheet-page { display: grid; gap: 18px; min-width: 0; }
+.app .fleed-customize-panel .cz-sheet-page[hidden] { display: none!important; }
+.app .fleed-customize-panel .cz-advanced { margin: 0; }
+.app .fleed-customize-panel .cz-advanced > summary { padding-top: 18px; }
+/* Give room for focus states and let users swipe the expression rail. */
+.app .fleed-customize-panel .cz-looks { -webkit-overflow-scrolling: touch; }
+@media(max-width:440px) {
+  .app .fleed-customize-panel .cz-depth-tabs > button { min-height: 44px; }
+  .app .fleed-customize-panel .cz-sheet-page { gap: 17px; }
+}
