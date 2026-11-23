@@ -65,6 +65,15 @@
 .mode-edit .portfolio { padding-bottom: clamp(10rem,16vh,13rem); }
 .mode-edit .pf-hero-photo .img-empty { border-radius: 12px; }
 
+/* Empty fields should feel inviting rather than invisible on OLED screens. */
+.mode-edit .field-input::placeholder { color: color-mix(in oklab,var(--ink) 55%,transparent); opacity:1; }
+.mode-edit .pf-name .field-input::placeholder { color: color-mix(in oklab,var(--ink) 68%,transparent); }
+.mode-edit .pf-chip-input::placeholder { color: color-mix(in oklab,var(--ink) 55%,transparent); }
+.mode-edit .pf-label { font: 500 .85rem/1.4 var(--font-sans);letter-spacing:0;text-transform:none;color:var(--dim); }
+.mode-edit .pf-hint { max-width:35rem;font-size:.83rem;line-height:1.6; }
+.mode-edit .pf-skill-editor { padding-block:1.65rem; }
+.mode-edit .pf-add-section { padding-top:3rem; }
+
 /* Quiet frosted controls. Craft-like softness, Framer-like directness. */
 .app .dock.chrome {
   background: color-mix(in oklab,#252523 81%,transparent);
