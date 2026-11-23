@@ -177,6 +177,70 @@ with sync_playwright() as p:
             assert page.get_by_role("textbox", name="Name").input_value() == "Alex Morgan"
             print("PASS eight looks, three composition controls, retained content, and horizontal overflow checks")
 
+        # Alignment is an independent choice and must work in every
+        # expression, whether someone is typing or viewing a published page.
+        page.get_by_role("button", name="Edit portfolio").click()
+        page.locator(".pf-name textarea").fill("Alexandra Victoria Montrose")
+        page.locator(".pf-role textarea").fill("Creative engineer and storyteller")
+        page.locator(".pf-tagline textarea").fill("Thoughtful design that feels like something.")
+        page.get_by_role("button", name="Customise your portfolio").click()
+        advanced = page.locator(".cz-advanced")
+        if not advanced.get_attribute("open"):
+            advanced.locator("summary").click()
+        page.get_by_role("button", name="Centre", exact=True).click()
+        assert page.locator(".portfolio").get_attribute("data-align") == "center"
+
+        for look,label in [
+            ("classic","Original"),("editorial","Editorial"),
+            ("glass","Liquid"),("brutal","Brutal"),
+            ("aero","Aero"),("print","Print"),
+            ("neo","Digital"),("playful","Playground")
+        ]:
+            page.get_by_role("button", name=label + " expression").click()
+            assert page.locator(".app").get_attribute("data-look") == look
+            assert page.locator(".pf-name textarea").input_value() == "Alexandra Victoria Montrose"
+            # Regression: fields used to keep their previous expression's
+            # height after selecting a different headline font or scale.
+            for field in (".pf-name textarea",".pf-role textarea",".pf-tagline textarea"):
+                metrics = page.locator(field).evaluate("""el => ({
+                    scroll:el.scrollHeight, client:el.clientHeight,
+                    align:getComputedStyle(el).textAlign,
+                    value:el.value
+                })""")
+                assert metrics["scroll"] <= metrics["client"] + 3, f"Clipped editing field {field} in {look} at {width}: {metrics}"
+                assert metrics["align"] == "center", f"Editable text not centered: {field} {look} {width}"
+            centers = page.evaluate("""() => {
+              const mid = s => {const r=document.querySelector(s).getBoundingClientRect();
+                return r.left + r.width/2;};
+              return {hero:mid('.pf-hero-main'),name:mid('.pf-name'),
+                      role:mid('.pf-role'),intro:mid('.pf-tagline'),
+                      meta:mid('.pf-inline-meta')};
+            }""")
+            for item in ("name","role","intro","meta"):
+                assert abs(centers[item]-centers["hero"]) <= 4, f"{item} off-centre in {look} at {width}: {centers}"
+            assert page.evaluate("document.documentElement.scrollWidth") <= width + 2, f"Edit overflow in centred {look} at {width}"
+            page.get_by_role("button", name="Customise your portfolio").click()
+            if look in ("editorial","glass","brutal","playful"):
+                page.screenshot(path=str(OUT / f"aligned-edit-{look}-{width}.png"))
+            page.get_by_role("button", name="Preview portfolio").click()
+            assert page.locator(".pf-name").evaluate("(el)=>getComputedStyle(el).textAlign") == "center", f"Preview title off-centre in {look}"
+            assert page.locator(".pf-role").evaluate("(el)=>getComputedStyle(el).textAlign") == "center", f"Preview role off-centre in {look}"
+            assert page.evaluate("document.documentElement.scrollWidth") <= width + 2, f"Preview overflow in {look} at {width}"
+            if look in ("editorial","glass","brutal","playful"):
+                page.screenshot(path=str(OUT / f"aligned-preview-{look}-{width}.png"))
+            page.get_by_role("button", name="Edit portfolio").click()
+            page.get_by_role("button", name="Customise your portfolio").click()
+
+        page.get_by_role("button", name="Customise your portfolio").click()
+        if width == 320:
+            # A single very long name must not break the page on a phone.
+            page.locator(".pf-name textarea").fill("AVeryLongUnbrokenProfessionalUsername")
+            assert page.locator(".pf-name").get_attribute("data-name-fit") == "compact"
+            page.get_by_role("button", name="Preview portfolio").click()
+            assert page.evaluate("document.documentElement.scrollWidth") <= width + 2, "Unbroken name overflows viewport"
+            page.screenshot(path=str(OUT / "aligned-long-name-320.png"))
+        print(f"PASS alignment across 8 expressions in edit/preview at {width}")
+
         assert not errors, f"Uncaught browser errors at {width}: {errors}"
         context.close()
     browser.close()
