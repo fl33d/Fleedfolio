@@ -52,6 +52,39 @@ with sync_playwright() as p:
         page.screenshot(path=str(OUT / f"home-{width}.png"))
         print(f"PASS initial viewport {width} — no page errors yet, no horizontal overflow")
 
+        # The overlay MUST be outside the blurred dock, inside the app layer.
+        # Test the actual DOM/backdrop roots, not just CSS property presence.
+        page.get_by_role("button", name="Customise your portfolio").click()
+        panel = page.get_by_role("dialog", name="Customise")
+        panel.wait_for(state="visible", timeout=7500)
+        sheet = panel.evaluate("""el => {
+          const dock=document.querySelector('.dock.chrome');
+          const host=document.querySelector('#fleed-overlay-root');
+          const d=dock.getBoundingClientRect(),r=el.getBoundingClientRect();
+          const s=getComputedStyle(el),ds=getComputedStyle(dock);
+          return {
+            inHost:host.contains(el),
+            insideDock:dock.contains(el),
+            panelBlur:s.backdropFilter || s.webkitBackdropFilter,
+            dockBlur:ds.backdropFilter || ds.webkitBackdropFilter,
+            background:s.backgroundColor,
+            left:r.left,right:r.right,top:r.top,bottom:r.bottom,
+            dockTop:d.top
+          };
+        }""")
+        assert sheet["inHost"] and not sheet["insideDock"], f"Nested Safari backdrop roots: {sheet}"
+        assert "blur(" in sheet["panelBlur"] and "blur(" in sheet["dockBlur"], f"Glass filter missing: {sheet}"
+        assert sheet["background"].startswith("rgba("), f"Customise is opaque: {sheet}"
+        assert sheet["left"] >= -2 and sheet["right"] <= width+2, f"Panel overflows width: {sheet}"
+        assert sheet["top"] >= -2 and sheet["bottom"] <= height+2, f"Panel overflows height: {sheet}"
+        assert sheet["bottom"] <= sheet["dockTop"]+2, f"Panel overlaps dock: {sheet}"
+        page.wait_for_timeout(200)
+        page.screenshot(path=str(OUT / f"customise-portal-{width}.png"))
+        page.keyboard.press("Escape")
+        assert panel.count()==0, f"Escape did not dismiss Customise at {width}"
+        assert page.get_by_role("button", name="Customise your portfolio").get_attribute("aria-expanded")=="false"
+        print(f"PASS independent glass surfaces, Escape and positioning at {width}")
+
         if width in (320, 390):
             page.get_by_role("button", name="Add an element").click()
             panel = page.get_by_role("dialog", name="Add to your portfolio")
