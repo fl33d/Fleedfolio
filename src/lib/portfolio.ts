@@ -235,8 +235,8 @@ export const blankPortfolio = (): Portfolio => ({
   socials: [emptySocial()],
   extras: [],
   aboutImage: '',
-  accent: ACCENTS[0],
-  theme: { ...DEFAULT_THEME, look: 'editorial', texture: 'bloom' },
+  accent: '#c56f55',
+  theme: { ...DEFAULT_THEME, palette: 'paper', look: 'editorial', texture: 'bloom' },
   labels: { ...DEFAULT_LABELS },
   hidden: [],
 })
