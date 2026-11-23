@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { CircleHelp, Eye, FileText, PenLine, RotateCcw, Send } from 'lucide-react'
+import { Eye, PenLine, Send } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { Customize } from '@/components/portfolio/Customize'
@@ -18,7 +18,6 @@ import {
 } from '@/lib/portfolio'
 import { publishPortfolio } from '@/server/portfolio.functions'
 import { cn } from '@/lib/utils'
-import '@/portfolio-refinement.css'
 import { normalizeCustomSlug, portfolioPublicPath } from '@/lib/portfolio-slug'
 
 export const Route = createFileRoute('/')({
@@ -199,33 +198,11 @@ function Editor() {
           </button>
         </div>
 
-        <span className="dock-sep" />
-
         {!cvOpen && editing && <Elements data={data} onChange={setData} />}
         {!cvOpen && (
           <Customize data={data} onChange={setData} onImport={importDraft} customSlug={customSlug} onSlugChange={setCustomSlug}
             onPreviewCv={() => setCvOpen(true)} onHelp={() => setTourOpen(true)} onResetDraft={reset} />
         )}
-
-        <button
-          type="button"
-          className={cn('dock-icon', 'dock-cv', cvOpen && 'is-active')}
-          aria-label={cvOpen ? 'Return from CV view' : 'Preview CV'}
-          aria-pressed={cvOpen}
-          title="CV / résumé"
-          onClick={() => setCvOpen((value) => !value)}
-        >
-          <FileText className="size-4" />
-          <span>CV</span>
-        </button>
-
-        <button className="dock-icon dock-help" onClick={() => setTourOpen(true)} aria-label="How to use Fleedfolio" title="How it works">
-          <CircleHelp className="size-4" />
-        </button>
-
-        <button className="dock-icon dock-reset" onClick={reset} aria-label="Reset draft" title="Reset draft">
-          <RotateCcw className="size-4" />
-        </button>
 
         <button className="dock-publish" aria-label={publishing ? 'Publishing portfolio' : published ? 'Update portfolio' : 'Publish portfolio'} title={published ? 'Update portfolio' : 'Publish portfolio'} onClick={() => { void publish() }} disabled={publishing}>
           <Send className={cn('size-4', publishing && 'animate-pulse')} aria-hidden="true" />

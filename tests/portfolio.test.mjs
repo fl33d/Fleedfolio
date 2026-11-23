@@ -129,3 +129,27 @@ test('portfolio project order can be changed without mutating the original conte
   assert.deepEqual(reorderItems(projects, 0, -1).map(p => p.id), ['a', 'b', 'c'])
   assert.deepEqual(reorderItems(projects, 2, 1).map(p => p.id), ['a', 'b', 'c'])
 })
+
+test('art directions are composable, persisted and safely normalised', () => {
+  const fresh=blankPortfolio()
+  assert.equal(fresh.theme.look,'editorial')
+  assert.equal(fresh.theme.palette,'paper')
+  const styled=normalizePortfolio({...fresh,theme:{
+    ...fresh.theme,look:'glass',texture:'grid',background:'#123456',foreground:'#abcdef',
+  }})
+  assert.equal(styled.theme.look,'glass')
+  assert.equal(styled.theme.texture,'grid')
+  assert.equal(styled.theme.background,'#123456')
+  assert.equal(styled.theme.foreground,'#abcdef')
+  const invalid=normalizePortfolio({...fresh,theme:{
+    ...fresh.theme,look:'<script>',texture:'url(evil)',background:'red',foreground:'javascript:alert(1)',
+  }})
+  assert.equal(invalid.theme.look,'classic')
+  assert.equal(invalid.theme.texture,'none')
+  assert.equal(invalid.theme.background,'')
+  assert.equal(invalid.theme.foreground,'')
+  const legacy=normalizePortfolio({...fresh,theme:{palette:'moss',font:'serif',motion:false}})
+  assert.equal(legacy.theme.look,'classic')
+  assert.equal(legacy.theme.texture,'none')
+  assert.equal(legacy.theme.motion,false)
+})
