@@ -44,7 +44,6 @@ export function Reveal({
   )
 }
 
-/** Splits text into letters that drift in one by one. */
 /** Readable immediately on a view switch, with a single quiet title entrance.
  * The old per-character stagger made Preview look empty for multiple seconds.
  */
