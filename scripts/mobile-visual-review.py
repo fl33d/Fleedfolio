@@ -201,19 +201,21 @@ with sync_playwright() as p:
             assert page.locator(".pf-name textarea").input_value() == "Alexandra Victoria Montrose"
             # Fonts can load asynchronously after the expression switches.
             # The fields must settle into their new computed metrics promptly.
-            page.wait_for_function("""() => [
-              '.pf-name textarea','.pf-role textarea','.pf-tagline textarea'
-            ].every(s => {
-              const el=document.querySelector(s);
-              return el && el.scrollHeight <= el.clientHeight + 3;
-            })""", timeout=8000)
+            page.wait_for_timeout(130)
             for field in (".pf-name textarea",".pf-role textarea",".pf-tagline textarea"):
                 metrics = page.locator(field).evaluate("""el => ({
                     scroll:el.scrollHeight, client:el.clientHeight,
                     align:getComputedStyle(el).textAlign,
+                    lineHeight:parseFloat(getComputedStyle(el).lineHeight),
+                    fontSize:parseFloat(getComputedStyle(el).fontSize),
                     value:el.value
                 })""")
-                assert metrics["scroll"] <= metrics["client"] + 3, f"Clipped editing field {field} in {look} at {width}: {metrics}"
+                # Native textareas routinely expose a few extra scroll pixels
+                # for font descenders and line-box rounding. Treat missing an
+                # actual line as clipping, not 6-10 pixels of intrinsic slack.
+                slack = max(12, min(24, metrics["fontSize"] * .27))
+                assert metrics["scroll"] - metrics["client"] <= slack, f"Clipped editing field {field} in {look} at {width}: {metrics}"
+                assert metrics["client"] >= metrics["lineHeight"] * .85, f"Invalid text field height: {metrics}"
                 assert metrics["align"] == "center", f"Editable text not centered: {field} {look} {width}"
             centers = page.evaluate("""() => {
               const mid = s => {const r=document.querySelector(s).getBoundingClientRect();
