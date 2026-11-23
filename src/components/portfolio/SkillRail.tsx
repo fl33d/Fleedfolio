@@ -10,6 +10,46 @@ const LANGUAGE_COLOURS: Record<string, string> = {
   vue:'#41b883', scss:'#c6538c', svelte:'#ff3e00',
   'jupyter notebook':'#da5b0b', dockerfile:'#384d54',
 }
+/**
+ * Local Devicon symbols (MIT licensed). No third-party network requests are made
+ * by visitor pages. An unknown language keeps its readable text label.
+ */
+const ICONS: Record<string, { group: string; id: string }> = {
+  python:{group:'core',id:'python'},
+  javascript:{group:'core',id:'javascript'},
+  typescript:{group:'core',id:'typescript'},
+  html:{group:'core',id:'html'},html5:{group:'core',id:'html'},
+  css:{group:'core',id:'css'},css3:{group:'core',id:'css'},
+  rust:{group:'core',id:'rust'},
+  go:{group:'systems',id:'go'},golang:{group:'systems',id:'go'},
+  java:{group:'systems',id:'java'},
+  c:{group:'systems',id:'c'},
+  'c++':{group:'systems',id:'cplusplus'},cpp:{group:'systems',id:'cplusplus'},
+  'c#':{group:'systems',id:'csharp'},csharp:{group:'systems',id:'csharp'},
+  ruby:{group:'systems',id:'ruby'},
+  php:{group:'more',id:'php'},swift:{group:'more',id:'swift'},
+  kotlin:{group:'more',id:'kotlin'},shell:{group:'more',id:'shell'},
+  bash:{group:'more',id:'shell'},'shell script':{group:'more',id:'shell'},
+  dart:{group:'more',id:'dart'},lua:{group:'more',id:'lua'},
+  sql:{group:'frameworks',id:'sql'},mysql:{group:'frameworks',id:'sql'},
+  react:{group:'frameworks',id:'react'},'react.js':{group:'frameworks',id:'react'},
+  nodejs:{group:'frameworks',id:'nodejs'},'node.js':{group:'frameworks',id:'nodejs'},
+  docker:{group:'frameworks',id:'docker'},dockerfile:{group:'frameworks',id:'docker'},
+  terraform:{group:'frameworks',id:'terraform'},
+  vue:{group:'frameworks',id:'vue'},'vue.js':{group:'frameworks',id:'vue'},
+  svelte:{group:'extra',id:'svelte'},
+  scss:{group:'extra',id:'scss'},sass:{group:'extra',id:'scss'},
+  jupyter:{group:'extra',id:'jupyter'},'jupyter notebook':{group:'extra',id:'jupyter'},
+}
+export function LanguageIcon({ name }: { name: string }) {
+  const asset=ICONS[name.trim().toLowerCase()]
+  if(!asset) return null
+  return <svg className="pf-language-icon" viewBox="0 0 128 128"
+    aria-hidden="true" focusable="false">
+    <use href={`/icons/languages-${asset.group}.svg#lang-${asset.id}`}/>
+  </svg>
+}
+
 const LANGUAGES = [
   'Python','JavaScript','TypeScript','HTML','CSS','Rust','Go',
   'Java','C','C++','C#','Ruby','PHP','Swift','Kotlin','Shell',
@@ -24,7 +64,7 @@ export function SkillRail({ skills }: { skills: string[] }) {
     <span className="pf-reel-badge" key={index} style={{
       '--language-colour': LANGUAGE_COLOURS[skill.toLowerCase()] || '#a9b79c',
     } as CSSProperties}>
-      <span className="pf-reel-dot" aria-hidden="true" />{skill}
+      <LanguageIcon name={skill} /><span className="pf-reel-fallback" aria-hidden="true"/> {skill}
     </span>
   ))
   return <div role="group" className={'pf-skill-reel'+(moving?' is-moving':'')} aria-label={'Skills: '+skills.join(', ')}>
@@ -149,7 +189,7 @@ export function GithubLanguages({ skills, socials, onChange }: {
     </div>
     {notice && <p className="pf-github-status" role="status">{notice}</p>}
     {suggested.length>0 && <div className="pf-github-results">
-      <div className="pf-github-found">{suggested.map(name=><span key={name}>{name}</span>)}</div>
+      <div className="pf-github-found">{suggested.map(name=><span key={name}><LanguageIcon name={name}/>{name}</span>)}</div>
       <button type="button" disabled={!available.length} onClick={()=>{
         onChange(mergeLanguages(skills,available));setSuggested([])
         setNotice(available.length+' language'+(available.length===1?'':'s')+' added. You can remove any above.')
@@ -163,7 +203,7 @@ export function GithubLanguages({ skills, socials, onChange }: {
       {suggestionOpen && <div className="pf-language-presets">
         {LANGUAGES.filter(name=>!skills.some(skill=>skill.toLowerCase()===name.toLowerCase())).map(name=>
           <button key={name} type="button" onClick={()=>onChange(mergeLanguages(skills,[name]))}
-            disabled={skills.length>=40}>+ {name}</button>)}
+            disabled={skills.length>=40}><LanguageIcon name={name}/> {name}</button>)}
       </div>}
     </div>
     </div>}
