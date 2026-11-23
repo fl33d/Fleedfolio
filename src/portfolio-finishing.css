@@ -327,3 +327,26 @@
 @media (prefers-reduced-motion: reduce) {
   .app .cz-palette { transition: none; }
 }
+
+/* Safari: keep BOTH layers frosted. The dock's own backdrop-filter would
+   isolate its child panel's backdrop, so while the picker is open move the
+   dock's blur to a non-ancestor ::before layer. This lets the panel sample
+   the portfolio while the dock still visibly blurs underneath its buttons. */
+.app .dock.chrome:has(.cz-panel) {
+  position: fixed;
+  isolation: isolate;
+  background: rgba(25,31,36,.32);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.app .dock.chrome:has(.cz-panel)::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  z-index: -1;
+  pointer-events: none;
+  background: rgba(25,31,36,.26);
+  -webkit-backdrop-filter: blur(35px) saturate(1.5);
+  backdrop-filter: blur(35px) saturate(1.5);
+}
