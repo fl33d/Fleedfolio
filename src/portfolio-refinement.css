@@ -212,3 +212,130 @@
   .app .dock.chrome,.app .el-panel { animation:none!important; }
   .el-options>button { transition:none; }
 }
+
+
+/* Code-language rail — a gentle, linear scroll, no attention-grabbing marquee.
+   Duplicated content is aria-hidden; the parent has a single text label. */
+.pf-skills > .pf-skill-reel { min-width:0;align-self:center; }
+.pf-skill-reel {
+  position:relative;
+  width:100%;min-width:0;max-width:100%;
+  overflow:hidden;
+  -webkit-mask-image:linear-gradient(to right,transparent,black 6%,black 94%,transparent);
+  mask-image:linear-gradient(to right,transparent,black 6%,black 94%,transparent);
+}
+.pf-reel-track {
+  display:flex;align-items:center;
+  width:max-content;max-width:none;
+  padding-block:.25rem;
+}
+.pf-reel-group {
+  display:flex;align-items:center;flex:0 0 auto;
+  gap:.6rem;padding-right:.6rem;
+}
+.pf-reel-badge {
+  display:inline-flex;align-items:center;flex:0 0 auto;
+  gap:.55rem;
+  padding:.55rem .85rem;
+  min-height:36px;
+  border-radius:999px;
+  border:1px solid color-mix(in oklab,var(--ink) 18%,transparent);
+  background:color-mix(in oklab,var(--ink) 4%,transparent);
+  font:500 clamp(.8rem,1.3vw,.91rem)/1.3 var(--font-sans);
+  letter-spacing:0;white-space:nowrap;color:var(--ink);
+}
+.pf-reel-dot {
+  width:8px;height:8px;flex:0 0 auto;border-radius:100%;
+  background:var(--language-colour,#a9b79c);
+  box-shadow:0 0 0 1px color-mix(in oklab,var(--ink) 10%,transparent);
+}
+.pf-skill-reel.is-moving .pf-reel-track {
+  animation:fleed-language-flow 34s linear infinite;
+  will-change:transform;
+}
+.pf-skill-reel.is-moving:hover .pf-reel-track,
+.pf-skill-reel.is-moving:focus-within .pf-reel-track {
+  animation-play-state:paused;
+}
+@keyframes fleed-language-flow {
+  from { transform:translateX(0); }
+  to { transform:translateX(-50%); }
+}
+.app[data-motion='still'] .pf-reel-track,
+.app[data-motion='still'] .pf-reel-track *,
+.app[data-motion='still'] .pf-reel-track::before {
+  animation:none!important;
+}
+.app[data-motion='still'] .pf-skill-reel.is-moving .pf-reel-group:nth-child(2) {display:none}
+.pf-reel-preview {display:grid;gap:.8rem;margin-top:.4rem;max-width:100%;overflow:hidden;}
+.pf-reel-preview>span {color:var(--dim);font:500 .83rem/1.4 var(--font-sans)}
+.pf-github-import {
+  display:grid;gap:12px;max-width:37rem;
+  margin-top:1rem;padding:1.2rem;
+  border:1px solid color-mix(in oklab,var(--ink) 16%,transparent);
+  border-radius:16px;
+  background:color-mix(in oklab,var(--ink) 3%,transparent);
+}
+.pf-github-heading {display:flex;align-items:center;gap:.6rem;font:.95rem/1.35 var(--font-sans)}
+.pf-github-heading strong {font-weight:620}
+.pf-github-import>p {font:.85rem/1.55 var(--font-sans);color:var(--dim)}
+.pf-github-row {display:flex;flex-wrap:wrap;gap:.55rem}
+.pf-github-row input {
+  min-width:11rem;flex:1 1 11rem;
+  padding:11px 12px;
+  border:1px solid color-mix(in oklab,var(--ink) 23%,transparent);
+  border-radius:10px;
+  color:var(--ink);background:transparent;
+  font:500 .88rem/1.3 var(--font-sans);
+}
+.pf-github-row input::placeholder {color:var(--dim)}
+.pf-github-row input:focus-visible,.pf-github-import button:focus-visible {
+  outline:2px solid var(--accent-c);outline-offset:3px;
+}
+.pf-github-row button,.pf-github-results>button {
+  display:flex;align-items:center;justify-content:center;
+  min-height:42px;padding:10px 14px;
+  border-radius:10px;
+  background:var(--ink);color:var(--paper);
+  font:600 .85rem/1.25 var(--font-sans);
+  transition:opacity .2s,transform .2s;
+}
+.pf-github-row button:hover:not(:disabled),.pf-github-results>button:hover:not(:disabled) {opacity:.82;transform:translateY(-1px)}
+.pf-github-row button:disabled,.pf-github-results>button:disabled {opacity:.4}
+.pf-github-import .pf-github-status {font-size:.82rem;line-height:1.55;color:var(--dim)}
+.pf-github-results {display:grid;justify-items:start;gap:13px}
+.pf-github-found {display:flex;flex-wrap:wrap;gap:7px}
+.pf-github-found span {
+  display:inline-flex;align-items:center;
+  padding:6px 10px;
+  border-radius:99px;border:1px solid color-mix(in oklab,var(--ink) 19%,transparent);
+  font:500 .8rem/1.2 var(--font-sans);
+}
+.pf-github-suggestions>button {
+  border-bottom:1px solid color-mix(in oklab,var(--ink) 45%,transparent);
+  padding-block:3px;color:var(--ink);font:500 .83rem/1.3 var(--font-sans);
+}
+.pf-language-presets {display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.pf-language-presets button {
+  border:1px solid color-mix(in oklab,var(--ink) 18%,transparent);
+  border-radius:99px;
+  padding:7px 12px;
+  color:var(--ink);
+  font:500 .8rem/1.25 var(--font-sans);
+  transition:background .2s;
+}
+.pf-language-presets button:hover:not(:disabled) {
+  background:color-mix(in oklab,var(--ink) 9%,transparent);
+}
+.pf-language-presets button:disabled{opacity:.35}
+@media(max-width:650px) {
+  .pf-skills>.pf-skill-reel {width:100%}
+  .pf-github-import {padding:14px;border-radius:13px}
+  .pf-reel-badge {font-size:.84rem;padding:.55rem .8rem}
+  .pf-github-row input {font-size:16px}
+}
+@media (prefers-reduced-motion:reduce) {
+  .pf-skill-reel.is-moving .pf-reel-track {animation:none!important;transform:none!important}
+  .pf-skill-reel.is-moving .pf-reel-group:nth-child(2) {display:none}
+  .pf-github-import * {transition:none!important}
+}
