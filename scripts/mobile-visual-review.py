@@ -68,10 +68,10 @@ with sync_playwright() as p:
             assert page.locator("[id^=section-]").count() >= 1, "Freeform section did not get added"
             name = page.get_by_role("textbox", name="Name")
             name.fill("Mobile QA")
-            page.wait_for_timeout(650)
+            page.wait_for_function("JSON.parse(localStorage.getItem('blank:draft') || '{}').name === 'Mobile QA'", timeout=10000)
             page.reload(wait_until="domcontentloaded")
             page.locator(".dock").wait_for(state="visible")
-            assert page.get_by_role("textbox", name="Name").input_value() == "Mobile QA", "Draft persistence failed"
+            page.wait_for_function("document.querySelector('textarea[aria-label=Name]')?.value === 'Mobile QA'", timeout=12000)
             assert page.locator("[id^=section-]").count() >= 1, "New block not persisted"
             print(f"PASS mobile shelf, insertion, editing and reload at {width}")
 
