@@ -237,6 +237,28 @@ with sync_playwright() as p:
             assert page.locator(".pf-name").evaluate("(el)=>getComputedStyle(el).textAlign") == "center", f"Preview title off-centre in {look}"
             assert page.locator(".pf-role").evaluate("(el)=>getComputedStyle(el).textAlign") == "center", f"Preview role off-centre in {look}"
             assert page.evaluate("document.documentElement.scrollWidth") <= width + 2, f"Preview overflow in {look} at {width}"
+            # Actual painted geometry: the scroll affordance must sit within
+            # its hero and share the hero's horizontal center, not overlap
+            # the rounded edge or the following skills section.
+            scroll = page.locator(".pf-hero .pf-scroll")
+            if scroll.count() and scroll.is_visible():
+                cue = scroll.evaluate("""el => {
+                  const r=el.getBoundingClientRect(), h=el.closest('.pf-hero').getBoundingClientRect();
+                  return {cx:r.left+r.width/2, heroCx:h.left+h.width/2,
+                    top:r.top,bottom:r.bottom,heroTop:h.top,heroBottom:h.bottom};
+                }""")
+                assert abs(cue["cx"]-cue["heroCx"]) <= 5, f"Scroll cue off axis in {look} at {width}: {cue}"
+                assert cue["top"] >= cue["heroTop"] - 2 and cue["bottom"] <= cue["heroBottom"] + 2, f"Scroll cue outside hero in {look} at {width}: {cue}"
+                if look in ("editorial","glass","aero"):
+                    scroll.screenshot(path=str(OUT / f"scroll-{look}-{width}.png"))
+            if width <= 390:
+                dock = page.locator(".dock.chrome").evaluate("""el => ({
+                  background:getComputedStyle(el).backgroundColor,
+                  blur:getComputedStyle(el).backdropFilter
+                })""")
+                assert dock["background"].startswith("rgba("), f"Mobile dock is opaque in {look}: {dock}"
+                assert "blur(" in dock["blur"], f"Mobile dock lacks frosted depth in {look}: {dock}"
+
             if look in ("editorial","glass","brutal","playful"):
                 page.screenshot(path=str(OUT / f"aligned-preview-{look}-{width}.png"))
             page.get_by_role("button", name="Edit portfolio").click()

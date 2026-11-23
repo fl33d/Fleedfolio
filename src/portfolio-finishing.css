@@ -74,27 +74,27 @@
 
 /* The floating editor dock should feel like the same glass material,
    not a second opaque interface pasted over a colourful portfolio. */
-.app .dock {
-  background: color-mix(in srgb, #1b1a18 65%, transparent);
+.app .dock.chrome {
+  background: rgba(21, 23, 23, .76);
   border-color: rgb(255 255 255 / .19);
   backdrop-filter: blur(30px) saturate(1.3);
   -webkit-backdrop-filter: blur(30px) saturate(1.3);
   box-shadow: 0 16px 42px rgb(0 0 0 / .24), inset 0 1px rgb(255 255 255 / .12);
 }
-.app .dock-toggle {
+.app .dock.chrome .dock-toggle {
   background: rgb(255 255 255 / .065);
   border-color: rgb(255 255 255 / .13);
 }
-.app .dock-toggle-pill { background: rgb(255 255 255 / .12); }
+.app .dock.chrome .dock-toggle-pill { background: rgb(255 255 255 / .12); }
 
 /* Publishing is a modal interaction, so keep the contrast legible while
    replacing the unrelated opaque charcoal slab with translucent depth. */
 .share-dialog {
-  background: color-mix(in srgb, #171614 78%, transparent);
+  background: rgba(19, 22, 22, .88);
   border: 1px solid rgb(255 255 255 / .20);
   box-shadow: 0 28px 80px rgb(0 0 0 / .38), inset 0 1px rgb(255 255 255 / .09);
-  backdrop-filter: blur(34px) saturate(1.35);
-  -webkit-backdrop-filter: blur(34px) saturate(1.35);
+  backdrop-filter: blur(40px) saturate(1.25);
+  -webkit-backdrop-filter: blur(40px) saturate(1.25);
 }
 .share-url-input, .share-handle-row {
   background: rgb(255 255 255 / .065);
@@ -128,4 +128,38 @@
   .app .made-with, .app.mode-view .portfolio .pf-hero .pf-scroll {
     background: var(--paper);
   }
+}
+
+/* Consistent darkened glass for floating actions, including mobile where
+   refinement.css previously forced an opaque background under 440px.
+   Match the *actual* .dock.chrome selector rather than an overridden .dock. */
+@media (max-width: 440px) {
+  .app .dock.chrome {
+    background: rgba(20, 23, 23, .79);
+    border-color: rgba(255, 255, 255, .20);
+    -webkit-backdrop-filter: blur(32px) saturate(1.25);
+    backdrop-filter: blur(32px) saturate(1.25);
+  }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .app .dock.chrome { background: #202323; }
+}
+/* Modal text stays readable on the darker tinted glass; unlike reducing
+   opacity on the entire dialog, this preserves crisp input and copy text. */
+.share-dialog .share-heading,
+.share-dialog .share-field-label { color: #f5f2ea; }
+.share-dialog .share-description { color: #d1cec7; }
+.share-dialog .share-footnote { color: #b3afa6; }
+
+/* A hero scroll affordance is always centered within its own content box,
+   never visually pinned to the left of an inset editorial or aero frame. */
+.app.mode-view .portfolio .pf-hero .pf-scroll {
+  flex: 0 0 auto;
+  margin-inline: auto;
+  text-align: center;
+  white-space: nowrap;
+}
+.app.mode-view .portfolio .pf-hero .pf-scroll:focus-visible {
+  outline: 2px solid var(--accent-c);
+  outline-offset: 3px;
 }
