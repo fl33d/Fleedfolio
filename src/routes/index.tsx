@@ -210,6 +210,9 @@ function Editor() {
         </button>
       </div>
 
+      {/* Separate layer: floating sheets do not inherit the dock backdrop root. */}
+      <div id="fleed-overlay-root" />
+
       <ShareDialog
         open={shareOpen}
         onOpenChange={setShareOpen}
