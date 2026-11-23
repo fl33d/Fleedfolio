@@ -5,7 +5,7 @@
  */
 
 /* The unadorned portfolio is the first screen on every device. */
-.app .portfolio { isolation:isolate; }
+.app .portfolio { isolation:isolate;display:flow-root; }
 .app .pf-hero { min-width:0; }
 .app .pf-inline-meta {
   display:flex;align-items:baseline;flex-wrap:wrap;gap:.75rem;
@@ -322,7 +322,7 @@
   .app[data-look].mode-view .pf-hero {min-height:clamp(420px,72svh,620px)}
   .app[data-look='glass'] .pf-hero {padding:clamp(28px,5vw,46px)!important}
   .app[data-look='brutal'] .pf-name {font-size:clamp(3.1rem,13vw,6.3rem)}
-  .app[data-look='editorial'] .pf-name {font-size:clamp(3.85rem,14vw,7rem)}
+  .app[data-look='editorial'] .pf-name {font-size:clamp(4.2rem,17vw,7rem)}
   .app[data-look='playful'] .pf-name {font-size:clamp(3.85rem,14vw,7rem)}
   .app[data-look='print'] .pf-name {font-size:clamp(3.6rem,14vw,7rem)}
   .app[data-look='aero'] .pf-hero {padding-inline:12px}
