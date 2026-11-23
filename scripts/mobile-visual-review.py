@@ -76,7 +76,20 @@ with sync_playwright() as p:
             page.locator(".dock").wait_for(state="visible")
             page.wait_for_function("document.querySelector('textarea[aria-label=Name]')?.value === 'Mobile QA'", timeout=12000)
             assert page.locator("[id^=section-]").count() >= 1, "New block not persisted"
-            print(f"PASS mobile shelf, insertion, editing and reload at {width}")
+            # New creative blocks use the very same editor and save path.
+            page.get_by_role("button", name="Add an element").click()
+            panel = page.get_by_role("dialog", name="Add to your portfolio")
+            panel.locator("input[type=search]").fill("Statement")
+            panel.locator(".el-options > button").first.click()
+            assert page.locator(".pf-narrative-statement").count() == 1, "Statement element not inserted"
+            page.get_by_role("button", name="Add an element").click()
+            panel = page.get_by_role("dialog", name="Add to your portfolio")
+            panel.locator("input[type=search]").fill("Feature story")
+            panel.locator(".el-options > button").first.click()
+            assert page.locator(".pf-narrative-feature").count() == 1, "Feature story not inserted"
+            page.wait_for_function("JSON.parse(localStorage.getItem('blank:draft')).extras.length >= 3",timeout=12000)
+            page.screenshot(path=str(OUT / f"narrative-elements-{width}.png"))
+            print(f"PASS mobile shelf, two new narrative elements, editing and reload at {width}")
 
         if width == 390:
             # Import suggestions are deliberately opt-in, and this mock keeps
@@ -143,8 +156,26 @@ with sync_playwright() as p:
                 page.wait_for_timeout(220)
                 page.screenshot(path=str(OUT / f"look-{look}-1440.png"))
                 page.get_by_role("button", name="Customise your portfolio").click()
+            # Independently compose project display, whitespace and corner language.
+            project = page.get_by_placeholder("Project title").first
+            project.fill("A project with presence")
+            page.get_by_role("button", name="Gallery", exact=True).click()
+            assert page.locator(".app").get_attribute("data-work-layout") == "grid"
+            assert page.locator(".pf-works").evaluate("(el)=>getComputedStyle(el).display") == "grid"
             page.get_by_role("button", name="Customise your portfolio").click()
-            print("PASS eight looks, retained content, and horizontal overflow checks")
+            page.screenshot(path=str(OUT / "work-gallery-1440.png"))
+            page.get_by_role("button", name="Customise your portfolio").click()
+            page.get_by_role("button", name="Showcase", exact=True).click()
+            assert page.locator(".app").get_attribute("data-work-layout") == "spotlight"
+            page.locator(".cz-advanced > summary").click()
+            page.get_by_role("button", name="Open", exact=True).click()
+            assert page.locator(".app").get_attribute("data-spacing") == "airy"
+            page.get_by_role("button", name="Round", exact=True).click()
+            assert page.locator(".app").get_attribute("data-corners") == "round"
+            page.get_by_role("button", name="Customise your portfolio").click()
+            page.screenshot(path=str(OUT / "work-showcase-1440.png"))
+            assert page.get_by_role("textbox", name="Name").input_value() == "Alex Morgan"
+            print("PASS eight looks, three composition controls, retained content, and horizontal overflow checks")
 
         assert not errors, f"Uncaught browser errors at {width}: {errors}"
         context.close()
