@@ -74,6 +74,25 @@
   align-self: center;
   text-wrap: balance;
 }
+/* Keep the gap between separate words visible in oversized display fonts.
+ * Aggressive tracking formerly made names read as joined-up text. */
+.app[data-look='editorial'] .portfolio[data-align='center'] .pf-name,
+.app[data-look='print'] .portfolio[data-align='center'] .pf-name {
+  letter-spacing: -.03em;
+  word-spacing: .07em;
+}
+.app[data-look='brutal'] .portfolio[data-align='center'] .pf-name,
+.app[data-look='playful'] .portfolio[data-align='center'] .pf-name {
+  letter-spacing: -.055em;
+  word-spacing: .065em;
+}
+.app[data-look='neo'] .portfolio[data-align='center'] .pf-name,
+.app[data-look='aero'] .portfolio[data-align='center'] .pf-name,
+.app[data-look='glass'] .portfolio[data-align='center'] .pf-name {
+  letter-spacing: -.045em;
+  word-spacing: .055em;
+}
+
 .portfolio[data-align='center'] .pf-name .field,
 .portfolio[data-align='center'] .pf-name .field-input {
   display: block;
