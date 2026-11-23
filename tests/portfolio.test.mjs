@@ -153,3 +153,35 @@ test('art directions are composable, persisted and safely normalised', () => {
   assert.equal(legacy.theme.texture,'none')
   assert.equal(legacy.theme.motion,false)
 })
+
+test('composition controls preserve existing portfolios and safely normalise unknown values', () => {
+  const fresh=blankPortfolio()
+  const rich=normalizePortfolio({
+    ...fresh,
+    theme:{...fresh.theme,workLayout:'spotlight',spacing:'airy',corners:'round'},
+    extras:[{id:'story1',title:'Thoughts',body:'Something important.',image:'',variant:'statement'}],
+  })
+  assert.equal(rich.theme.workLayout,'spotlight')
+  assert.equal(rich.theme.spacing,'airy')
+  assert.equal(rich.theme.corners,'round')
+  assert.equal(rich.extras[0].variant,'statement')
+  const altered=normalizePortfolio({...rich,theme:{...rich.theme,workLayout:'grid'}})
+  assert.deepEqual(altered.extras,rich.extras)
+  const legacy=normalizePortfolio({...fresh,theme:{palette:'ink',font:'serif'},
+    extras:[{id:'old',title:'Old writing',body:'Still here',image:''}],
+  })
+  assert.equal(legacy.theme.workLayout,'list')
+  assert.equal(legacy.theme.spacing,'balanced')
+  assert.equal(legacy.theme.corners,'soft')
+  assert.equal(legacy.extras[0].variant,'essay')
+  const malformed=normalizePortfolio({
+    ...rich,
+    theme:{...rich.theme,workLayout:'javascript:evil',spacing:'url(x)',corners:'unbounded'},
+    extras:[{id:'bad',variant:'script',body:'Survives',title:'Safe'}],
+  })
+  assert.equal(malformed.theme.workLayout,'list')
+  assert.equal(malformed.theme.spacing,'balanced')
+  assert.equal(malformed.theme.corners,'soft')
+  assert.equal(malformed.extras[0].variant,'essay')
+  assert.equal(malformed.extras[0].body,'Survives')
+})
