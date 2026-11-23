@@ -17,7 +17,7 @@ import {
 import { cn } from '@/lib/utils'
 import { Field } from './Field'
 import { ImageSlot } from './ImageSlot'
-import { GithubLanguages, SkillRail } from './SkillRail'
+import { GithubLanguages, SkillRail, LanguageIcon } from './SkillRail'
 import { Reveal, SplitText } from './effects'
 
 type Props = {
@@ -716,7 +716,7 @@ function SkillEditor({
       <div className="flex flex-wrap items-center gap-2">
         {skills.map((s, i) => (
           <span key={`${s}-${i}`} className="pf-chip">
-            {s}
+            <LanguageIcon name={s} />{s}
             <button
               type="button"
               aria-label={`Remove ${s}`}
