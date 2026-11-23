@@ -45,16 +45,8 @@ function Editor() {
   const loaded = useRef(false)
   const storageWarningShown = useRef(false)
 
-  useEffect(() => {
-    try {
-      if (localStorage.getItem(TOUR_SEEN_KEY) || localStorage.getItem(PUBLISHED_KEY)) return
-    } catch {
-      // Walkthrough can still be opened manually when browser storage is disabled.
-      return
-    }
-    const timer = window.setTimeout(() => setTourOpen(true), 650)
-    return () => window.clearTimeout(timer)
-  }, [])
+  // The first page is the editor. The walkthrough is discoverable through
+  // Customise, but never interrupts someone who is ready to start typing.
 
   const closeTour = () => {
     setTourOpen(false)
