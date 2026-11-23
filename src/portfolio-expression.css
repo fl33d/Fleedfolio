@@ -15,8 +15,8 @@
 .app .pf-mini-field .field-input {font:inherit;letter-spacing:0;min-width:0}
 .app .pf-meta-dot {color:var(--accent-c);opacity:.85}
 .app .pf-public-meta {display:flex;align-items:center;flex-wrap:wrap;gap:1rem;margin-top:2.5rem;font:500 .9rem/1.45 var(--font-sans);color:var(--dim)}
-.app[data-look] .mode-edit .pf-hero {padding-block:clamp(5rem,8vw,8.5rem) clamp(4rem,7vw,7rem)}
-.app[data-look] .mode-view .pf-hero {min-height:clamp(420px,77svh,720px)}
+.app[data-look].mode-edit .pf-hero {padding-block:clamp(5rem,8vw,8.5rem) clamp(4rem,7vw,7rem)}
+.app[data-look].mode-view .pf-hero {min-height:clamp(420px,77svh,720px)}
 .app[data-look] .pf-name {overflow-wrap:anywhere}
 .app[data-look] .pf-scroll,.app[data-look] .pf-social,
 .app[data-look] .pf-link,.app[data-look] .pf-section-head,
@@ -318,8 +318,8 @@
 .app .cz-panel .cz-palette-name{font-size:.78rem}
 
 @media(max-width:700px){
-  .app[data-look] .mode-edit .pf-hero {padding-top:clamp(3.8rem,12vw,5.5rem)}
-  .app[data-look] .mode-view .pf-hero {min-height:clamp(420px,72svh,620px)}
+  .app[data-look].mode-edit .pf-hero {padding-top:clamp(3.8rem,12vw,5.5rem)}
+  .app[data-look].mode-view .pf-hero {min-height:clamp(420px,72svh,620px)}
   .app[data-look='glass'] .pf-hero {padding:clamp(28px,5vw,46px)!important}
   .app[data-look='brutal'] .pf-name {font-size:clamp(3.1rem,13vw,6.3rem)}
   .app[data-look='editorial'] .pf-name {font-size:clamp(3.85rem,14vw,7rem)}
