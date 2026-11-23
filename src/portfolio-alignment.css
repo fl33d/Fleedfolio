@@ -1,3 +1,13 @@
+/* CSS-native text measurement removes transient clipping on font changes.
+ * Safari 26.1 and older use the guarded JavaScript fallback in Field.tsx. */
+@supports (field-sizing: content) {
+  .field-input {
+    field-sizing: content;
+    height: auto !important;
+    min-height: 1.2em;
+  }
+}
+
 /* Expression-safe alignment / Fleedfolio.
  * The author-controlled Align choice must mean the same thing for every
  * expression, in both direct editing and on the published public page.
