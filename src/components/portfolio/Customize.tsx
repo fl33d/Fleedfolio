@@ -235,6 +235,24 @@ export function Customize({
                   onClick={()=>setTheme('texture',key)}>{TEXTURES[key]}</button>)}
             </div>
           </Group>
+          <Group title="Show your work">
+            <div className="cz-layout-picks" role="group" aria-label="Project layout">
+              {([
+                ['list','Index'],
+                ['grid','Gallery'],
+                ['spotlight','Showcase'],
+              ] as const).map(([key,label])=>
+                <button key={key} type="button"
+                  aria-pressed={theme.workLayout===key}
+                  onClick={()=>setTheme('workLayout',key)}>
+                  <span className={'cz-layout-preview cz-layout-'+key} aria-hidden="true">
+                    <i/><i/><i/>
+                  </span>
+                  <span>{label}</span>
+                </button>)}
+            </div>
+          </Group>
+
           <details className="cz-advanced">
             <summary>More control <ChevronDown className="size-4" aria-hidden="true"/></summary>
             <div className="cz-advanced-content">
@@ -251,6 +269,20 @@ export function Customize({
                 onChange(current=>({...current,theme:{...current.theme,background:'',foreground:''}}))}>
                 Reset custom colours
               </button>
+            </Group>
+            <Group title="Spacing">
+              <Segmented
+                value={theme.spacing}
+                options={ [['compact','Close'],['balanced','Balanced'],['airy','Open']] }
+                onChange={v=>setTheme('spacing',v)}
+              />
+            </Group>
+            <Group title="Corners">
+              <Segmented
+                value={theme.corners}
+                options={ [['sharp','Sharp'],['soft','Soft'],['round','Round']] }
+                onChange={v=>setTheme('corners',v)}
+              />
             </Group>
             <Group title="Typeface">
             <div className="cz-fonts">

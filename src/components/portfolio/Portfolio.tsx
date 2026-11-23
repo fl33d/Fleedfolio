@@ -471,10 +471,11 @@ export function Portfolio({ data, editing, onChange }: Props) {
       ) : null}
 
       {/* Sections the writer added themselves */}
-      {extras.map((x) => (
+      {extras.map((x, index) => (
         <Section
           key={x.id}
           id={`section-${x.id}`}
+          className={cn('pf-narrative', 'pf-narrative-' + x.variant)}
           number={nextNumber()}
           title={x.title}
           editing={editing}
@@ -482,6 +483,26 @@ export function Portfolio({ data, editing, onChange }: Props) {
           titlePlaceholder="Section title"
           onRemove={() => removeItem('extras', x.id)}
         >
+          {editing && <div className="pf-block-appearance" role="group" aria-label={`Presentation for ${x.title || 'section'}`}>
+            {([
+              ['essay','Text'],
+              ['statement','Statement'],
+              ['feature','Feature'],
+            ] as const).map(([variant,label])=>
+              <button key={variant} type="button" aria-pressed={x.variant===variant}
+                onClick={()=>updateItem('extras',x.id,{variant})}>{label}</button>)}
+            <span className="pf-block-separator" aria-hidden="true"/>
+            <button type="button" className="pf-block-order" title="Move section earlier"
+              aria-label={`Move ${x.title || 'section'} up`} disabled={index === 0}
+              onClick={()=>set('extras',reorderItems(data.extras,index,-1))}>
+              <ArrowUp size={15} aria-hidden="true"/>
+            </button>
+            <button type="button" className="pf-block-order" title="Move section later"
+              aria-label={`Move ${x.title || 'section'} down`} disabled={index === data.extras.length - 1}
+              onClick={()=>set('extras',reorderItems(data.extras,index,1))}>
+              <ArrowDown size={15} aria-hidden="true"/>
+            </button>
+          </div>}
           <div className={cn('pf-about-wrap slot-host', x.image && 'has-image')}>
             {(editing || x.body) && (
               <Reveal className="pf-extra-body">
@@ -658,6 +679,7 @@ function Section({
   number,
   title,
   children,
+  className,
   editing,
   onTitle,
   onRemove,
@@ -667,13 +689,14 @@ function Section({
   number: string
   title: string
   children: ReactNode
+  className?: string
   editing?: boolean
   onTitle?: (value: string) => void
   onRemove?: () => void
   titlePlaceholder?: string
 }) {
   return (
-    <section id={id} className="pf-section">
+    <section id={id} className={cn('pf-section', className)}>
       <Reveal className="pf-section-head">
         <span className="pf-section-num">{number}</span>
         {editing && onTitle ? (
