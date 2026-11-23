@@ -1,0 +1,62 @@
+name: Fleed mobile visual review
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/routes/index.tsx'
+      - 'src/components/portfolio/**'
+      - 'src/portfolio-refinement.css'
+      - 'scripts/mobile-visual-review.py'
+      - '.github/workflows/mobile-visual-review.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fleed-mobile-qa-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  browser-review:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.10.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - name: Install project
+        run: pnpm install --frozen-lockfile
+      - name: Set up browser test
+        run: python3 -m pip install --break-system-packages --quiet playwright==1.58.0
+      - name: Launch local app
+        run: |
+          pnpm dev --host 127.0.0.1 > /tmp/fleed-dev.log 2>&1 &
+          echo $! > /tmp/fleed-dev.pid
+          for i in $(seq 1 50); do
+            if curl --silent --fail http://127.0.0.1:3000/ > /dev/null; then
+              echo "Local app is available"
+              exit 0
+            fi
+            sleep 2
+          done
+          cat /tmp/fleed-dev.log
+          exit 1
+      - name: Test actual mobile and desktop interactions
+        run: python3 scripts/mobile-visual-review.py
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fleed-home-mobile-review
+          path: visual-review/
+          if-no-files-found: warn
+          retention-days: 7
+      - name: Show dev server errors
+        if: failure()
+        run: cat /tmp/fleed-dev.log
