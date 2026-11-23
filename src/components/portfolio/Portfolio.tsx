@@ -88,7 +88,6 @@ export function Portfolio({ data, editing, onChange }: Props) {
       {/* Hero */}
       <section id="top" className={cn('pf-hero slot-host', data.photo && 'has-photo')}>
         <div className="pf-hero-main">
-        {editing && <span className="pf-canvas-start" aria-hidden="true">make this yours<span>.</span></span>}
 
         <h1 className="pf-name">
           {editing ? (
