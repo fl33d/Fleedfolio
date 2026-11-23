@@ -161,6 +161,35 @@ with sync_playwright() as p:
             rail = page.locator(".pf-skills .pf-skill-reel.is-moving")
             rail.wait_for(state="visible")
             rail.screenshot(path=str(OUT / "skills-visitor-390.png"))
+            # New skills presentation is independent from the chosen
+            # expression and keeps exactly the original language data.
+            page.get_by_role("button", name="Customise your portfolio").click()
+            page.get_by_role("tab", name="Fine tune").click()
+            page.get_by_role("button", name="Cards", exact=True).click()
+            page.get_by_role("button", name="Logos", exact=True).click()
+            page.get_by_role("button", name="Customise your portfolio").click()
+            assert page.locator(".pf-skills .pf-skill-reel.is-grid").count()==1
+            assert page.locator(".pf-skills .pf-reel-badge").count()==3
+            assert page.locator(".pf-skills .pf-language-icon").count()==3
+            assert page.locator(".pf-skills .pf-reel-name").count()==0
+            page.screenshot(path=str(OUT / "skills-grid-logos-390.png"))
+            page.get_by_role("button", name="Customise your portfolio").click()
+            page.get_by_role("tab", name="Fine tune").click()
+            page.get_by_role("button", name="List", exact=True).click()
+            page.get_by_role("button", name="Names", exact=True).click()
+            page.get_by_role("button", name="Customise your portfolio").click()
+            assert page.locator(".pf-skills .pf-skill-reel.is-list").count()==1
+            assert page.locator(".pf-skills .pf-language-icon").count()==0
+            assert page.locator(".pf-skills .pf-reel-name").count()==3
+            page.screenshot(path=str(OUT / "skills-list-text-390.png"))
+            assert page.evaluate("document.documentElement.scrollWidth") <= width + 2
+            page.get_by_role("button", name="Customise your portfolio").click()
+            page.get_by_role("tab", name="Fine tune").click()
+            page.get_by_role("button", name="Flow", exact=True).click()
+            page.get_by_role("button", name="Logo + name", exact=True).click()
+            page.get_by_role("button", name="Customise your portfolio").click()
+            assert page.locator(".pf-skills .pf-skill-reel.is-moving").count()==1
+            assert page.evaluate("JSON.parse(localStorage.getItem('blank:draft')).skills") == ["Python","Rust","TypeScript"]
             page.emulate_media(reduced_motion="reduce")
             assert page.locator(".pf-skills .pf-reel-track").evaluate(
                 "(e)=>getComputedStyle(e).animationName"
