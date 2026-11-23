@@ -199,8 +199,14 @@ with sync_playwright() as p:
             page.get_by_role("button", name=label + " expression").click()
             assert page.locator(".app").get_attribute("data-look") == look
             assert page.locator(".pf-name textarea").input_value() == "Alexandra Victoria Montrose"
-            # Regression: fields used to keep their previous expression's
-            # height after selecting a different headline font or scale.
+            # Fonts can load asynchronously after the expression switches.
+            # The fields must settle into their new computed metrics promptly.
+            page.wait_for_function("""() => [
+              '.pf-name textarea','.pf-role textarea','.pf-tagline textarea'
+            ].every(s => {
+              const el=document.querySelector(s);
+              return el && el.scrollHeight <= el.clientHeight + 3;
+            })""", timeout=8000)
             for field in (".pf-name textarea",".pf-role textarea",".pf-tagline textarea"):
                 metrics = page.locator(field).evaluate("""el => ({
                     scroll:el.scrollHeight, client:el.clientHeight,
