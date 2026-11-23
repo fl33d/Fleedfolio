@@ -4,6 +4,7 @@ import { CircleHelp, Eye, FileText, PenLine, RotateCcw, Send } from 'lucide-reac
 import { toast } from 'sonner'
 
 import { Customize } from '@/components/portfolio/Customize'
+import { Elements } from '@/components/portfolio/Elements'
 import { ShareDialog } from '@/components/portfolio/ShareDialog'
 import { Walkthrough } from '@/components/portfolio/Walkthrough'
 import { Portfolio } from '@/components/portfolio/Portfolio'
@@ -17,6 +18,7 @@ import {
 } from '@/lib/portfolio'
 import { publishPortfolio } from '@/server/portfolio.functions'
 import { cn } from '@/lib/utils'
+import '@/portfolio-refinement.css'
 import { normalizeCustomSlug, portfolioPublicPath } from '@/lib/portfolio-slug'
 
 export const Route = createFileRoute('/')({
@@ -197,16 +199,17 @@ function Editor() {
       <div className="dock chrome">
         <div className="dock-toggle" role="group" aria-label="Editor mode">
           <span className={cn('dock-toggle-pill', !editing && 'is-right')} />
-          <button type="button" aria-pressed={editing && !cvOpen} onClick={() => switchMode(true)}>
-            <PenLine className="size-4" /> Edit
+          <button type="button" aria-label="Edit portfolio" title="Edit" aria-pressed={editing && !cvOpen} onClick={() => switchMode(true)}>
+            <PenLine className="size-4" aria-hidden="true" /><span className="dock-action-label">Edit</span>
           </button>
-          <button type="button" aria-pressed={!editing && !cvOpen} onClick={() => switchMode(false)}>
-            <Eye className="size-4" /> Preview
+          <button type="button" aria-label="Preview portfolio" title="Preview" aria-pressed={!editing && !cvOpen} onClick={() => switchMode(false)}>
+            <Eye className="size-4" aria-hidden="true" /><span className="dock-action-label">Preview</span>
           </button>
         </div>
 
         <span className="dock-sep" />
 
+        {!cvOpen && editing && <Elements data={data} onChange={setData} />}
         {!cvOpen && (
           <Customize data={data} onChange={setData} onImport={importDraft} customSlug={customSlug} onSlugChange={setCustomSlug} />
         )}
@@ -223,17 +226,17 @@ function Editor() {
           <span>CV</span>
         </button>
 
-        <button className="dock-icon" onClick={() => setTourOpen(true)} aria-label="How to use Fleedfolio" title="How it works">
+        <button className="dock-icon dock-help" onClick={() => setTourOpen(true)} aria-label="How to use Fleedfolio" title="How it works">
           <CircleHelp className="size-4" />
         </button>
 
-        <button className="dock-icon" onClick={reset} aria-label="Reset draft" title="Reset draft">
+        <button className="dock-icon dock-reset" onClick={reset} aria-label="Reset draft" title="Reset draft">
           <RotateCcw className="size-4" />
         </button>
 
-        <button className="dock-publish" onClick={() => { void publish() }} disabled={publishing}>
-          <Send className={cn('size-4', publishing && 'animate-pulse')} />
-          {publishing ? 'Publishing…' : published ? 'Update' : 'Publish'}
+        <button className="dock-publish" aria-label={publishing ? 'Publishing portfolio' : published ? 'Update portfolio' : 'Publish portfolio'} title={published ? 'Update portfolio' : 'Publish portfolio'} onClick={() => { void publish() }} disabled={publishing}>
+          <Send className={cn('size-4', publishing && 'animate-pulse')} aria-hidden="true" />
+          <span className="dock-action-label">{publishing ? 'Publishing…' : published ? 'Update' : 'Publish'}</span>
         </button>
       </div>
 
