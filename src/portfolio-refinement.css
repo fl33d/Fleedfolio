@@ -34,6 +34,18 @@
   font-weight: 500;
   letter-spacing: -.015em;
 }
+.mode-edit .pf-status {
+  font-family:var(--font-sans);
+  font-size:.9rem;
+  font-weight:500;
+  letter-spacing:0;
+  text-transform:none;
+}
+.mode-edit .pf-status .field-input {
+  font-family:var(--font-sans);
+  font-size:.9rem;
+  letter-spacing:0;
+}
 .mode-edit .pf-editor-eyebrow {
   font-size: .88rem;
   font-weight: 500;
