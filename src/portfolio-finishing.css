@@ -233,3 +233,19 @@
 @media (prefers-reduced-transparency: reduce) {
   .app .cz-panel, .app .dock.chrome { background: #24292d; }
 }
+
+/* iOS Safari backdrop-root fix.
+   A backdrop-filter on the ancestor .dock.chrome isolates the backdrop of
+   its child .cz-panel. The panel could only sample the dock's own pixels,
+   leaving portfolio text visibly SHARP behind the expression picker.
+   Remove the ancestor's filter only while the picker is open, allowing the
+   panel to blur the actual page. Restore dock blur on close. */
+.app .dock.chrome:has(.cz-panel) {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.app .dock.chrome:has(.cz-panel) .cz-panel {
+  background: rgba(28, 35, 39, .56);
+  -webkit-backdrop-filter: blur(30px) saturate(1.4);
+  backdrop-filter: blur(30px) saturate(1.4);
+}
