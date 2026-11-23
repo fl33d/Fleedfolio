@@ -75,7 +75,7 @@ export function ShareDialog({ open, onOpenChange, published, saving, onSaveAddre
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="share-dialog fleed-frosted-dialog">
+      <DialogContent className="share-dialog fleed-frosted-dialog" overlayClassName="fleed-frosted-overlay">
         <div className="share-kicker"><Check className="size-3.5" /> Published successfully</div>
         <DialogHeader>
           <DialogTitle className="share-heading">Your portfolio is live.</DialogTitle>
