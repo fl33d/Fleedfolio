@@ -1,0 +1,353 @@
+/* Expression-safe alignment / Fleedfolio.
+ * The author-controlled Align choice must mean the same thing for every
+ * expression, in both direct editing and on the published public page.
+ * Specificity intentionally follows the expression CSS; it does not change
+ * presentation choices for existing left-aligned portfolios.
+ */
+
+.portfolio .pf-hero-main,
+.portfolio .pf-hero-row,
+.portfolio .pf-name,
+.portfolio .pf-role,
+.portfolio .pf-tagline {
+  min-width: 0;
+}
+.portfolio .pf-name .field,
+.portfolio .pf-role .field,
+.portfolio .pf-tagline .field {
+  min-width: 0;
+  max-width: 100%;
+}
+.portfolio .pf-name .field-input,
+.portfolio .pf-role .field-input,
+.portfolio .pf-tagline .field-input {
+  box-sizing: border-box;
+  overflow-wrap: anywhere;
+}
+.portfolio .pf-name .split-text {
+  display: block;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+/* The giant, full-width form line made a name look like a broken input. */
+.portfolio .pf-name .field::after {background: transparent}
+.portfolio .pf-name .field:hover::after,
+.portfolio .pf-name .field:focus-within::after {
+  background: color-mix(in oklab,var(--ink) 22%,transparent);
+}
+
+/* Protect longer names from being forced into unbroken oversized text;
+ * both edit textareas and published headings receive the same fit category. */
+.portfolio .pf-name[data-name-fit='balanced'] {
+  font-size: clamp(2.35rem, 7.7vw, 7.3rem);
+  max-width: 100%;
+}
+.portfolio .pf-name[data-name-fit='compact'] {
+  font-size: clamp(2.05rem, 5.5vw, 5rem);
+  max-width: 100%;
+}
+
+/* Centred is a complete composition, not just text-align on the headline.
+ * An image no longer pulls the name off the visual center. */
+.portfolio[data-align='center'] .pf-hero,
+.portfolio[data-align='center'] .pf-hero.has-photo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.portfolio[data-align='center'] .pf-hero-main {
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.portfolio[data-align='center'] .pf-name {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  margin-inline: auto;
+  text-align: center;
+  align-self: center;
+  text-wrap: balance;
+}
+.portfolio[data-align='center'] .pf-name .field,
+.portfolio[data-align='center'] .pf-name .field-input {
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+.portfolio[data-align='center'] .pf-name .field-line {
+  transform-origin: center;
+}
+.portfolio[data-align='center'] .pf-hero-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: min(100%, 48rem);
+  max-width: 100%;
+  margin-inline: auto;
+  gap: clamp(1.4rem, 3vw, 2.2rem);
+  text-align: center;
+}
+.portfolio[data-align='center'] .pf-role,
+.portfolio[data-align='center'] .pf-tagline {
+  width: min(100%, 40rem);
+  max-width: 100%;
+  margin-inline: auto;
+  text-align: center;
+}
+.portfolio[data-align='center'] .pf-role .field,
+.portfolio[data-align='center'] .pf-role .field-input,
+.portfolio[data-align='center'] .pf-tagline .field,
+.portfolio[data-align='center'] .pf-tagline .field-input {
+  text-align: center;
+}
+.portfolio[data-align='center'] :is(.pf-field-label,.pf-label) {
+  text-align: center;
+}
+.portfolio[data-align='center'] .pf-inline-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  width: min(100%, 40rem);
+  max-width: 100%;
+  margin-inline: auto;
+  gap: .65rem 1.15rem;
+}
+.portfolio[data-align='center'] .pf-mini-field {
+  width: min(100%, 15rem);
+  max-width: 100%;
+  text-align: center;
+  flex: 0 1 15rem;
+}
+.portfolio[data-align='center'] .pf-mini-field .field-input {
+  text-align: center;
+}
+.portfolio[data-align='center'] .pf-public-meta {
+  justify-content: center;
+  text-align: center;
+  margin-inline: auto;
+}
+.portfolio[data-align='center'] .pf-hero-photo {
+  width: min(100%, 22rem);
+  max-width: 100%;
+  margin: clamp(2.5rem,5vw,4.2rem) auto 0;
+  justify-self: center;
+}
+.portfolio[data-align='center'] .pf-scroll {
+  left: 50%;
+  right: auto;
+  translate: -50% 0;
+  justify-content: center;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Skills should not suddenly jump left when changing expressions. */
+.portfolio[data-align='center'] .pf-skills {
+  grid-template-columns: minmax(0,1fr);
+  justify-items: center;
+  gap: 1.1rem;
+  text-align: center;
+}
+.portfolio[data-align='center'] .pf-skills-heading {
+  padding: 0;
+  text-align: center;
+}
+.portfolio[data-align='center'] .pf-skills-list {
+  justify-content: center;
+}
+.portfolio[data-align='center'] .pf-skill-editor {
+  justify-items: center;
+  text-align: center;
+}
+.portfolio[data-align='center'] .pf-skill-editor > .flex {
+  justify-content: center;
+}
+.portfolio[data-align='center'] .pf-chip-input {
+  text-align: center;
+}
+.portfolio[data-align='center'] .pf-hint {
+  max-width: min(100%, 32rem);
+  text-align: center;
+}
+.portfolio[data-align='center'] .pf-github-shell {
+  width: min(100%, 37rem);
+  margin-inline: auto;
+  text-align: left;
+}
+.portfolio[data-align='center'] .pf-reel-preview {
+  width: min(100%, 40rem);
+  justify-items: center;
+}
+.portfolio[data-align='center'] .pf-skill-reel:not(.is-moving) .pf-reel-track,
+.portfolio[data-align='center'] .pf-skill-reel:not(.is-moving) .pf-reel-group {
+  justify-content: center;
+}
+.portfolio[data-align='center'] .pf-skill-reel.is-moving {
+  width: min(100%, 45rem);
+}
+
+/* Center section headings and actual section content, not just the hero. */
+.portfolio[data-align='center'] .pf-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .9rem;
+  text-align: center;
+}
+.portfolio[data-align='center'] .pf-section-title {
+  min-width: 0;
+  max-width: 100%;
+  text-align: center;
+}
+.portfolio[data-align='center'] .pf-section-head .field-input {
+  text-align: center;
+}
+.portfolio[data-align='center'] .pf-section-rule {
+  display: none;
+}
+.portfolio[data-align='center'] .pf-about-wrap {
+  grid-template-columns: minmax(0,1fr);
+  justify-items: center;
+  align-items: center;
+  gap: clamp(1.8rem, 4vw, 3.5rem);
+}
+.portfolio[data-align='center'] :is(.pf-about,.pf-extra-body,.pf-cta,.pf-work-desc) {
+  margin-inline: auto;
+  text-align: center;
+}
+.portfolio[data-align='center'] .pf-about-image {
+  justify-self: center;
+  margin-inline: auto;
+  max-width: min(100%, 34rem);
+}
+.portfolio[data-align='center'] .pf-work-body {
+  justify-items: center;
+  text-align: center;
+}
+.portfolio[data-align='center'] .pf-work-title {
+  max-width: 100%;
+  text-align: center;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+.portfolio[data-align='center'] .pf-work-title .field-input,
+.portfolio[data-align='center'] .pf-work-desc .field-input {
+  text-align: center;
+}
+.portfolio[data-align='center'] .pf-work-image.img-frame {
+  margin-inline: auto;
+}
+.portfolio[data-align='center'] .pf-work-foot {
+  width: 100%;
+  justify-content: center;
+}
+.portfolio[data-align='center'] .pf-work-foot .field-input {
+  text-align: center;
+}
+.portfolio[data-align='center'] .pf-work-year {
+  text-align: center;
+}
+.portfolio[data-align='center'] .pf-add-inline,
+.portfolio[data-align='center'] .pf-add-section {
+  text-align: center;
+}
+.portfolio[data-align='center'] .pf-add {
+  margin-inline: auto;
+}
+.portfolio[data-align='center'] .pf-timeline .pf-row {
+  grid-template-columns: minmax(0,1fr);
+  justify-items: center;
+  text-align: center;
+  gap: .6rem;
+}
+.portfolio[data-align='center'] .pf-row .field-input,
+.portfolio[data-align='center'] .pf-row-period {
+  text-align: center;
+}
+.portfolio[data-align='center'] .pf-socials {
+  width: min(100%, 36rem);
+  margin-inline: auto;
+}
+.portfolio[data-align='center'] .pf-social,
+.portfolio[data-align='center'] .pf-social-edit {
+  justify-content: center;
+  gap: 1rem;
+}
+.portfolio[data-align='center'] .pf-email-edit {
+  width: min(100%, 36rem);
+  margin-inline: auto;
+}
+.portfolio[data-align='center'] .pf-email-edit .field-input {
+  text-align: center;
+}
+.portfolio[data-align='center'] .pf-email {
+  margin-inline: auto;
+}
+.portfolio[data-align='center'] .pf-cta .field-input {
+  text-align: center;
+}
+.portfolio[data-align='center'] .pf-block-appearance {
+  margin-inline: auto;
+}
+.portfolio[data-align='center'] .pf-footer {
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: .6rem 2rem;
+  text-align: center;
+}
+
+/* Narrow screens need balanced typography and no form width overflow. */
+@media (max-width: 700px) {
+  .portfolio .pf-name[data-name-fit='balanced'] {
+    font-size: clamp(2.05rem, 10vw, 4.8rem);
+  }
+  .portfolio .pf-name[data-name-fit='compact'] {
+    font-size: clamp(1.85rem, 7.5vw, 3.45rem);
+  }
+  .portfolio .pf-hero-row {
+    min-width: 0;
+  }
+  .portfolio[data-align='center'] .pf-hero-row {
+    width: 100%;
+    gap: 1.3rem;
+  }
+  .portfolio[data-align='center'] .pf-inline-meta {
+    width: 100%;
+  }
+  .portfolio[data-align='center'] .pf-mini-field {
+    flex: 1 1 8rem;
+    min-width: 0;
+  }
+  .portfolio[data-align='center'] .pf-mini-field .field {
+    min-width: 0;
+  }
+  .portfolio[data-align='center'] .pf-scroll {
+    max-width: 100%;
+  }
+  .portfolio[data-align='center'] .pf-timeline .pf-row {
+    gap: .85rem;
+  }
+}
+@media (max-width: 350px) {
+  .portfolio[data-align='center'] .pf-inline-meta {
+    flex-direction: column;
+    align-items: stretch;
+    gap: .6rem;
+  }
+  .portfolio[data-align='center'] .pf-meta-dot {
+    display: none;
+  }
+  .portfolio[data-align='center'] .pf-mini-field {
+    flex: none;
+    width: 100%;
+  }
+}
