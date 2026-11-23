@@ -102,7 +102,9 @@ export function Elements({ data, onChange }: {
       title="Add a section" onClick={() => {
         const next = !open
         setOpen(next)
-        if (next) window.setTimeout(() => searchRef.current?.focus(), 50)
+        // Opening the shelf should not summon the on-screen keyboard on phones.
+        if (next && window.matchMedia('(min-width: 641px)').matches)
+          window.setTimeout(() => searchRef.current?.focus(), 50)
       }}>
       <Plus className="size-5" aria-hidden="true"/>
       <span className="el-trigger-text">Add</span>
