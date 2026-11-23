@@ -68,6 +68,13 @@ export function Portfolio({ data, editing, onChange }: Props) {
   const showContact = shown('contact') && (editing || hasContact)
 
   const firstSection = showAbout ? 'about' : showWork ? 'work' : showExperience ? 'experience' : showEducation ? 'education' : showContact ? 'contact' : 'top'
+  // Long names need proportionate type regardless of which expression is active.
+  // The same fit class is used for the editable field and the published title.
+  const nameWords = data.name.trim().split(/\s+/)
+  const longestNameWord = Math.max(0, ...nameWords.map(word => word.length))
+  const nameFit = data.name.length > 42 || longestNameWord > 20
+    ? 'compact' : data.name.length > 28 || longestNameWord > 14
+      ? 'balanced' : 'regular'
 
   // Old shared links may still carry #top and friends; tidy them away
   useEffect(() => {
@@ -89,7 +96,7 @@ export function Portfolio({ data, editing, onChange }: Props) {
       <section id="top" className={cn('pf-hero slot-host', data.photo && 'has-photo')}>
         <div className="pf-hero-main">
 
-        <h1 className="pf-name">
+        <h1 className="pf-name" data-name-fit={nameFit}>
           {editing ? (
             <Field
               value={data.name}

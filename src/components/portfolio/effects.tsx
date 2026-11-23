@@ -44,29 +44,11 @@ export function Reveal({
   )
 }
 
-/** Splits text into letters that drift in one by one. */
+/** Readable immediately on a view switch, with a single quiet title entrance.
+ * The old per-character stagger made Preview look empty for multiple seconds.
+ */
 export function SplitText({ text, className }: { text: string; className?: string }) {
-  return (
-    <span className={cn('split-text', className)} aria-label={text}>
-      {text.split(' ').map((word, w, words) => (
-        <span key={w} className="inline-block whitespace-nowrap" aria-hidden>
-          {word.split('').map((char, i) => {
-            const index = words.slice(0, w).join(' ').length + i
-            return (
-              <span
-                key={i}
-                className="split-char"
-                style={{ animationDelay: `${index * 55}ms` }}
-              >
-                {char}
-              </span>
-            )
-          })}
-          {w < words.length - 1 && <span>&nbsp;</span>}
-        </span>
-      ))}
-    </span>
-  )
+  return <span className={cn('split-text', className)}>{text}</span>
 }
 
 /** An open brush circle. `pathLength` lets CSS draw it with dash offsets. */

@@ -25,12 +25,77 @@ export function Field({
 }) {
   const ref = useRef<HTMLTextAreaElement>(null)
 
-  useLayoutEffect(() => {
+  const fitHeight = () => {
     const el = ref.current
     if (!el) return
-    el.style.height = '0px'
-    el.style.height = `${el.scrollHeight}px`
-  }, [value])
+    // Modern engines use their content to size an editable textarea.
+    // Safari 26.1 and earlier still require the measured-height fallback.
+    if (typeof CSS !== 'undefined' && CSS.supports('field-sizing', 'content')) {
+      el.style.removeProperty('height')
+      return
+    }
+    el.style.height = 'auto'
+    const fontSize = Number.parseFloat(getComputedStyle(el).fontSize) || 16
+    const breathingRoom = Math.min(18, Math.max(12, Math.ceil(fontSize * .26)))
+    el.style.height = String(el.scrollHeight + breathingRoom) + 'px'
+  }
+
+  // The exact same field participates in every visual expression.
+  // Updating a theme can change font metrics without changing the text.
+  useLayoutEffect(() => {
+    fitHeight()
+    // A selected expression can change its font metrics after the initial
+    // React commit; double-check the final painted typography.
+    const frame = requestAnimationFrame(fitHeight)
+    return () => cancelAnimationFrame(frame)
+  })
+
+  useLayoutEffect(() => {
+    const el = ref.current
+    const wrapper = el?.parentElement
+    if (!el || !wrapper) return
+
+    let active = true
+    let observedWidth = -1
+    const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver((entries) => {
+      const width = entries[0]?.contentRect.width ?? -1
+      if (width >= 0 && Math.abs(width - observedWidth) > 0.5) {
+        observedWidth = width
+        fitHeight()
+      }
+    })
+    observer?.observe(wrapper)
+    window.addEventListener('resize', fitHeight, { passive: true })
+
+    // The page can switch font and text scale without editing the value or
+    // changing the wrapper width. Observe the actual style inputs rather than
+    // hoping a textarea resize event will fire.
+    const app = el.closest('.app')
+    const portfolio = el.closest('.portfolio')
+    const appearanceObserver = typeof MutationObserver === 'undefined'
+      ? null : new MutationObserver(fitHeight)
+    if (app) appearanceObserver?.observe(app, {
+      attributes: true, attributeFilter: ['data-look', 'style'],
+    })
+    if (portfolio) appearanceObserver?.observe(portfolio, {
+      attributes: true, attributeFilter: ['data-font', 'data-scale', 'data-align'],
+    })
+
+    // Web fonts may finish loading after initial hydration.
+    if (document.fonts) {
+      void document.fonts.ready.then(() => {
+        if (active) fitHeight()
+      })
+      document.fonts.addEventListener('loadingdone', fitHeight)
+    }
+    return () => {
+      active = false
+      observer?.disconnect()
+      appearanceObserver?.disconnect()
+      document.fonts?.removeEventListener('loadingdone', fitHeight)
+      window.removeEventListener('resize', fitHeight)
+    }
+  }, [])
 
   return (
     <span className={cn('field', !value && 'is-empty')}>
