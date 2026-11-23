@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { ChevronDown, Download, RotateCcw, SlidersHorizontal, Upload } from 'lucide-react'
+import { ChevronDown, CircleHelp, Download, FileText, RotateCcw, SlidersHorizontal, Upload } from 'lucide-react'
 import { toast } from 'sonner'
 
 import {
@@ -34,12 +34,18 @@ export function Customize({
   onImport,
   customSlug,
   onSlugChange,
+  onPreviewCv,
+  onHelp,
+  onResetDraft,
 }: {
   data: Portfolio
   onChange: (fn: (d: Portfolio) => Portfolio) => void
   onImport: (draft: Portfolio) => boolean
   customSlug: string
   onSlugChange: (slug: string) => void
+  onPreviewCv?: () => void
+  onHelp?: () => void
+  onResetDraft?: () => void
 }) {
   const [open, setOpen] = useState(false)
   const root = useRef<HTMLDivElement>(null)
@@ -268,6 +274,15 @@ export function Customize({
                 <Upload className="size-3.5" /> Import backup
               </button>
             </div>
+            {onPreviewCv && <button type="button" className="cz-utility" onClick={() => { setOpen(false); onPreviewCv() }}>
+              <FileText className="size-3.5" /> Preview CV
+            </button>}
+            {onHelp && <button type="button" className="cz-utility" onClick={() => { setOpen(false); onHelp() }}>
+              <CircleHelp className="size-3.5" /> How it works
+            </button>}
+            {onResetDraft && <button type="button" className="cz-utility" onClick={() => { setOpen(false); onResetDraft() }}>
+              <RotateCcw className="size-3.5" /> Start over
+            </button>}
             <input
               ref={fileInput}
               type="file"

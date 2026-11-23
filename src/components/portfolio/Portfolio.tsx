@@ -17,6 +17,7 @@ import {
 import { cn } from '@/lib/utils'
 import { Field } from './Field'
 import { ImageSlot } from './ImageSlot'
+import { GithubLanguages, SkillRail } from './SkillRail'
 import { Reveal, SplitText } from './effects'
 
 type Props = {
@@ -57,13 +58,6 @@ export function Portfolio({ data, editing, onChange }: Props) {
   const shown = (key: PortfolioData['hidden'][number]) => !data.hidden.includes(key)
   const setLabel = (key: keyof Labels, value: string) => set('labels', { ...data.labels, [key]: value })
   const labels = data.labels
-  const initials =
-    data.name
-      .split(/\s+/)
-      .filter(Boolean)
-      .slice(0, 2)
-      .map((w) => w[0]?.toUpperCase())
-      .join('') || '○'
   const emailHref = mailtoHref(data.email)
   const hasContact = Boolean(emailHref) || socials.length > 0
 
@@ -98,9 +92,6 @@ export function Portfolio({ data, editing, onChange }: Props) {
       style={{ '--accent-c': data.accent } as CSSProperties}
     >
       <header className="pf-nav">
-        <ScrollLink to="top" className="pf-mono-badge" aria-label="Back to top">
-          <span>{initials}</span>
-        </ScrollLink>
         <nav className="pf-main-nav" aria-label="Portfolio sections">
           {nav.map((n) => (
             <ScrollLink key={n.id} to={n.id} className="pf-nav-link">
@@ -109,14 +100,14 @@ export function Portfolio({ data, editing, onChange }: Props) {
           ))}
         </nav>
         <div className="pf-meta">
-          <span>{data.location || (editing ? 'Editing your portfolio' : 'Selected work')}</span>
+          <span>{data.location || (editing ? 'Make it yours' : 'Selected work')}</span>
         </div>
       </header>
 
       {/* Hero */}
       <section id="top" className={cn('pf-hero slot-host', data.photo && 'has-photo')}>
         <div className="pf-hero-main">
-        {editing && <p className="pf-editor-eyebrow">01 / Introduction</p>}
+        {editing && <p className="pf-editor-eyebrow">Start with your story</p>}
         {(editing || data.status) && (
           <div className="pf-status">
             {editing ? (
@@ -216,15 +207,11 @@ export function Portfolio({ data, editing, onChange }: Props) {
       {/* Skills */}
       {shown('skills') && (
         editing ? (
-          <SkillEditor skills={data.skills} onChange={(s) => set('skills', s)} />
+          <SkillEditor skills={data.skills} socials={data.socials} onChange={(s) => set('skills', s)} />
         ) : data.skills.length > 0 ? (
-          <section className="pf-skills" aria-label="Skills">
+          <section className="pf-skills" aria-label="Skills and tools">
             <span className="pf-skills-heading">Skills & tools</span>
-            <div className="pf-skills-list">
-              {data.skills.map((skill, index) => (
-                <span key={`${skill}-${index}`}>{skill}</span>
-              ))}
-            </div>
+            <SkillRail skills={data.skills} />
           </section>
         ) : null
       )}
@@ -734,9 +721,11 @@ function Section({
 
 function SkillEditor({
   skills,
+  socials,
   onChange,
 }: {
   skills: string[]
+  socials: PortfolioData['socials']
   onChange: (skills: string[]) => void
 }) {
   const [draft, setDraft] = useState('')
@@ -781,7 +770,9 @@ function SkillEditor({
           className="pf-chip-input"
         />
       </div>
-      <p className="pf-hint">Press Enter or separate skills with commas. They appear as a simple list on your published page.</p>
+      <p className="pf-hint">Type a skill and press Enter, or pick one from the suggestions below.</p>
+      {skills.length>0 && <div className="pf-reel-preview"><span>How they look</span><SkillRail skills={skills}/></div>}
+      <GithubLanguages skills={skills} socials={socials} onChange={onChange} />
     </div>
   )
 }
