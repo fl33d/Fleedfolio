@@ -31,7 +31,10 @@ with sync_playwright() as p:
         page.on("pageerror", lambda exc: errors.append(str(exc)))
         page.goto(BASE, wait_until="domcontentloaded", timeout=45000)
         page.locator(".dock").wait_for(state="visible", timeout=30000)
-        page.wait_for_timeout(600)
+        # With SSR+Vite the dock may be visible before the React hydration
+        # handlers have loaded. Wait for network quiescence before clicking.
+        page.wait_for_load_state("networkidle", timeout=30000)
+        page.wait_for_timeout(700)
         assert not page.locator(".pf-mono-badge").count(), "Decorative badge has returned"
         assert page.get_by_role("button", name="Edit portfolio").count() == 1
         assert page.get_by_role("button", name="Preview portfolio").count() == 1
@@ -49,7 +52,12 @@ with sync_playwright() as p:
         if width in (320, 390):
             page.get_by_role("button", name="Add an element").click()
             panel = page.get_by_role("dialog", name="Add to your portfolio")
-            assert panel.is_visible(), "Library does not open"
+            try:
+                panel.wait_for(state="visible", timeout=7500)
+            except Exception:
+                page.screenshot(path=str(OUT / f"shelf-open-failure-{width}.png"))
+                expanded = page.get_by_role("button", name="Add an element").get_attribute("aria-expanded")
+                raise AssertionError(f"Library did not open: aria-expanded={expanded}; errors={errors}")
             bounds = panel.bounding_box()
             assert bounds, "Library is not laid out"
             assert bounds["x"] >= -2 and bounds["x"] + bounds["width"] <= width + 2, f"Library outside viewport: {bounds}"
