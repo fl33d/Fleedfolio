@@ -139,7 +139,10 @@ with sync_playwright() as p:
                 assert page.locator(".app").get_attribute("data-look") == look
                 assert page.get_by_role("textbox", name="Name").input_value() == "Alex Morgan", "Look switch erased content"
                 assert page.evaluate("document.documentElement.scrollWidth") <= width + 2, f"Overflow in {look}"
+                page.get_by_role("button", name="Customise your portfolio").click()
+                page.wait_for_timeout(220)
                 page.screenshot(path=str(OUT / f"look-{look}-1440.png"))
+                page.get_by_role("button", name="Customise your portfolio").click()
             page.get_by_role("button", name="Customise your portfolio").click()
             print("PASS eight looks, retained content, and horizontal overflow checks")
 
