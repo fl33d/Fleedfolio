@@ -118,7 +118,7 @@ export function Elements({ data, onChange }: {
 
     {open && <div role="dialog" aria-label="Add to your portfolio" className="el-panel">
       <div className="el-panel-header">
-        <div><small>YOUR ELEMENTS</small><h2>Make it yours.</h2></div>
+        <div><small>Elements</small><h2>Make it yours.</h2></div>
         <button type="button" className="el-close" aria-label="Close element library"
           onClick={() => { setOpen(false); triggerRef.current?.focus() }}><X className="size-4"/></button>
       </div>
