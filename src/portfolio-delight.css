@@ -312,3 +312,13 @@
     transition:none!important;animation:none!important;transform:none!important;
   }
 }
+
+/* Quiet, readable inline block order controls. */
+.app .pf-block-separator{width:1px;align-self:stretch;margin:5px 2px;background:color-mix(in oklab,var(--ink) 15%,transparent)}
+.app .pf-block-appearance .pf-block-order{display:grid;place-items:center;width:35px;padding:0}
+.app .pf-block-appearance .pf-block-order:disabled{opacity:.25;cursor:not-allowed}
+@media(max-width:700px){
+  .app .pf-block-appearance{flex-wrap:wrap;max-width:100%;gap:2px}
+  .app .pf-block-appearance button{min-height:40px}
+  .app .pf-block-appearance .pf-block-order{width:40px}
+}
