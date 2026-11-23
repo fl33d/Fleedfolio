@@ -125,7 +125,7 @@ with sync_playwright() as p:
 
         if width == 1440:
             page.get_by_role("textbox", name="Name").fill("Alex Morgan")
-            page.get_by_role("textbox", name="Role").fill("Creative engineer")
+            page.get_by_placeholder("Designer, developer, artist…").fill("Creative engineer")
             page.get_by_role("textbox", name="Tagline").fill("Making digital things worth feeling.")
             page.get_by_role("button", name="Customise your portfolio").click()
             looks = {
