@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
-import { ChevronDown, CircleHelp, Download, FileText, RotateCcw, SlidersHorizontal, Upload } from 'lucide-react'
+import { ChevronDown, CircleHelp, Download, FileText, RotateCcw, SlidersHorizontal, Upload, X } from 'lucide-react'
 import { toast } from 'sonner'
 
 import {
@@ -65,6 +65,7 @@ export function Customize({
   onResetDraft?: () => void
 }) {
   const [open, setOpen] = useState(false)
+  const [depth, setDepth] = useState<'feel' | 'details'>('feel')
   const root = useRef<HTMLDivElement>(null)
   const trigger = useRef<HTMLButtonElement>(null)
   const panel = useRef<HTMLDivElement>(null)
@@ -210,7 +211,25 @@ export function Customize({
             maxHeight: placement.maxHeight,
           }}
         >
-          <div className="cz-panel-intro"><span>Make it yours.</span><p>Start with a feeling. Change anything later.</p></div>
+          <div className="cz-panel-heading">
+            <div className="cz-panel-intro"><span>Make it yours.</span><p>Start with a feeling. Go further whenever you like.</p></div>
+            <button type="button" className="cz-sheet-close" aria-label="Close Customise"
+              onClick={() => { setOpen(false); trigger.current?.focus() }}>
+              <X size={18} aria-hidden="true"/>
+            </button>
+          </div>
+          <div className="cz-depth-tabs" role="tablist" aria-label="Customisation">
+            <button type="button" role="tab" id="fleed-feel-tab" aria-controls="fleed-feel-panel"
+              aria-selected={depth==='feel'} onClick={() => { setDepth('feel'); panel.current?.scrollTo({top:0}) }}>
+              Feel
+            </button>
+            <button type="button" role="tab" id="fleed-details-tab" aria-controls="fleed-details-panel"
+              aria-selected={depth==='details'} onClick={() => { setDepth('details'); panel.current?.scrollTo({top:0}) }}>
+              Fine tune
+            </button>
+          </div>
+          <div className="cz-sheet-page" id="fleed-feel-panel" role="tabpanel"
+            aria-labelledby="fleed-feel-tab" hidden={depth!=='feel'}>
           <Group title="Expression">
             <div className="cz-looks">
               {(Object.keys(LOOKS) as LookKey[]).map((key) => {
@@ -293,6 +312,9 @@ export function Customize({
                   onClick={()=>setTheme('texture',key)}>{TEXTURES[key]}</button>)}
             </div>
           </Group>
+          </div>
+          <div className="cz-sheet-page" id="fleed-details-panel" role="tabpanel"
+            aria-labelledby="fleed-details-tab" hidden={depth!=='details'}>
           <Group title="Show your work">
             <div className="cz-layout-picks" role="group" aria-label="Project layout">
               {([
@@ -484,6 +506,7 @@ export function Customize({
           </button>
             </div>
           </details>
+          </div>
         </div>, overlayHost
       )}
     </div>
