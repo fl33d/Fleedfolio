@@ -49,7 +49,7 @@ export function SplitText({ text, className }: { text: string; className?: strin
   return (
     <span className={cn('split-text', className)} aria-label={text}>
       {text.split(' ').map((word, w, words) => (
-        <span key={w} className="inline-block whitespace-nowrap" aria-hidden>
+        <span key={w} className={word.length > 14 ? 'inline' : 'inline-block whitespace-nowrap'} aria-hidden>
           {word.split('').map((char, i) => {
             const index = words.slice(0, w).join(' ').length + i
             return (
