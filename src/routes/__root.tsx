@@ -4,10 +4,12 @@ import { Toaster } from '@/components/ui/sonner'
 import { TooltipProvider } from '@/components/ui/tooltip'
 
 import '../styles.css'
+import '../portfolio-refinement.css'
+import '../portfolio-expression.css'
 
-const siteName = 'fleed — a quiet portfolio you write yourself'
+const siteName = 'fleed — make a portfolio that feels like you'
 const siteDescription =
-  'Start from a blank page and type your portfolio straight into it. Calm, minimal and published in one click.'
+  'Make a portfolio directly on the page. From beautifully minimal to expressive and experimental, without learning an editor first.'
 
 export const Route = createRootRoute({
   head: () => ({
