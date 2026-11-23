@@ -91,6 +91,7 @@ with sync_playwright() as p:
                 lambda route: route.fulfill(
                     status=200,content_type="application/json",body=json.dumps(repos)
                 ))
+            page.get_by_role("button", name="Import languages or browse suggestions").click()
             page.get_by_role("textbox", name="GitHub username").fill("demoauthor")
             page.get_by_role("button", name="Find languages").click()
             add_import = page.get_by_role("button", name="Add 3 new languages")
