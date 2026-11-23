@@ -1,0 +1,205 @@
+/* Fleed / original-first refinement — November 2026.
+   The homepage stays the portfolio editor. Glass belongs on the tool surface,
+   not over the work. Studio is an optional deeper layer, not an entry gate. */
+
+.mode-edit .pf-nav {
+  border-bottom: 1px solid color-mix(in oklab,var(--ink) 8%,transparent);
+  padding-block: 1.35rem;
+}
+.mode-edit .pf-nav::before {
+  background: color-mix(in oklab,var(--paper) 88%,transparent);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+.mode-edit .pf-nav-link,
+.mode-edit .pf-meta,
+.mode-edit .pf-editor-eyebrow,
+.mode-edit .pf-field-label,
+.mode-edit .pf-section-head,
+.mode-edit .pf-section-num,
+.mode-edit .pf-row-period,
+.mode-edit .pf-work-index,
+.mode-edit .pf-work-year,
+.mode-edit .pf-add,
+.mode-edit .pf-social-edit,
+.mode-edit .pf-footer,
+.mode-edit .pf-skills-heading,
+.mode-edit .pf-hint {
+  font-family: var(--font-sans);
+  text-transform: none;
+  letter-spacing: -.008em;
+}
+.mode-edit .pf-nav-link,.mode-edit .pf-meta {
+  font-size: .85rem;
+  font-weight: 500;
+  letter-spacing: -.015em;
+}
+.mode-edit .pf-editor-eyebrow {
+  font-size: .88rem;
+  font-weight: 500;
+  color: var(--dim);
+  margin-bottom: 1.2rem;
+}
+.mode-edit .pf-field-label {
+  font-size: .81rem;
+  font-weight: 500;
+  margin-bottom: .6rem;
+  color: color-mix(in oklab,var(--ink) 65%,transparent);
+}
+.mode-edit .pf-section-head {
+  font-size: .91rem;
+  letter-spacing: -.025em;
+  font-weight: 500;
+  gap: 1rem;
+}
+.mode-edit .pf-section-num { font-size: .78rem; font-variant-numeric:tabular-nums; }
+.mode-edit .pf-skills-heading { font-size: .82rem; font-weight: 500; }
+.mode-edit .pf-work-index,.mode-edit .pf-work-year,.mode-edit .pf-row-period { font-size: .85rem; }
+.mode-edit .pf-footer { font-size: .85rem; letter-spacing: 0; color:var(--dim); }
+.mode-edit .pf-add { font-size: .91rem; letter-spacing: 0; }
+.mode-edit .pf-hero { padding-block: clamp(3.2rem,6vw,5rem); }
+.mode-edit .pf-hero-row { margin-top: clamp(1.5rem,4vw,2.5rem); }
+.mode-edit .pf-section { padding-top: clamp(3.5rem,6vw,5.5rem); }
+.mode-edit .pf-socials { margin-top: 2.25rem; }
+.mode-edit .pf-footer { margin-top: clamp(4rem,8vw,6rem); }
+.mode-edit .portfolio { padding-bottom: clamp(10rem,16vh,13rem); }
+.mode-edit .pf-hero-photo .img-empty { border-radius: 12px; }
+
+/* Quiet frosted controls. Craft-like softness, Framer-like directness. */
+.app .dock.chrome {
+  background: color-mix(in oklab,#252523 81%,transparent);
+  backdrop-filter: blur(30px) saturate(1.4);
+  -webkit-backdrop-filter: blur(30px) saturate(1.4);
+  border: 1px solid rgb(255 255 255 / .17);
+  border-radius: 18px;
+  padding: .45rem;
+  gap: .32rem;
+  box-shadow: 0 18px 65px rgb(0 0 0 / .24), inset 0 1px 0 rgb(255 255 255 / .16);
+}
+.app .dock-toggle {
+  border-radius: 12px;
+  background: rgb(255 255 255 / .045);
+}
+.app .dock-toggle-pill {
+  background: rgb(255 255 255 / .13);
+  border-radius: 10px;
+}
+.app .dock-toggle-pill::after { background: var(--accent-c); }
+.app .dock-toggle button { min-height: 40px; font-size: .84rem; font-weight: 500; }
+.app .dock-publish {
+  min-height: 40px;
+  border-radius: 12px;
+  font-weight: 600;
+  background: #f4f3eb;
+  color: #262923;
+}
+.app .dock-publish:hover { background: #dce4c9; color:#263127; }
+.app .dock-icon:hover,.app .cz-trigger:hover { background:rgb(255 255 255 / .1); }
+.app .cz-panel {
+  border-radius: 18px;
+  border-color: rgb(255 255 255 / .16);
+  background: color-mix(in oklab,#252523 89%,transparent);
+  -webkit-backdrop-filter: blur(30px) saturate(1.25);
+  backdrop-filter: blur(30px) saturate(1.25);
+  box-shadow: 0 32px 80px rgb(0 0 0 / .26);
+}
+.app .cz-title {
+  font-family: var(--font-sans);
+  text-transform: none;
+  letter-spacing: -.01em;
+  color: #c1c7bd;
+  font-weight: 500;
+  font-size: .8rem;
+}
+.app .cz-utility { min-height: 40px; font-size: .84rem; }
+
+/* Searchable, low-distraction element library. */
+.el-root { position: relative; }
+.app .el-trigger { width:auto; min-width:40px; height:40px; display:flex;gap:.45rem;align-items:center;justify-content:center;padding:.5rem .65rem;color:#ebece5;font-size:.84rem; }
+.app .el-trigger-text { display:inline; }
+.app .el-panel {
+  position:absolute; bottom:calc(100% + .95rem);left:50%;translate:-50% 0;
+  z-index:86; width:min(355px,calc(100vw - 1.5rem));
+  max-height:min(72dvh,540px); overflow:auto; overscroll-behavior:contain;
+  color:#f3f2ea;border-radius:19px;
+  padding:20px;
+  background:color-mix(in oklab,#252523 88%,transparent);
+  border:1px solid rgb(255 255 255 / .18);
+  box-shadow:0 28px 85px rgb(0 0 0 / .3),inset 0 1px 0 rgb(255 255 255 / .13);
+  -webkit-backdrop-filter:blur(32px) saturate(1.3);backdrop-filter:blur(32px) saturate(1.3);
+}
+.el-panel-header { display:flex; justify-content:space-between;align-items:start;gap:12px; }
+.el-panel-header small { display:block;color:#bbc4b4;font-size:.76rem;letter-spacing:.01em; }
+.el-panel-header h2 { margin:6px 0 18px;font:400 2.1rem/1.04 var(--font-display);letter-spacing:-.035em; }
+.el-close { border:1px solid rgb(255 255 255 / .14);padding:8px;border-radius:9px;color:#f0f1e8; }
+.el-close:hover { background:rgb(255 255 255 / .11); }
+.el-search { display:flex;align-items:center;gap:10px;padding:11px 12px;border:1px solid rgb(255 255 255 / .15);border-radius:11px;color:#bac7b9;background:rgb(255 255 255 / .085); }
+.el-search input { min-width:0;flex:1;background:transparent;border:0;color:#f2f1e9;font:400 15px var(--font-sans);outline:none; }
+.el-search input::placeholder { color:#c0c5bb; }
+.el-search:focus-within { outline:2px solid #b9ccae;outline-offset:2px; }
+.el-options { margin-top:14px;display:grid; gap:4px; }
+.el-options>button { display:grid;grid-template-columns:30px 1fr 20px;gap:10px;align-items:center;width:100%;padding:11px 9px;text-align:left;border-radius:10px;transition:background .18s; }
+.el-options>button:hover,.el-options>button:focus-visible { background:rgb(255 255 255 / .095); }
+.el-options>button:focus-visible,.el-close:focus-visible,.el-trigger:focus-visible { outline:2px solid #d8ebc4;outline-offset:2px; }
+.el-options>button:disabled { opacity:.35;cursor:not-allowed; }
+.el-option-icon { width:30px;height:30px;display:grid;place-items:center;border-radius:8px;background:rgb(255 255 255 / .11);font:500 12px var(--font-sans);color:#d2ddc9; }
+.el-options strong { display:block;font:600 14px/1.3 var(--font-sans);color:#f7f6f1; }
+.el-options small { display:block;margin-top:4px;font:400 12px/1.4 var(--font-sans);color:#bdc4b9; }
+.el-options svg { color:#c7d9bd; }
+.el-empty { color:#c0c8b8;font-size:.9rem;padding:12px; }
+.el-footnote { color:#aab5a8;font-size:.78rem;line-height:1.55;margin:15px 2px 0; }
+
+/* Compact touch-first toolbar; full controls remain accessible in Customise. */
+@media (max-width: 640px) {
+  .mode-edit .pf-nav { display:none; }
+  .mode-edit .pf-hero { padding-top: 2.25rem; padding-bottom:3.15rem; }
+  .mode-edit .pf-section { padding-top: 3.25rem; }
+  .mode-edit .pf-section-head { margin-bottom:1.25rem; }
+  .mode-edit .pf-status { min-width:0; }
+  .mode-edit .pf-name { overflow-wrap:anywhere; }
+  .mode-edit .pf-socials { margin-top:1.5rem; }
+  .mode-edit .pf-footer { margin-top: 4rem; gap:10px; flex-wrap:wrap; align-items:center; }
+  .mode-edit .portfolio { padding-inline: clamp(18px,5vw,26px); padding-bottom: calc(12rem + env(safe-area-inset-bottom)); }
+  .app .dock.chrome {
+    bottom:calc(.7rem + env(safe-area-inset-bottom));
+    width:max-content;max-width:calc(100vw - .85rem);
+    padding:5px; gap:4px;border-radius:17px;
+  }
+  .app .dock-toggle { gap:0;border-radius:11px; }
+  .app .dock-toggle button { padding:0!important;width:42px;min-width:42px;min-height:44px; }
+  .app .dock .dock-action-label,
+  .app .dock .cz-trigger-label,.app .dock .cz-chevron,.app .dock .cz-trigger-dot,
+  .app .dock .el-trigger-text { display:none!important; }
+  .app .dock .dock-icon,.app .dock .cz-trigger,.app .dock .dock-publish {
+    display:grid;place-items:center;min-width:44px;width:44px;height:44px;padding:0;border-radius:12px;
+  }
+  .app .dock .dock-cv,.app .dock .dock-help,.app .dock .dock-reset,
+  .app .dock .dock-sep { display:none!important; }
+  .app .dock .dock-publish { background:#f1f3e8; }
+  .app .dock svg { width:19px;height:19px;flex:none; }
+  .app .el-panel {
+    position:fixed;left:50%;translate:-50% 0;
+    bottom:calc(5.3rem + env(safe-area-inset-bottom));
+    width:calc(100vw - 1.5rem);
+    max-height: min(70dvh,580px);
+    padding:18px;
+  }
+  .app .cz-panel {
+    position:fixed;left:50%;
+    bottom:calc(5.3rem + env(safe-area-inset-bottom));
+    width:calc(100vw - 1.5rem);
+    max-height:min(70dvh,580px);
+  }
+}
+@media (max-width: 360px) {
+  .app .dock.chrome { gap:3px; }
+  .app .dock-toggle button { width:40px;min-width:40px; }
+  .app .dock .dock-icon,.app .dock .cz-trigger,.app .dock .dock-publish { width:41px;min-width:41px; }
+}
+@supports not (backdrop-filter:blur(2px)) {
+  .app .dock.chrome,.app .cz-panel,.app .el-panel { background:#252523; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .app .dock.chrome,.app .el-panel { animation:none!important; }
+  .el-options>button { transition:none; }
+}
