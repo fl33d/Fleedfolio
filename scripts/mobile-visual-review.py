@@ -192,6 +192,7 @@ with sync_playwright() as p:
             # Independently compose project display, whitespace and corner language.
             project = page.get_by_placeholder("Project title").first
             project.fill("A project with presence")
+            page.get_by_role("tab", name="Fine tune").click()
             page.get_by_role("button", name="Gallery", exact=True).click()
             assert page.locator(".app").get_attribute("data-work-layout") == "grid"
             assert page.locator(".pf-works").evaluate("(el)=>getComputedStyle(el).display") == "grid"
@@ -217,11 +218,13 @@ with sync_playwright() as p:
         page.locator(".pf-role textarea").fill("Creative engineer and storyteller")
         page.locator(".pf-tagline textarea").fill("Thoughtful design that feels like something.")
         page.get_by_role("button", name="Customise your portfolio").click()
+        page.get_by_role("tab", name="Fine tune").click()
         advanced = page.locator(".cz-advanced")
         if not advanced.get_attribute("open"):
             advanced.locator("summary").click()
         page.get_by_role("button", name="Centre", exact=True).click()
         assert page.locator(".portfolio").get_attribute("data-align") == "center"
+        page.get_by_role("tab", name="Feel").click()
 
         for look,label in [
             ("classic","Original"),("editorial","Editorial"),
