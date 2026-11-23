@@ -31,7 +31,12 @@ export function Field({
     // Reset before measuring, otherwise switching to a smaller typeface leaves
     // oversized whitespace. This runs for visual expression changes as well.
     el.style.height = '0px'
-    el.style.height = `${el.scrollHeight}px`
+    // Textareas under some Safari/Chromium font metrics report scrollHeight
+    // a few pixels short of the final painted glyphs, especially on a
+    // typography switch. Reserve a small cap rather than clipping descenders.
+    const fontSize = Number.parseFloat(getComputedStyle(el).fontSize) || 16
+    const breathingRoom = Math.min(10, Math.max(6, Math.ceil(fontSize * .22)))
+    el.style.height = `${el.scrollHeight + breathingRoom}px`
   }
 
   // The exact same field participates in every visual expression.
