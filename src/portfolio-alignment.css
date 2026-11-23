@@ -305,6 +305,31 @@
   text-align: center;
 }
 
+/* Preview must show a real name immediately. Delayed character-by-character
+ * reveals made the first impression look like a blank, broken portfolio. */
+.app .mode-swap {
+  animation: fleed-canvas-settle .3s cubic-bezier(.2,.8,.2,1) both;
+}
+@keyframes fleed-canvas-settle {
+  from { opacity: .9; transform: translateY(2px); }
+  to { opacity: 1; transform: none; }
+}
+.app.mode-view .pf-hero .reveal {
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+.app.mode-view .pf-name .split-text {
+  animation: fleed-name-settle .48s cubic-bezier(.2,.8,.2,1) both;
+}
+@keyframes fleed-name-settle {
+  from { opacity: .84; transform: translateY(.035em); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .app .mode-swap,.app.mode-view .pf-name .split-text {animation:none!important}
+}
+
 /* Narrow screens need balanced typography and no form width overflow. */
 @media (max-width: 700px) {
   .portfolio .pf-name[data-name-fit='balanced'] {
