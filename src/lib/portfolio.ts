@@ -33,6 +33,7 @@ export type SocialLink = {
 /** A section the writer adds themselves: a heading, some prose and an optional image. */
 export type CustomSection = {
   id: string
+  variant: 'essay' | 'statement' | 'feature'
   title: string
   body: string
   image: string
@@ -87,6 +88,9 @@ export type Theme = {
   texture: TextureKey
   background: string
   foreground: string
+  workLayout: 'list' | 'grid' | 'spotlight'
+  spacing: 'compact' | 'balanced' | 'airy'
+  corners: 'soft' | 'sharp' | 'round'
 }
 
 export type SectionKey = 'skills' | 'about' | 'work' | 'experience' | 'education' | 'contact'
@@ -123,6 +127,9 @@ export const DEFAULT_THEME: Theme = {
   texture: 'none',
   background: '',
   foreground: '',
+  workLayout: 'list',
+  spacing: 'balanced',
+  corners: 'soft',
 }
 
 export type Portfolio = {
@@ -196,8 +203,9 @@ export const emptyProject = (): Project => ({
   image: '',
 })
 
-export const emptyCustomSection = (): CustomSection => ({
+export const emptyCustomSection = (variant: CustomSection['variant'] = 'essay'): CustomSection => ({
   id: uid(),
+  variant,
   title: '',
   body: '',
   image: '',
@@ -327,6 +335,7 @@ export function normalizePortfolio(input: any): Portfolio {
     })),
     extras: list(p.extras, 12, (x) => ({
       id: str(x?.id, 20) || uid(),
+      variant: pick(x?.variant, ['essay', 'statement', 'feature'], 'essay'),
       title: str(x?.title, 120),
       body: str(x?.body, 3000),
       image: safeImage(x?.image),
@@ -344,6 +353,9 @@ export function normalizePortfolio(input: any): Portfolio {
       texture: pick(t.texture, Object.keys(TEXTURES) as TextureKey[], DEFAULT_THEME.texture),
       background: customColour(t.background),
       foreground: customColour(t.foreground),
+      workLayout: pick(t.workLayout, ['list','grid','spotlight'], DEFAULT_THEME.workLayout),
+      spacing: pick(t.spacing, ['compact','balanced','airy'], DEFAULT_THEME.spacing),
+      corners: pick(t.corners, ['soft','sharp','round'], DEFAULT_THEME.corners),
     },
     labels: {
       about: label(l.about, 60, DEFAULT_LABELS.about),
@@ -368,6 +380,9 @@ export function themeProps(p: Portfolio) {
     'data-motion': p.theme.motion ? 'on' : 'still',
     'data-look': p.theme.look || 'classic',
     'data-texture': p.theme.texture || 'none',
+    'data-work-layout': p.theme.workLayout || 'list',
+    'data-spacing': p.theme.spacing || 'balanced',
+    'data-corners': p.theme.corners || 'soft',
     style: {
       '--accent-c': p.accent,
       '--paper': p.theme.background || palette.paper,
