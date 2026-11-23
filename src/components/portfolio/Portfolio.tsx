@@ -70,7 +70,7 @@ export function Portfolio({ data, editing, onChange }: Props) {
   const firstSection = showAbout ? 'about' : showWork ? 'work' : showExperience ? 'experience' : showEducation ? 'education' : showContact ? 'contact' : 'top'
   // Long names need proportionate type regardless of which expression is active.
   // The same fit class is used for the editable field and the published title.
-  const nameWords = data.name.trim().split(/\\s+/)
+  const nameWords = data.name.trim().split(/\s+/)
   const longestNameWord = Math.max(0, ...nameWords.map(word => word.length))
   const nameFit = data.name.length > 42 || longestNameWord > 20
     ? 'compact' : data.name.length > 28 || longestNameWord > 14
