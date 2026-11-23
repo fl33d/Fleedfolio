@@ -60,8 +60,8 @@ export function Elements({ data, onChange }: {
 
   const add = (kind: ItemKind) => {
     const item = LIBRARY.find(entry => entry.kind === kind)
-    const addition = kind === 'text' ? emptyCustomSection()
-      : kind === 'project' ? emptyProject() : undefined
+    const textAddition = kind === 'text' ? emptyCustomSection() : undefined
+    const projectAddition = kind === 'project' ? emptyProject() : undefined
 
     onChange(current => {
       const hidden = current.hidden.filter(section =>
@@ -70,10 +70,10 @@ export function Elements({ data, onChange }: {
         !(section === kind)
       )
 
-      if (kind === 'text' && addition && current.extras.length < 12)
-        return { ...current, hidden, extras: [...current.extras, addition as Portfolio['extras'][number]] }
-      if (kind === 'project' && addition && current.projects.length < 24)
-        return { ...current, hidden, projects: [...current.projects, addition as Portfolio['projects'][number]] }
+      if (kind === 'text' && textAddition && current.extras.length < 12)
+        return { ...current, hidden, extras: [...current.extras, textAddition] }
+      if (kind === 'project' && projectAddition && current.projects.length < 24)
+        return { ...current, hidden, projects: [...current.projects, projectAddition] }
       if (kind === 'experience' && current.experience.length < 24)
         return { ...current, hidden, experience: [...current.experience, emptyExperience()] }
       if (kind === 'education' && current.education.length < 24)
@@ -85,7 +85,7 @@ export function Elements({ data, onChange }: {
 
     setOpen(false)
     setQuery('')
-    const target = kind === 'text' && addition ? 'section-' + addition.id : item?.target
+    const target = textAddition ? 'section-' + textAddition.id : item?.target
     if (target) window.setTimeout(() => {
       document.getElementById(target)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }, 90)
