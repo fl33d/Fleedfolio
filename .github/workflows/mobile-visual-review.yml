@@ -34,6 +34,13 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Set up browser test
         run: python3 -m pip install --break-system-packages --quiet playwright==1.58.0
+      - name: Match preview runtime for local QA only
+        run: |
+          # Miniflare bundled with the pinned vite-plugin supports up to 2026-10-19.
+          # Make this replacement *only in the ephemeral GitHub runner*.
+          # Production wrangler.jsonc in the repository is not changed.
+          sed -i 's/"compatibility_date": "2026-10-21"/"compatibility_date": "2026-10-19"/' wrangler.jsonc
+          grep -q '"compatibility_date": "2026-10-19"' wrangler.jsonc
       - name: Launch local app
         run: |
           pnpm dev --host 127.0.0.1 > /tmp/fleed-dev.log 2>&1 &
