@@ -1,0 +1,146 @@
+/* Fleedfolio / functional chrome — the canvas stays the product.
+   The Customise sheet is a SIBLING of .dock.chrome in #fleed-overlay-root,
+   not a child of any filtered surface. That is essential for real iOS blur. */
+#fleed-overlay-root { position: relative; z-index: 120; }
+.app .cz-panel.fleed-customize-panel {
+  position: fixed;
+  translate: none;
+  transform: none;
+  z-index: 121;
+  min-width: 0;
+  padding: clamp(16px,3.5vw,23px);
+  display: grid;
+  gap: 18px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border-radius: 23px;
+  background: rgba(24, 30, 35, .53);
+  -webkit-backdrop-filter: blur(30px) saturate(1.36);
+  backdrop-filter: blur(30px) saturate(1.36);
+  border: 1px solid rgba(255,255,255,.26);
+  box-shadow: inset 0 1px rgba(255,255,255,.17), 0 28px 78px rgba(0,0,0,.25);
+  font-family: "Helvetica Neue", Helvetica, Arial, system-ui, sans-serif;
+  color: #f4f4ef;
+  --font-sans: "Helvetica Neue", Helvetica, Arial, system-ui, sans-serif;
+  --font-display: "Instrument Serif", Georgia, serif;
+  --font-mono: "SFMono-Regular", Consolas, monospace;
+  --ink: #f4f4ef;
+  --dim: #d5ddd5;
+  --faint: #b8c4ba;
+  --hair: rgba(255,255,255,.16);
+  scrollbar-color: rgba(255,255,255,.28) transparent;
+}
+.app .fleed-customize-panel .cz-title {
+  font: 600 13px/1.3 "Helvetica Neue", Helvetica, Arial, sans-serif;
+  letter-spacing: -.01em;
+  color: #e6ebdf;
+  text-transform: none;
+}
+.app .fleed-customize-panel .cz-panel-intro > span {
+  font: 400 clamp(1.8rem,5vw,2.25rem)/1 "Instrument Serif",Georgia,serif;
+  letter-spacing: -.05em;
+}
+.app .fleed-customize-panel .cz-panel-intro > p {
+  font-size: 13px;
+  color: #d5dcd2;
+  margin-top: 6px;
+}
+.app .fleed-customize-panel .cz-looks {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 9px;
+  padding: 3px 3px 9px;
+  margin: 0 -3px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,.3) transparent;
+}
+.app .fleed-customize-panel .cz-look {
+  flex: 0 0 clamp(91px,27vw,112px);
+  min-width: 0;
+  display: grid;
+  scroll-snap-align: start;
+  gap: 7px;
+  padding: 6px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,.17);
+  background: rgba(255,255,255,.055);
+}
+.app .fleed-customize-panel .cz-look[aria-pressed=true] {
+  border-color: rgba(230,247,216,.94);
+  background: rgba(230,247,216,.10);
+}
+.app .fleed-customize-panel .cz-look-preview { height: 71px; border-radius: 8px; }
+.app .fleed-customize-panel .cz-look-title {
+  font: 600 12px/1.35 "Helvetica Neue",Helvetica,Arial,sans-serif;
+  letter-spacing: -.01em;
+}
+.app .fleed-customize-panel .cz-look-hint {
+  font: 400 12px/1.45 "Helvetica Neue",Helvetica,Arial,sans-serif;
+  color: #c5d2c6;
+  margin-top: 2px;
+}
+.app .fleed-customize-panel .cz-palettes {
+  grid-template-columns: repeat(5,minmax(0,1fr));
+  gap: clamp(5px,1.5vw,9px);
+}
+.app .fleed-customize-panel .cz-palette {
+  min-height: 70px;
+  min-width: 0;
+  gap: 6px;
+  padding: 9px 7px 8px;
+  border-radius: 11px;
+  box-shadow: inset 0 1px rgba(255,255,255,.07);
+}
+.app .fleed-customize-panel .cz-palette-aa { font-size: 22px; }
+.app .fleed-customize-panel .cz-palette-name {
+  font: 600 clamp(10px,2.5vw,12px)/1.2 "Helvetica Neue",Helvetica,Arial,sans-serif;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.app .fleed-customize-panel .cz-group { gap: 9px; min-width: 0; }
+.app .fleed-customize-panel .cz-accents { gap: 9px; }
+.app .fleed-customize-panel .cz-accent { width: 32px; height: 32px; border-radius: 10px; }
+.app .fleed-customize-panel .cz-surface-options { gap: 7px; }
+.app .fleed-customize-panel .cz-surface-options button {
+  min-height: 38px;
+  font: 500 12px "Helvetica Neue",Helvetica,Arial,sans-serif;
+  border-radius: 999px;
+  background: rgba(255,255,255,.075);
+  border: 1px solid rgba(255,255,255,.2);
+}
+.app .fleed-customize-panel .cz-advanced>summary { font: 600 13px "Helvetica Neue",Helvetica,Arial,sans-serif; }
+.app .fleed-customize-panel :is(button,input,summary):focus-visible {
+  outline: 2px solid #e2f3d1;
+  outline-offset: 3px;
+}
+.app .fleed-customize-panel .cz-utility { min-height: 42px; }
+/* Publish is also a portal: glass should be tinted, not a transparent sheet
+   layered over a nearly-black full-screen overlay. */
+[data-slot='dialog-overlay'].fleed-frosted-overlay {
+  background: rgba(7, 10, 13, .22);
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+}
+[data-slot='dialog-content'].fleed-frosted-dialog {
+  background: rgba(22, 30, 34, .60);
+  -webkit-backdrop-filter: blur(32px) saturate(1.36);
+  backdrop-filter: blur(32px) saturate(1.36);
+  border: 1px solid rgba(255,255,255,.26);
+  box-shadow: inset 0 1px rgba(255,255,255,.16), 0 30px 80px rgba(0,0,0,.3);
+}
+@media(max-width:440px) {
+  .app .cz-panel.fleed-customize-panel { padding: 16px 14px; gap: 16px; }
+  .app .fleed-customize-panel .cz-look { flex-basis: 100px; }
+  .app .fleed-customize-panel .cz-look-preview { height: 65px; }
+}
+@media(prefers-reduced-transparency:reduce) {
+  .app .cz-panel.fleed-customize-panel { background: #262e31; -webkit-backdrop-filter:none;backdrop-filter:none; }
+  [data-slot='dialog-content'].fleed-frosted-dialog { background:#222a2e; -webkit-backdrop-filter:none;backdrop-filter:none; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .app .fleed-customize-panel .cz-look { transition:none!important; }
+}
