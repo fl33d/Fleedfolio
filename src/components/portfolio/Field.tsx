@@ -36,7 +36,13 @@ export function Field({
 
   // The exact same field participates in every visual expression.
   // Updating a theme can change font metrics without changing the text.
-  useLayoutEffect(fitHeight)
+  useLayoutEffect(() => {
+    fitHeight()
+    // A selected expression can change its font metrics after the initial
+    // React commit; double-check the final painted typography.
+    const frame = requestAnimationFrame(fitHeight)
+    return () => cancelAnimationFrame(frame)
+  })
 
   useLayoutEffect(() => {
     const el = ref.current
@@ -54,15 +60,33 @@ export function Field({
     })
     observer?.observe(wrapper)
     window.addEventListener('resize', fitHeight, { passive: true })
+
+    // The page can switch font and text scale without editing the value or
+    // changing the wrapper width. Observe the actual style inputs rather than
+    // hoping a textarea resize event will fire.
+    const app = el.closest('.app')
+    const portfolio = el.closest('.portfolio')
+    const appearanceObserver = typeof MutationObserver === 'undefined'
+      ? null : new MutationObserver(fitHeight)
+    if (app) appearanceObserver?.observe(app, {
+      attributes: true, attributeFilter: ['data-look', 'style'],
+    })
+    if (portfolio) appearanceObserver?.observe(portfolio, {
+      attributes: true, attributeFilter: ['data-font', 'data-scale', 'data-align'],
+    })
+
     // Web fonts may finish loading after initial hydration.
     if (document.fonts) {
       void document.fonts.ready.then(() => {
         if (active) fitHeight()
       })
+      document.fonts.addEventListener('loadingdone', fitHeight)
     }
     return () => {
       active = false
       observer?.disconnect()
+      appearanceObserver?.disconnect()
+      document.fonts?.removeEventListener('loadingdone', fitHeight)
       window.removeEventListener('resize', fitHeight)
     }
   }, [])
