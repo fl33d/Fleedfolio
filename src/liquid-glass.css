@@ -1,0 +1,141 @@
+/* Website-wide liquid-glass editor chrome. Portfolio content itself keeps its chosen design. */
+:root {
+  --fleed-glass-bg: rgb(24 25 27 / 54%);
+  --fleed-glass-border: rgb(255 255 255 / 15%);
+  --fleed-glass-highlight: rgb(255 255 255 / 9%);
+  --fleed-glass-shadow: 0 22px 70px -26px rgb(0 0 0 / 72%), inset 0 1px 0 rgb(255 255 255 / 9%);
+  --fleed-glass-blur: 24px;
+}
+.app .dock,
+.app .cz-panel,
+.app .el-panel,
+.app .share-dialog,
+.app .tour-dialog,
+.app .fleed-frosted-dialog,
+.app .share-address-editor,
+.app .el-search,
+.app .el-tabs,
+.app .el-options > button,
+.app .share-url-input,
+.app .share-handle-row,
+.app .tour-example,
+.app .img-tools button,
+.app .pf-work-actions,
+.app .pf-order-button,
+.app .pf-remove,
+.app .pf-add-icon,
+.app .cz-utility,
+.app .cz-font,
+.app .cz-palette,
+.app .cz-seg {
+  -webkit-backdrop-filter: blur(var(--fleed-glass-blur)) saturate(155%);
+  backdrop-filter: blur(var(--fleed-glass-blur)) saturate(155%);
+}
+.app .dock {
+  background: linear-gradient(145deg, rgb(255 255 255 / 10%), transparent 48%), var(--fleed-glass-bg);
+  border: 1px solid var(--fleed-glass-border);
+  box-shadow: var(--fleed-glass-shadow), 0 0 0 1px rgb(255 255 255 / 2%);
+}
+.app .cz-panel,
+.app .el-panel,
+.app .share-dialog,
+.app .tour-dialog,
+.app .fleed-frosted-dialog {
+  background: linear-gradient(145deg, rgb(255 255 255 / 9%), transparent 44%), rgb(22 24 27 / 68%);
+  border: 1px solid var(--fleed-glass-border);
+  box-shadow: var(--fleed-glass-shadow);
+}
+.app .cz-panel,
+.app .el-panel { -webkit-backdrop-filter: blur(30px) saturate(165%); backdrop-filter: blur(30px) saturate(165%); }
+.app .cz-trigger,
+.app .el-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: .5rem .8rem;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  color: var(--dim);
+  background: transparent;
+  font-size: .78rem;
+  transition: color .25s, background .25s, border-color .25s, box-shadow .25s;
+}
+.app .cz-trigger:hover,
+.app .cz-trigger.is-open,
+.app .el-trigger:hover,
+.app .el-trigger[aria-expanded='true'] {
+  color: var(--ink);
+  background: rgb(255 255 255 / 9%);
+  border-color: rgb(255 255 255 / 13%);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 8%);
+}
+.app .el-trigger { min-width: 54px; }
+.app .el-options { gap: .5rem; }
+.app .el-options > button {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: .85rem;
+  padding: .85rem .9rem;
+  border-radius: 11px;
+  border: 1px solid rgb(255 255 255 / 10%);
+  background: rgb(255 255 255 / 4%);
+  color: var(--ink);
+  text-align: left;
+  transition: background .2s, border-color .2s, transform .2s;
+}
+.app .el-options > button:hover:not(:disabled) {
+  background: rgb(255 255 255 / 9%);
+  border-color: rgb(255 255 255 / 19%);
+  transform: translateY(-1px);
+}
+.app .el-options > button:disabled { opacity: .4; cursor: not-allowed; }
+.app .el-option-copy { display: grid; gap: .2rem; min-width: 0; }
+.app .el-option-copy strong { font-size: .78rem; font-weight: 500; }
+.app .el-option-copy small { color: var(--dim); font-size: .67rem; line-height: 1.45; }
+.app .el-option-action {
+  color: var(--accent-c);
+  font-family: var(--font-mono);
+  font-size: .62rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.app .el-search,
+.app .el-tabs,
+.app .share-url-input,
+.app .share-handle-row {
+  background: rgb(255 255 255 / 5%);
+  border-color: rgb(255 255 255 / 13%);
+}
+.app .cz-utility,
+.app .cz-font,
+.app .cz-palette,
+.app .cz-seg,
+.app .pf-work-actions,
+.app .pf-order-button,
+.app .pf-remove,
+.app .pf-add-icon {
+  border-color: rgb(255 255 255 / 13%);
+}
+.app .share-address-editor { background: rgb(255 255 255 / 5%); }
+.app :is(button, a, input, textarea, select):focus-visible {
+  outline-color: var(--accent-c);
+}
+@supports not ((backdrop-filter: blur(1px))) {
+  .app .dock, .app .cz-panel, .app .el-panel, .app .share-dialog, .app .tour-dialog {
+    background: rgb(22 24 27 / 94%);
+  }
+}
+@media (max-width: 640px) {
+  .app .dock { bottom: max(.65rem, env(safe-area-inset-bottom)); gap: .35rem; padding: .35rem; }
+  .app .el-trigger { min-width: 48px; }
+  .app .el-options > button { padding: .8rem; }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .app .dock, .app .cz-panel, .app .el-panel, .app .share-dialog, .app .tour-dialog {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: rgb(22 24 27 / 96%);
+  }
+}
