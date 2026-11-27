@@ -36,7 +36,7 @@ export function Elements({ data, onChange }: {
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState<ItemCategory>('All')
-  const [placement, setPlacement] = useState({ left: 12, bottom: 88, width: 420, maxHeight: 550 })
+  const [placement, setPlacement] = useState({ left: 12, bottom: 88, width: 360, maxHeight: 480 })
   const root = useRef<HTMLDivElement>(null)
   const searchRef = useRef<HTMLInputElement>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
@@ -50,11 +50,11 @@ export function Elements({ data, onChange }: {
       if (!anchor) return
       const vw = window.innerWidth
       const vh = window.innerHeight
-      const width = Math.min(440, Math.max(260, vw - 24))
+      const width = Math.min(360, Math.max(260, vw - 24))
       const preferredLeft = vw <= 640 ? (vw - width) / 2 : anchor.left + anchor.width / 2 - width / 2
       const left = Math.max(12, Math.min(preferredLeft, vw - width - 12))
       const bottom = Math.max(12, vh - (dock?.top ?? anchor.top) + 12)
-      const maxHeight = Math.max(160, Math.min(610, vh - bottom - 16))
+      const maxHeight = Math.max(160, Math.min(480, vh - bottom - 16))
       setPlacement(old => old.left === left && old.bottom === bottom &&
         old.width === width && old.maxHeight === maxHeight
         ? old : { left, bottom, width, maxHeight })
