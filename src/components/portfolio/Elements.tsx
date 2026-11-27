@@ -146,10 +146,10 @@ export function Elements({ data, onChange }: {
       <div ref={panelRef} role="dialog" aria-label="Add to your portfolio"
         className="cz-panel fleed-customize-panel"
         style={{ left: placement.left, bottom: placement.bottom, width: placement.width, maxHeight: placement.maxHeight }}>
-        <div className="cz-panel-heading">
-          <div className="cz-panel-intro"><span>Make it yours.</span><p>Choose what you want to add.</p></div>
+        <div className="el-compact-heading">
+          <span>Elements</span>
           <button type="button" className="cz-sheet-close el-close" aria-label="Close element library"
-            onClick={() => { setOpen(false); triggerRef.current?.focus() }}><X size={18} aria-hidden="true"/></button>
+            onClick={() => { setOpen(false); triggerRef.current?.focus() }}><X size={16} aria-hidden="true"/></button>
         </div>
         <label className="el-search">
           <Search className="size-4" aria-hidden="true"/>
@@ -171,12 +171,12 @@ export function Elements({ data, onChange }: {
               (item.kind === 'education' && data.education.length >= 24) ||
               (item.kind === 'link' && data.socials.length >= 24)
             }>
-            <span className="el-option-copy"><strong>{item.name}</strong><small>{item.description}</small></span>
+            <span className="el-option-copy"><strong>{item.name}</strong></span>
             <span className="el-option-action">Add</span>
           </button>)}
           {!results.length && <p className="el-empty">Nothing found. Try another word.</p>}
         </div>
-        <p className="el-footnote">Anything here can be edited right on your page.</p>
+        
       </div>,
       overlayHost,
     )}
