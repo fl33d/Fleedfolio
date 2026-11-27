@@ -8,7 +8,7 @@
 }
 .app .dock,
 .app .cz-panel,
-.app .el-panel,
+.el-panel,
 .app .share-dialog,
 .app .tour-dialog,
 .app .fleed-frosted-dialog,
@@ -37,7 +37,7 @@
   box-shadow: var(--fleed-glass-shadow), 0 0 0 1px rgb(255 255 255 / 2%);
 }
 .app .cz-panel,
-.app .el-panel,
+.el-panel,
 .app .share-dialog,
 .app .tour-dialog,
 .app .fleed-frosted-dialog {
@@ -46,7 +46,7 @@
   box-shadow: var(--fleed-glass-shadow);
 }
 .app .cz-panel,
-.app .el-panel { -webkit-backdrop-filter: blur(30px) saturate(165%); backdrop-filter: blur(30px) saturate(165%); }
+.el-panel { -webkit-backdrop-filter: blur(30px) saturate(165%); backdrop-filter: blur(30px) saturate(165%); }
 .app .cz-trigger,
 .app .el-trigger {
   display: inline-flex;
@@ -123,7 +123,7 @@
   outline-color: var(--accent-c);
 }
 @supports not ((backdrop-filter: blur(1px))) {
-  .app .dock, .app .cz-panel, .app .el-panel, .app .share-dialog, .app .tour-dialog {
+  .app .dock, .app .cz-panel, .el-panel, .app .share-dialog, .app .tour-dialog {
     background: rgb(22 24 27 / 94%);
   }
 }
@@ -133,7 +133,7 @@
   .app .el-options > button { padding: .8rem; }
 }
 @media (prefers-reduced-transparency: reduce) {
-  .app .dock, .app .cz-panel, .app .el-panel, .app .share-dialog, .app .tour-dialog {
+  .app .dock, .app .cz-panel, .el-panel, .app .share-dialog, .app .tour-dialog {
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
     background: rgb(22 24 27 / 96%);
@@ -142,7 +142,7 @@
 
 
 /* Add uses the exact same floating glass sheet treatment as Customise. */
-.app .el-panel.fleed-customize-panel {
+.el-panel.fleed-customize-panel {
   position: fixed;
   translate: none;
   transform: none;
@@ -166,22 +166,22 @@
   --faint: #b8c4ba;
   --hair: rgba(255,255,255,.16);
 }
-.app .el-panel .cz-panel-heading {
+.el-panel .cz-panel-heading {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
 }
-.app .el-panel .cz-panel-intro > span {
+.el-panel .cz-panel-intro > span {
   font: 400 clamp(1.8rem,5vw,2.25rem)/1 "Instrument Serif", Georgia, serif;
   letter-spacing: -.05em;
 }
-.app .el-panel .cz-panel-intro > p {
+.el-panel .cz-panel-intro > p {
   margin-top: 6px;
   color: #d5dcd2;
   font-size: 13px;
 }
-.app .el-panel .cz-sheet-close {
+.el-panel .cz-sheet-close {
   flex: 0 0 auto;
   width: 36px;
   height: 36px;
@@ -193,11 +193,11 @@
   color: #f3f5ee;
   transition: background .18s, transform .18s;
 }
-.app .el-panel .cz-sheet-close:hover {
+.el-panel .cz-sheet-close:hover {
   background: rgba(255,255,255,.18);
   transform: rotate(8deg);
 }
-.app .el-panel .el-search {
+.el-panel .el-search {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -208,7 +208,7 @@
   background: rgba(5,9,12,.23);
   color: #e9eee7;
 }
-.app .el-panel .el-search input {
+.el-panel .el-search input {
   width: 100%;
   min-width: 0;
   background: transparent;
@@ -217,8 +217,8 @@
   color: #f4f4ef;
   font-size: 13px;
 }
-.app .el-panel .el-search input::placeholder { color: rgba(235,240,233,.58); }
-.app .el-panel .el-tabs {
+.el-panel .el-search input::placeholder { color: rgba(235,240,233,.58); }
+.el-panel .el-tabs {
   display: grid;
   grid-template-columns: repeat(4,minmax(0,1fr));
   gap: 4px;
@@ -227,27 +227,27 @@
   background: rgba(5,9,12,.29);
   border: 1px solid rgba(255,255,255,.12);
 }
-.app .el-panel .el-tabs > button {
+.el-panel .el-tabs > button {
   min-height: 42px;
   border-radius: 10px;
   color: rgba(235,240,233,.72);
   font: 600 13px/1.25 "Helvetica Neue", Helvetica, Arial, sans-serif;
   transition: background .18s, color .18s, box-shadow .18s;
 }
-.app .el-panel .el-tabs > button[aria-pressed=true] {
+.el-panel .el-tabs > button[aria-pressed=true] {
   color: #1e2826;
   background: rgba(242,247,238,.95);
   box-shadow: 0 2px 10px rgba(0,0,0,.16);
 }
-.app .el-panel .el-tabs > button:not([aria-pressed=true]):hover {
+.el-panel .el-tabs > button:not([aria-pressed=true]):hover {
   color: #fff;
   background: rgba(255,255,255,.09);
 }
-.app .el-panel .el-options {
+.el-panel .el-options {
   display: grid;
   gap: 5px;
 }
-.app .el-panel .el-options > button {
+.el-panel .el-options > button {
   display: grid;
   grid-template-columns: minmax(0,1fr) auto;
   align-items: center;
@@ -262,27 +262,27 @@
   transition: background .22s, border-color .22s, transform .45s cubic-bezier(.2,.75,.2,1);
   animation: el-option-in .42s cubic-bezier(.2,.75,.2,1) both;
 }
-.app .el-panel .el-options > button:nth-child(2) { animation-delay: 25ms; }
-.app .el-panel .el-options > button:nth-child(3) { animation-delay: 50ms; }
-.app .el-panel .el-options > button:nth-child(4) { animation-delay: 75ms; }
-.app .el-panel .el-options > button:nth-child(5) { animation-delay: 100ms; }
-.app .el-panel .el-options > button:nth-child(6) { animation-delay: 125ms; }
-.app .el-panel .el-options > button:hover:not(:disabled) {
+.el-panel .el-options > button:nth-child(2) { animation-delay: 25ms; }
+.el-panel .el-options > button:nth-child(3) { animation-delay: 50ms; }
+.el-panel .el-options > button:nth-child(4) { animation-delay: 75ms; }
+.el-panel .el-options > button:nth-child(5) { animation-delay: 100ms; }
+.el-panel .el-options > button:nth-child(6) { animation-delay: 125ms; }
+.el-panel .el-options > button:hover:not(:disabled) {
   background: rgba(255,255,255,.105);
   border-color: rgba(255,255,255,.25);
   transform: translateY(-1px);
 }
-.app .el-panel .el-options > button:disabled { opacity: .4; cursor: not-allowed; }
-.app .el-panel .el-option-copy { display: grid; gap: 4px; min-width: 0; }
-.app .el-panel .el-option-copy strong {
+.el-panel .el-options > button:disabled { opacity: .4; cursor: not-allowed; }
+.el-panel .el-option-copy { display: grid; gap: 4px; min-width: 0; }
+.el-panel .el-option-copy strong {
   font: 600 13px/1.25 "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: #f4f4ef;
 }
-.app .el-panel .el-option-copy small {
+.el-panel .el-option-copy small {
   color: #c5d2c6;
   font: 400 12px/1.45 "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
-.app .el-panel .el-option-action {
+.el-panel .el-option-action {
   color: #e4efd9;
   font: 600 11px "Helvetica Neue", Helvetica, Arial, sans-serif;
   letter-spacing: .02em;
@@ -293,12 +293,12 @@
   background: rgba(255,255,255,.07);
   transition: background .2s, border-color .2s;
 }
-.app .el-panel .el-options > button:hover:not(:disabled) .el-option-action {
+.el-panel .el-options > button:hover:not(:disabled) .el-option-action {
   background: rgba(255,255,255,.15);
   border-color: rgba(255,255,255,.3);
 }
-.app .el-panel .el-empty,
-.app .el-panel .el-footnote {
+.el-panel .el-empty,
+.el-panel .el-footnote {
   color: #c5d2c6;
   font: 400 12px/1.5 "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
@@ -307,12 +307,12 @@
   to { opacity: 1; transform: translateY(0); }
 }
 @media(max-width:440px) {
-  .app .el-panel.fleed-customize-panel { padding: 16px 14px; gap: 16px; }
-  .app .el-panel .el-options > button { min-height: 58px; padding: 10px; }
+  .el-panel.fleed-customize-panel { padding: 16px 14px; gap: 16px; }
+  .el-panel .el-options > button { min-height: 58px; padding: 10px; }
 }
 @media(prefers-reduced-transparency:reduce) {
-  .app .el-panel.fleed-customize-panel { background: #262e31; -webkit-backdrop-filter:none; backdrop-filter:none; }
+  .el-panel.fleed-customize-panel { background: #262e31; -webkit-backdrop-filter:none; backdrop-filter:none; }
 }
 @media(prefers-reduced-motion:reduce) {
-  .app .el-panel .el-options > button { animation: none!important; transition: none!important; }
+  .el-panel .el-options > button { animation: none!important; transition: none!important; }
 }
