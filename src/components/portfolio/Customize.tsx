@@ -209,6 +209,7 @@ export function Customize({
             bottom: placement.bottom,
             width: placement.width,
             maxHeight: placement.maxHeight,
+            '--accent-c': data.accent,
           }}
         >
           <div className="cz-panel-heading">
