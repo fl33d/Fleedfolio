@@ -401,3 +401,77 @@
   .fleed-customize-panel:has(.el-compact-heading) { padding: 13px; gap: 9px; }
   .fleed-customize-panel .el-option-row { min-height: 37px; padding: 7px 9px; }
 }
+
+
+/* Obsidian-informed workspace refinement.
+   Borrow the restrained graphite surfaces, compact hierarchy and violet
+   interaction accent; retain Fleedfolio's existing frosted-glass material. */
+:root {
+  --fleed-workspace-accent: #a78bfa;
+}
+.app .dock.chrome {
+  background:
+    linear-gradient(145deg, rgba(255,255,255,.075), transparent 48%),
+    rgba(19,20,24,.76);
+  border-color: rgba(255,255,255,.16);
+  box-shadow: 0 20px 64px rgba(0,0,0,.30), inset 0 1px rgba(255,255,255,.12);
+}
+.app .dock-toggle button[aria-pressed="true"] {
+  color: #fff;
+}
+.app .dock-toggle-pill::after {
+  background: var(--fleed-workspace-accent);
+  box-shadow: 0 0 14px rgba(167,139,250,.35);
+}
+.app .dock-publish {
+  transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+}
+.app .dock-publish:focus-visible,
+.app .cz-trigger:focus-visible,
+.app .el-trigger:focus-visible {
+  outline: 2px solid var(--fleed-workspace-accent);
+  outline-offset: 3px;
+}
+.cz-panel.fleed-customize-panel {
+  background:
+    linear-gradient(145deg, rgba(255,255,255,.075), transparent 45%),
+    rgba(25,27,32,.76);
+  border-color: rgba(255,255,255,.19);
+  box-shadow: inset 0 1px rgba(255,255,255,.13), 0 28px 82px rgba(0,0,0,.34);
+}
+.fleed-customize-panel .cz-depth-tabs > button[aria-selected="true"] {
+  box-shadow: inset 0 -2px var(--fleed-workspace-accent), 0 2px 10px rgba(0,0,0,.18);
+}
+.fleed-customize-panel .cz-look[aria-pressed="true"],
+.fleed-customize-panel .cz-palette[aria-pressed="true"] {
+  outline: 1px solid rgba(167,139,250,.8);
+  outline-offset: 2px;
+}
+.fleed-customize-panel :is(button,input,summary):focus-visible {
+  outline-color: var(--fleed-workspace-accent);
+}
+.fleed-customize-panel:has(.el-compact-heading) {
+  background:
+    linear-gradient(145deg, rgba(255,255,255,.075), transparent 45%),
+    rgba(25,27,32,.78);
+}
+.fleed-customize-panel .el-search:focus-within {
+  border-color: rgba(167,139,250,.7);
+  box-shadow: 0 0 0 3px rgba(167,139,250,.13);
+}
+.fleed-customize-panel .el-options .el-option-row {
+  background: rgba(255,255,255,.035);
+  border-color: rgba(255,255,255,.09);
+}
+.fleed-customize-panel .el-options .el-option-row:hover {
+  background: rgba(255,255,255,.085);
+  border-color: rgba(167,139,250,.32);
+}
+.fleed-customize-panel .el-option-action {
+  background: rgba(167,139,250,.13);
+  border-color: rgba(167,139,250,.28);
+  color: #e4dcff;
+}
+@media (prefers-reduced-motion: reduce) {
+  .app .dock-publish { transition: none; }
+}
