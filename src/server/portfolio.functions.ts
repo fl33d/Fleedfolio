@@ -7,9 +7,14 @@ export const publishPortfolio = createServerFn({ method: 'POST' })
   .inputValidator(
     (data: { id?: string; token?: string; slug?: string; portfolio: unknown }) => data,
   )
-  .handler(({ data }) =>
-    savePortfolio(normalizePortfolio(data.portfolio), data.id, data.token, data.slug),
-  )
+  .handler(async ({ data }) => {
+    try {
+      return await savePortfolio(normalizePortfolio(data.portfolio), data.id, data.token, data.slug)
+    } catch (error) {
+      console.error('[Fleedfolio] Publish server function failed', error)
+      throw error
+    }
+  })
 
 export const getPortfolio = createServerFn({ method: 'GET' })
   .inputValidator((data: { id: string }) => data)
