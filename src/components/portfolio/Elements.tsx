@@ -112,7 +112,7 @@ export function Elements({ data, onChange }: {
         if (next && window.matchMedia('(min-width: 641px)').matches)
           window.setTimeout(() => searchRef.current?.focus(), 50)
       }}>
-      <Plus className="size-5" aria-hidden="true"/>
+
       <span className="el-trigger-text">Add</span>
     </button>
 
@@ -142,9 +142,9 @@ export function Elements({ data, onChange }: {
             (item.kind === 'education' && data.education.length >= 24) ||
             (item.kind === 'link' && data.socials.length >= 24)
           }>
-          <span className="el-option-icon" aria-hidden="true"><item.icon size={19} strokeWidth={1.8}/></span>
-          <span><strong>{item.name}</strong><small>{item.description}</small></span>
-          <Plus className="size-4" aria-hidden="true"/>
+
+          <span className="el-option-copy"><strong>{item.name}</strong><small>{item.description}</small></span>
+          <span className="el-option-action">Add</span>
         </button>)}
         {!results.length && <p className="el-empty">Nothing found. Try another word.</p>}
       </div>
