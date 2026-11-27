@@ -144,7 +144,7 @@ export function Elements({ data, onChange }: {
 
     {open && overlayHost && createPortal(
       <div ref={panelRef} role="dialog" aria-label="Add to your portfolio"
-        className="cz-panel el-panel fleed-customize-panel"
+        className="cz-panel fleed-customize-panel"
         style={{ left: placement.left, bottom: placement.bottom, width: placement.width, maxHeight: placement.maxHeight }}>
         <div className="cz-panel-heading">
           <div className="cz-panel-intro"><span>Make it yours.</span><p>Choose what you want to add.</p></div>
@@ -157,9 +157,9 @@ export function Elements({ data, onChange }: {
           <input ref={searchRef} type="search" placeholder="Search elements" value={query}
             onChange={event => setQuery(event.target.value)}/>
         </label>
-        <div className="cz-depth-tabs el-tabs" role="group" aria-label="Filter elements">
+        <div className="cz-depth-tabs" role="group" aria-label="Filter elements">
           {(['All','Write','Show','About'] as const).map(tab=>
-            <button key={tab} type="button" aria-pressed={category===tab}
+            <button key={tab} type="button" aria-selected={category===tab}
               onClick={()=>setCategory(tab)}>{tab}</button>)}
         </div>
         <div className="el-options">
