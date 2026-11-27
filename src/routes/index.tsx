@@ -130,7 +130,7 @@ function Editor() {
       return true
     } catch (error) {
       const message = error instanceof Error ? error.message : ''
-      toast.error(message.includes('taken') || message.includes('claimed') ? 'That custom link may already be taken. Choose another.' : 'Publishing failed. Try again in a moment.')
+      toast.error(message.includes('taken') || message.includes('claimed') ? 'That custom link may already be taken. Choose another.' : (message ? `Publishing failed: ${message.slice(0, 150)}` : 'Publishing failed. Check your connection and try again.'))
       return false
     } finally {
       setPublishing(false)
