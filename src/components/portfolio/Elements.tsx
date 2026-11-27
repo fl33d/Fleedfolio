@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { AlignLeft, BookOpenText, BriefcaseBusiness, Contact, FolderOpen, GraduationCap, Image, Link2, Plus, Quote, Search, Shapes, Sparkles, X, type LucideIcon } from 'lucide-react'
+import { Search, Sparkles, X } from 'lucide-react'
 
 import {
   emptyCustomSection,
@@ -12,19 +12,19 @@ import {
 
 type ItemKind = 'text' | 'statement' | 'feature' | 'project' | 'skills' | 'about' | 'experience' | 'education' | 'contact' | 'link'
 type ItemCategory = 'All' | 'Write' | 'Show' | 'About'
-type LibraryItem = { kind: ItemKind; name: string; description: string; category: Exclude<ItemCategory,'All'>; icon: LucideIcon; target?: string }
+type LibraryItem = { kind: ItemKind; name: string; description: string; category: Exclude<ItemCategory,'All'>; target?: string }
 
 const LIBRARY: LibraryItem[] = [
-  { kind: 'text', name: 'Freeform section', description: 'A blank canvas for your words.', category:'Write', icon:AlignLeft },
-  { kind: 'statement', name: 'Statement', description: 'One thought, beautifully oversized.', category:'Write', icon:Quote },
-  { kind: 'feature', name: 'Feature story', description: 'Bring words and imagery together.', category:'Show', icon:Image },
-  { kind: 'project', name: 'Project', description: 'A piece of work worth showcasing.', category:'Show', icon:FolderOpen, target:'work' },
-  { kind: 'skills', name: 'Skills', description: 'Languages, tools and interests.', category:'About', icon:Shapes, target:'top' },
-  { kind: 'about', name: 'About', description: 'The person behind the work.', category:'About', icon:BookOpenText, target:'about' },
-  { kind: 'experience', name: 'Experience', description: 'Roles, collaborations and milestones.', category:'About', icon:BriefcaseBusiness, target:'experience' },
-  { kind: 'education', name: 'Education', description: 'Learning and qualifications.', category:'About', icon:GraduationCap, target:'education' },
-  { kind: 'contact', name: 'Contact', description: 'A welcoming place to say hello.', category:'About', icon:Contact, target:'contact' },
-  { kind: 'link', name: 'Social link', description: 'Another place to find you.', category:'About', icon:Link2, target:'contact' },
+  { kind: 'text', name: 'Freeform section', description: 'A blank canvas for your words.', category:'Write' },
+  { kind: 'statement', name: 'Statement', description: 'One thought, beautifully oversized.', category:'Write' },
+  { kind: 'feature', name: 'Feature story', description: 'Bring words and imagery together.', category:'Show' },
+  { kind: 'project', name: 'Project', description: 'A piece of work worth showcasing.', category:'Show', target:'work' },
+  { kind: 'skills', name: 'Skills', description: 'Languages, tools and interests.', category:'About', target:'top' },
+  { kind: 'about', name: 'About', description: 'The person behind the work.', category:'About', target:'about' },
+  { kind: 'experience', name: 'Experience', description: 'Roles, collaborations and milestones.', category:'About', target:'experience' },
+  { kind: 'education', name: 'Education', description: 'Learning and qualifications.', category:'About', target:'education' },
+  { kind: 'contact', name: 'Contact', description: 'A welcoming place to say hello.', category:'About', target:'contact' },
+  { kind: 'link', name: 'Social link', description: 'Another place to find you.', category:'About', target:'contact' },
 ]
 
 /**
@@ -103,7 +103,7 @@ export function Elements({ data, onChange }: {
   )
 
   return <div ref={root} className="el-root">
-    <button ref={triggerRef} type="button" className="dock-icon el-trigger"
+    <button ref={triggerRef} type="button" className="cz-trigger el-trigger"
       aria-label="Add an element" aria-haspopup="dialog" aria-expanded={open}
       title="Add a section" onClick={() => {
         const next = !open
