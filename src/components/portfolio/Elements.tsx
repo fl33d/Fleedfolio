@@ -145,7 +145,7 @@ export function Elements({ data, onChange }: {
     {open && overlayHost && createPortal(
       <div ref={panelRef} role="dialog" aria-label="Add to your portfolio"
         className="cz-panel fleed-customize-panel"
-        style={{ left: placement.left, bottom: placement.bottom, width: placement.width, maxHeight: placement.maxHeight, '--accent-c': data.accent }}>
+        style={{ left: placement.left, bottom: placement.bottom, width: placement.width, maxHeight: placement.maxHeight, ['--accent-c' as string]: data.accent }}>
         <div className="el-compact-heading">
           <span>Elements</span>
           <button type="button" className="cz-sheet-close el-close" aria-label="Close element library"
