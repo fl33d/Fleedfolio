@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
-import { Search, Sparkles, X } from 'lucide-react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
+import { Search, X } from 'lucide-react'
 
 import {
   emptyCustomSection,
@@ -27,11 +28,7 @@ const LIBRARY: LibraryItem[] = [
   { kind: 'link', name: 'Social link', description: 'Another place to find you.', category:'About', target:'contact' },
 ]
 
-/**
- * A small, inline library for the original homepage builder.
- * Content uses the existing legacy Portfolio shape: no duplicate
- * document source, no new persistence key, no editor-mode switch.
- */
+/** The Add shelf shares the same floating-sheet placement and entrance motion as Customise. */
 export function Elements({ data, onChange }: {
   data: Portfolio
   onChange: (updater: (current: Portfolio) => Portfolio) => void
@@ -39,14 +36,44 @@ export function Elements({ data, onChange }: {
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState<ItemCategory>('All')
+  const [placement, setPlacement] = useState({ left: 12, bottom: 88, width: 420, maxHeight: 550 })
   const root = useRef<HTMLDivElement>(null)
   const searchRef = useRef<HTMLInputElement>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
+
+  useLayoutEffect(() => {
+    if (!open) return
+    const place = () => {
+      const anchor = triggerRef.current?.getBoundingClientRect()
+      const dock = root.current?.closest('.dock')?.getBoundingClientRect()
+      if (!anchor) return
+      const vw = window.innerWidth
+      const vh = window.innerHeight
+      const width = Math.min(440, Math.max(260, vw - 24))
+      const preferredLeft = vw <= 640 ? (vw - width) / 2 : anchor.left + anchor.width / 2 - width / 2
+      const left = Math.max(12, Math.min(preferredLeft, vw - width - 12))
+      const bottom = Math.max(12, vh - (dock?.top ?? anchor.top) + 12)
+      const maxHeight = Math.max(160, Math.min(610, vh - bottom - 16))
+      setPlacement(old => old.left === left && old.bottom === bottom &&
+        old.width === width && old.maxHeight === maxHeight
+        ? old : { left, bottom, width, maxHeight })
+    }
+    place()
+    window.addEventListener('resize', place)
+    window.visualViewport?.addEventListener('resize', place)
+    window.addEventListener('scroll', place, true)
+    return () => {
+      window.removeEventListener('resize', place)
+      window.visualViewport?.removeEventListener('resize', place)
+      window.removeEventListener('scroll', place, true)
+    }
+  }, [open])
 
   useEffect(() => {
     if (!open) return
     const closeOutside = (event: PointerEvent) => {
-      if (!root.current?.contains(event.target as Node)) setOpen(false)
+      if (!root.current?.contains(event.target as Node) && !panelRef.current?.contains(event.target as Node)) setOpen(false)
     }
     const closeEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
@@ -101,6 +128,7 @@ export function Elements({ data, onChange }: {
     (category === 'All' || item.category === category) &&
     (item.name + ' ' + item.description).toLowerCase().includes(query.toLowerCase().trim())
   )
+  const overlayHost = typeof document === 'undefined' ? null : document.getElementById('fleed-overlay-root')
 
   return <div ref={root} className="el-root">
     <button ref={triggerRef} type="button" className="cz-trigger el-trigger"
@@ -108,47 +136,49 @@ export function Elements({ data, onChange }: {
       title="Add a section" onClick={() => {
         const next = !open
         setOpen(next)
-        // Opening the shelf should not summon the on-screen keyboard on phones.
         if (next && window.matchMedia('(min-width: 641px)').matches)
           window.setTimeout(() => searchRef.current?.focus(), 50)
       }}>
-
       <span className="el-trigger-text">Add</span>
     </button>
 
-    {open && <div role="dialog" aria-label="Add to your portfolio" className="el-panel">
-      <div className="el-panel-header">
-        <div><small>Elements</small><h2>Make it yours.</h2></div>
-        <button type="button" className="el-close" aria-label="Close element library"
-          onClick={() => { setOpen(false); triggerRef.current?.focus() }}><X className="size-4"/></button>
-      </div>
-      <label className="el-search">
-        <Search className="size-4" aria-hidden="true"/>
-        <span className="sr-only">Find an element</span>
-        <input ref={searchRef} type="search" placeholder="Search elements" value={query}
-          onChange={event => setQuery(event.target.value)}/>
-      </label>
-      <div className="el-tabs" role="group" aria-label="Filter elements">
-        {(['All','Write','Show','About'] as const).map(tab=>
-          <button key={tab} type="button" aria-pressed={category===tab}
-            onClick={()=>setCategory(tab)}>{tab}</button>)}
-      </div>
-      <div className="el-options">
-        {results.map((item) => <button key={item.kind} type="button"
-          onClick={() => add(item.kind)} disabled={
-            (['text','statement','feature'].includes(item.kind) && data.extras.length >= 12) ||
-            (item.kind === 'project' && data.projects.length >= 24) ||
-            (item.kind === 'experience' && data.experience.length >= 24) ||
-            (item.kind === 'education' && data.education.length >= 24) ||
-            (item.kind === 'link' && data.socials.length >= 24)
-          }>
-
-          <span className="el-option-copy"><strong>{item.name}</strong><small>{item.description}</small></span>
-          <span className="el-option-action">Add</span>
-        </button>)}
-        {!results.length && <p className="el-empty">Nothing found. Try another word.</p>}
-      </div>
-      <p className="el-footnote"><Sparkles size={14} aria-hidden="true"/> Anything here can be edited right on your page.</p>
-    </div>}
+    {open && overlayHost && createPortal(
+      <div ref={panelRef} role="dialog" aria-label="Add to your portfolio"
+        className="cz-panel el-panel fleed-customize-panel"
+        style={{ left: placement.left, bottom: placement.bottom, width: placement.width, maxHeight: placement.maxHeight }}>
+        <div className="cz-panel-heading">
+          <div className="cz-panel-intro"><span>Make it yours.</span><p>Choose what you want to add.</p></div>
+          <button type="button" className="cz-sheet-close el-close" aria-label="Close element library"
+            onClick={() => { setOpen(false); triggerRef.current?.focus() }}><X size={18} aria-hidden="true"/></button>
+        </div>
+        <label className="el-search">
+          <Search className="size-4" aria-hidden="true"/>
+          <span className="sr-only">Find an element</span>
+          <input ref={searchRef} type="search" placeholder="Search elements" value={query}
+            onChange={event => setQuery(event.target.value)}/>
+        </label>
+        <div className="cz-depth-tabs el-tabs" role="group" aria-label="Filter elements">
+          {(['All','Write','Show','About'] as const).map(tab=>
+            <button key={tab} type="button" aria-pressed={category===tab}
+              onClick={()=>setCategory(tab)}>{tab}</button>)}
+        </div>
+        <div className="el-options">
+          {results.map(item => <button key={item.kind} type="button"
+            onClick={() => add(item.kind)} disabled={
+              (['text','statement','feature'].includes(item.kind) && data.extras.length >= 12) ||
+              (item.kind === 'project' && data.projects.length >= 24) ||
+              (item.kind === 'experience' && data.experience.length >= 24) ||
+              (item.kind === 'education' && data.education.length >= 24) ||
+              (item.kind === 'link' && data.socials.length >= 24)
+            }>
+            <span className="el-option-copy"><strong>{item.name}</strong><small>{item.description}</small></span>
+            <span className="el-option-action">Add</span>
+          </button>)}
+          {!results.length && <p className="el-empty">Nothing found. Try another word.</p>}
+        </div>
+        <p className="el-footnote">Anything here can be edited right on your page.</p>
+      </div>,
+      overlayHost,
+    )}
   </div>
 }
