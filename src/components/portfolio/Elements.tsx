@@ -163,17 +163,18 @@ export function Elements({ data, onChange }: {
               onClick={()=>setCategory(tab)}>{tab}</button>)}
         </div>
         <div className="el-options">
-          {results.map(item => <button key={item.kind} type="button"
-            onClick={() => add(item.kind)} disabled={
+          {results.map(item => {
+            const disabled =
               (['text','statement','feature'].includes(item.kind) && data.extras.length >= 12) ||
               (item.kind === 'project' && data.projects.length >= 24) ||
               (item.kind === 'experience' && data.experience.length >= 24) ||
               (item.kind === 'education' && data.education.length >= 24) ||
               (item.kind === 'link' && data.socials.length >= 24)
-            }>
-            <span className="el-option-copy"><strong>{item.name}</strong></span>
-            <span className="el-option-action">Add</span>
-          </button>)}
+            return <div key={item.kind} className="el-option-row">
+              <span className="el-option-copy"><strong>{item.name}</strong></span>
+              <button type="button" className="el-option-action" onClick={() => add(item.kind)} disabled={disabled}>Add</button>
+            </div>
+          })}
           {!results.length && <p className="el-empty">Nothing found. Try another word.</p>}
         </div>
         
