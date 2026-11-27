@@ -2,7 +2,7 @@
    The Customise sheet is a SIBLING of .dock.chrome in #fleed-overlay-root,
    not a child of any filtered surface. That is essential for real iOS blur. */
 #fleed-overlay-root { position: relative; z-index: 120; }
-.app .cz-panel.fleed-customize-panel {
+.cz-panel.fleed-customize-panel {
   position: fixed;
   translate: none;
   transform: none;
@@ -31,22 +31,22 @@
   --hair: rgba(255,255,255,.16);
   scrollbar-color: rgba(255,255,255,.28) transparent;
 }
-.app .fleed-customize-panel .cz-title {
+.fleed-customize-panel .cz-title {
   font: 600 13px/1.3 "Helvetica Neue", Helvetica, Arial, sans-serif;
   letter-spacing: -.01em;
   color: #e6ebdf;
   text-transform: none;
 }
-.app .fleed-customize-panel .cz-panel-intro > span {
+.fleed-customize-panel .cz-panel-intro > span {
   font: 400 clamp(1.8rem,5vw,2.25rem)/1 "Instrument Serif",Georgia,serif;
   letter-spacing: -.05em;
 }
-.app .fleed-customize-panel .cz-panel-intro > p {
+.fleed-customize-panel .cz-panel-intro > p {
   font-size: 13px;
   color: #d5dcd2;
   margin-top: 6px;
 }
-.app .fleed-customize-panel .cz-looks {
+.fleed-customize-panel .cz-looks {
   display: flex;
   flex-wrap: nowrap;
   gap: 9px;
@@ -58,7 +58,7 @@
   scrollbar-width: thin;
   scrollbar-color: rgba(255,255,255,.3) transparent;
 }
-.app .fleed-customize-panel .cz-look {
+.fleed-customize-panel .cz-look {
   flex: 0 0 clamp(91px,27vw,112px);
   min-width: 0;
   display: grid;
@@ -69,25 +69,25 @@
   border: 1px solid rgba(255,255,255,.17);
   background: rgba(255,255,255,.055);
 }
-.app .fleed-customize-panel .cz-look[aria-pressed=true] {
+.fleed-customize-panel .cz-look[aria-pressed=true] {
   border-color: rgba(230,247,216,.94);
   background: rgba(230,247,216,.10);
 }
-.app .fleed-customize-panel .cz-look-preview { height: 71px; border-radius: 8px; }
-.app .fleed-customize-panel .cz-look-title {
+.fleed-customize-panel .cz-look-preview { height: 71px; border-radius: 8px; }
+.fleed-customize-panel .cz-look-title {
   font: 600 12px/1.35 "Helvetica Neue",Helvetica,Arial,sans-serif;
   letter-spacing: -.01em;
 }
-.app .fleed-customize-panel .cz-look-hint {
+.fleed-customize-panel .cz-look-hint {
   font: 400 12px/1.45 "Helvetica Neue",Helvetica,Arial,sans-serif;
   color: #c5d2c6;
   margin-top: 2px;
 }
-.app .fleed-customize-panel .cz-palettes {
+.fleed-customize-panel .cz-palettes {
   grid-template-columns: repeat(5,minmax(0,1fr));
   gap: clamp(5px,1.5vw,9px);
 }
-.app .fleed-customize-panel .cz-palette {
+.fleed-customize-panel .cz-palette {
   min-height: 70px;
   min-width: 0;
   gap: 6px;
@@ -95,29 +95,29 @@
   border-radius: 11px;
   box-shadow: inset 0 1px rgba(255,255,255,.07);
 }
-.app .fleed-customize-panel .cz-palette-aa { font-size: 22px; }
-.app .fleed-customize-panel .cz-palette-name {
+.fleed-customize-panel .cz-palette-aa { font-size: 22px; }
+.fleed-customize-panel .cz-palette-name {
   font: 600 clamp(10px,2.5vw,12px)/1.2 "Helvetica Neue",Helvetica,Arial,sans-serif;
   letter-spacing: 0;
   text-transform: none;
 }
-.app .fleed-customize-panel .cz-group { gap: 9px; min-width: 0; }
-.app .fleed-customize-panel .cz-accents { gap: 9px; }
-.app .fleed-customize-panel .cz-accent { width: 32px; height: 32px; border-radius: 10px; }
-.app .fleed-customize-panel .cz-surface-options { gap: 7px; }
-.app .fleed-customize-panel .cz-surface-options button {
+.fleed-customize-panel .cz-group { gap: 9px; min-width: 0; }
+.fleed-customize-panel .cz-accents { gap: 9px; }
+.fleed-customize-panel .cz-accent { width: 32px; height: 32px; border-radius: 10px; }
+.fleed-customize-panel .cz-surface-options { gap: 7px; }
+.fleed-customize-panel .cz-surface-options button {
   min-height: 38px;
   font: 500 12px "Helvetica Neue",Helvetica,Arial,sans-serif;
   border-radius: 999px;
   background: rgba(255,255,255,.075);
   border: 1px solid rgba(255,255,255,.2);
 }
-.app .fleed-customize-panel .cz-advanced>summary { font: 600 13px "Helvetica Neue",Helvetica,Arial,sans-serif; }
-.app .fleed-customize-panel :is(button,input,summary):focus-visible {
+.fleed-customize-panel .cz-advanced>summary { font: 600 13px "Helvetica Neue",Helvetica,Arial,sans-serif; }
+.fleed-customize-panel :is(button,input,summary):focus-visible {
   outline: 2px solid #e2f3d1;
   outline-offset: 3px;
 }
-.app .fleed-customize-panel .cz-utility { min-height: 42px; }
+.fleed-customize-panel .cz-utility { min-height: 42px; }
 /* Publish is also a portal: glass should be tinted, not a transparent sheet
    layered over a nearly-black full-screen overlay. */
 [data-slot='dialog-overlay'].fleed-frosted-overlay {
@@ -133,26 +133,26 @@
   box-shadow: inset 0 1px rgba(255,255,255,.16), 0 30px 80px rgba(0,0,0,.3);
 }
 @media(max-width:440px) {
-  .app .cz-panel.fleed-customize-panel { padding: 16px 14px; gap: 16px; }
-  .app .fleed-customize-panel .cz-look { flex-basis: 100px; }
-  .app .fleed-customize-panel .cz-look-preview { height: 65px; }
+  .cz-panel.fleed-customize-panel { padding: 16px 14px; gap: 16px; }
+  .fleed-customize-panel .cz-look { flex-basis: 100px; }
+  .fleed-customize-panel .cz-look-preview { height: 65px; }
 }
 @media(prefers-reduced-transparency:reduce) {
-  .app .cz-panel.fleed-customize-panel { background: #262e31; -webkit-backdrop-filter:none;backdrop-filter:none; }
+  .cz-panel.fleed-customize-panel { background: #262e31; -webkit-backdrop-filter:none;backdrop-filter:none; }
   [data-slot='dialog-content'].fleed-frosted-dialog { background:#222a2e; -webkit-backdrop-filter:none;backdrop-filter:none; }
 }
 @media(prefers-reduced-motion:reduce) {
-  .app .fleed-customize-panel .cz-look { transition:none!important; }
+  .fleed-customize-panel .cz-look { transition:none!important; }
 }
 
 /* Progressive disclosure: a generous first impression with depth on demand. */
-.app .fleed-customize-panel .cz-panel-heading {
+.fleed-customize-panel .cz-panel-heading {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
 }
-.app .fleed-customize-panel .cz-sheet-close {
+.fleed-customize-panel .cz-sheet-close {
   flex: 0 0 auto;
   width: 36px; height: 36px;
   display: grid; place-items: center;
@@ -162,8 +162,8 @@
   color: #f3f5ee;
   transition: background .18s, transform .18s;
 }
-.app .fleed-customize-panel .cz-sheet-close:hover { background: rgba(255,255,255,.18); transform: rotate(8deg); }
-.app .fleed-customize-panel .cz-depth-tabs {
+.fleed-customize-panel .cz-sheet-close:hover { background: rgba(255,255,255,.18); transform: rotate(8deg); }
+.fleed-customize-panel .cz-depth-tabs {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 4px;
@@ -172,31 +172,31 @@
   background: rgba(5,9,12,.29);
   border: 1px solid rgba(255,255,255,.12);
 }
-.app .fleed-customize-panel .cz-depth-tabs > button {
+.fleed-customize-panel .cz-depth-tabs > button {
   min-height: 42px;
   border-radius: 10px;
   font: 600 13px/1.25 "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: rgba(235,240,233,.72);
   transition: background .18s, color .18s, box-shadow .18s;
 }
-.app .fleed-customize-panel .cz-depth-tabs > button[aria-selected=true] {
+.fleed-customize-panel .cz-depth-tabs > button[aria-selected=true] {
   color: #1e2826;
   background: rgba(242,247,238,.95);
   box-shadow: 0 2px 10px rgba(0,0,0,.16);
 }
-.app .fleed-customize-panel .cz-depth-tabs > button:not([aria-selected=true]):hover {
+.fleed-customize-panel .cz-depth-tabs > button:not([aria-selected=true]):hover {
   color: #fff;
   background: rgba(255,255,255,.09);
 }
-.app .fleed-customize-panel .cz-sheet-page { display: grid; gap: 18px; min-width: 0; }
-.app .fleed-customize-panel .cz-sheet-page[hidden] { display: none!important; }
-.app .fleed-customize-panel .cz-advanced { margin: 0; }
-.app .fleed-customize-panel .cz-advanced > summary { padding-top: 18px; }
+.fleed-customize-panel .cz-sheet-page { display: grid; gap: 18px; min-width: 0; }
+.fleed-customize-panel .cz-sheet-page[hidden] { display: none!important; }
+.fleed-customize-panel .cz-advanced { margin: 0; }
+.fleed-customize-panel .cz-advanced > summary { padding-top: 18px; }
 /* Give room for focus states and let users swipe the expression rail. */
-.app .fleed-customize-panel .cz-looks { -webkit-overflow-scrolling: touch; }
+.fleed-customize-panel .cz-looks { -webkit-overflow-scrolling: touch; }
 @media(max-width:440px) {
-  .app .fleed-customize-panel .cz-depth-tabs > button { min-height: 44px; }
-  .app .fleed-customize-panel .cz-sheet-page { gap: 17px; }
+  .fleed-customize-panel .cz-depth-tabs > button { min-height: 44px; }
+  .fleed-customize-panel .cz-sheet-page { gap: 17px; }
 }
 
 /* Portfolio skill presentation — expression-independent, authored by users.
@@ -278,12 +278,12 @@
   min-width: 62px;
 }
 .app .pf-skill-reel.pf-skill-labels-text .pf-reel-fallback { display: none; }
-.app .fleed-customize-panel .cz-skill-label {
+.fleed-customize-panel .cz-skill-label {
   color: #cbd5cc;
   font: 500 12px/1.25 "Helvetica Neue",Helvetica,Arial,sans-serif;
   margin-bottom: -5px;
 }
-.app .fleed-customize-panel .cz-skill-tip {
+.fleed-customize-panel .cz-skill-tip {
   font: 400 12px/1.5 "Helvetica Neue",Helvetica,Arial,sans-serif;
   color: #bacabe;
 }
@@ -297,13 +297,15 @@
 }
 
 
-/* Compact Add library: preserve the Customise frosted-glass surface. */
-.el-panel.fleed-customize-panel {
-  gap: 11px;
+/* Compact Add library — this sheet is portalled outside .app.
+   Keep the original horizontal filter rail and compact, text-only rows. */
+.fleed-customize-panel:has(.el-compact-heading) {
+  width: min(22rem, calc(100vw - 1.5rem));
   padding: 15px;
+  gap: 11px;
   border-radius: 19px;
 }
-.el-compact-heading {
+.fleed-customize-panel .el-compact-heading {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -312,29 +314,84 @@
   font: 600 12px/1.3 "Helvetica Neue", Helvetica, Arial, sans-serif;
   letter-spacing: .01em;
 }
-.el-compact-heading .cz-sheet-close {
+.fleed-customize-panel .el-compact-heading .cz-sheet-close {
   width: 30px;
   height: 30px;
 }
-.el-panel .el-search {
+.fleed-customize-panel .el-search {
+  display: flex;
+  align-items: center;
   min-height: 39px;
   padding: 0 11px;
   gap: 8px;
   border-radius: 11px;
+  background: rgba(255,255,255,.075);
+  border: 1px solid rgba(255,255,255,.17);
 }
-.el-panel .el-search input { font-size: 12px; }
-.el-panel .cz-depth-tabs { gap: 3px; padding: 3px; border-radius: 11px; }
-.el-panel .cz-depth-tabs > button { min-height: 34px; font-size: 12px; border-radius: 8px; }
-.el-panel .el-options { gap: 4px; }
-.el-panel .el-options > button {
+.fleed-customize-panel .el-search input {
+  min-width: 0;
+  color: #f4f4ef;
+  font: 400 12px/1.4 "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+.fleed-customize-panel .cz-depth-tabs {
+  display: grid;
+  grid-template-columns: repeat(4,minmax(0,1fr));
+  gap: 3px;
+  padding: 3px;
+  border-radius: 11px;
+}
+.fleed-customize-panel .cz-depth-tabs > button {
+  min-width: 0;
+  min-height: 34px;
+  padding: 0 4px;
+  font-size: 12px;
+  border-radius: 8px;
+}
+.fleed-customize-panel .el-options {
+  display: grid;
+  gap: 4px;
+}
+.fleed-customize-panel .el-options > button {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) auto;
+  align-items: center;
   min-height: 39px;
   padding: 8px 11px;
   border-radius: 10px;
-  grid-template-columns: minmax(0,1fr) auto;
+  border: 1px solid rgba(255,255,255,.11);
+  background: rgba(255,255,255,.055);
+  color: #f4f4ef;
+  text-align: left;
+  transition: background .18s, border-color .18s, transform .2s cubic-bezier(.2,.8,.2,1);
 }
-.el-panel .el-option-copy strong { font-size: 12px; font-weight: 500; }
-.el-panel .el-option-action { padding: 5px 9px; font-size: 10px; }
+.fleed-customize-panel .el-options > button:hover:not(:disabled) {
+  background: rgba(255,255,255,.12);
+  border-color: rgba(255,255,255,.23);
+  transform: translateX(2px);
+}
+.fleed-customize-panel .el-options > button:disabled { opacity: .4; cursor: not-allowed; }
+.fleed-customize-panel .el-option-copy { min-width: 0; }
+.fleed-customize-panel .el-option-copy strong {
+  font: 500 12px/1.3 "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+.fleed-customize-panel .el-option-action {
+  color: #c9dfbd;
+  font: 500 10px/1 "Helvetica Neue", Helvetica, Arial, sans-serif;
+  letter-spacing: .02em;
+  text-transform: none;
+  opacity: .78;
+  transition: opacity .18s, transform .18s;
+}
+.fleed-customize-panel .el-options > button:hover .el-option-action {
+  opacity: 1;
+  transform: translateX(2px);
+}
+.fleed-customize-panel .el-empty {
+  padding: 12px 4px;
+  color: #d5ddd5;
+  font-size: 12px;
+}
 @media(max-width:440px) {
-  .el-panel.fleed-customize-panel { padding: 13px; gap: 9px; }
-  .el-panel .el-options > button { min-height: 37px; padding: 7px 9px; }
+  .fleed-customize-panel:has(.el-compact-heading) { padding: 13px; gap: 9px; }
+  .fleed-customize-panel .el-options > button { min-height: 37px; padding: 7px 9px; }
 }
