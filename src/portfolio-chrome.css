@@ -351,7 +351,7 @@
   display: grid;
   gap: 4px;
 }
-.fleed-customize-panel .el-options > button {
+.fleed-customize-panel .el-option-row {
   display: grid;
   grid-template-columns: minmax(0,1fr) auto;
   align-items: center;
@@ -364,17 +364,23 @@
   text-align: left;
   transition: background .18s, border-color .18s, transform .2s cubic-bezier(.2,.8,.2,1);
 }
-.fleed-customize-panel .el-options > button:hover:not(:disabled) {
+.fleed-customize-panel .el-option-row:hover:not(:disabled) {
   background: rgba(255,255,255,.12);
   border-color: rgba(255,255,255,.23);
   transform: translateX(2px);
 }
-.fleed-customize-panel .el-options > button:disabled { opacity: .4; cursor: not-allowed; }
+.fleed-customize-panel .el-option-row:disabled { opacity: .4; cursor: not-allowed; }
 .fleed-customize-panel .el-option-copy { min-width: 0; }
 .fleed-customize-panel .el-option-copy strong {
   font: 500 12px/1.3 "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 .fleed-customize-panel .el-option-action {
+  justify-self: end;
+  padding: 6px 11px;
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: 999px;
+  background: rgba(255,255,255,.10);
+  cursor: pointer;
   color: #c9dfbd;
   font: 500 10px/1 "Helvetica Neue", Helvetica, Arial, sans-serif;
   letter-spacing: .02em;
@@ -382,7 +388,7 @@
   opacity: .78;
   transition: opacity .18s, transform .18s;
 }
-.fleed-customize-panel .el-options > button:hover .el-option-action {
+.fleed-customize-panel .el-option-row:hover .el-option-action {
   opacity: 1;
   transform: translateX(2px);
 }
@@ -393,5 +399,5 @@
 }
 @media(max-width:440px) {
   .fleed-customize-panel:has(.el-compact-heading) { padding: 13px; gap: 9px; }
-  .fleed-customize-panel .el-options > button { min-height: 37px; padding: 7px 9px; }
+  .fleed-customize-panel .el-option-row { min-height: 37px; padding: 7px 9px; }
 }
