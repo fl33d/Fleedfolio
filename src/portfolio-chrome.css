@@ -295,3 +295,46 @@
 @media(prefers-reduced-motion:reduce) {
   .app .pf-skill-reel.is-grid .pf-reel-badge { transition:none; }
 }
+
+
+/* Compact Add library: preserve the Customise frosted-glass surface. */
+.el-panel.fleed-customize-panel {
+  gap: 11px;
+  padding: 15px;
+  border-radius: 19px;
+}
+.el-compact-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 30px;
+  color: #e6ebdf;
+  font: 600 12px/1.3 "Helvetica Neue", Helvetica, Arial, sans-serif;
+  letter-spacing: .01em;
+}
+.el-compact-heading .cz-sheet-close {
+  width: 30px;
+  height: 30px;
+}
+.el-panel .el-search {
+  min-height: 39px;
+  padding: 0 11px;
+  gap: 8px;
+  border-radius: 11px;
+}
+.el-panel .el-search input { font-size: 12px; }
+.el-panel .cz-depth-tabs { gap: 3px; padding: 3px; border-radius: 11px; }
+.el-panel .cz-depth-tabs > button { min-height: 34px; font-size: 12px; border-radius: 8px; }
+.el-panel .el-options { gap: 4px; }
+.el-panel .el-options > button {
+  min-height: 39px;
+  padding: 8px 11px;
+  border-radius: 10px;
+  grid-template-columns: minmax(0,1fr) auto;
+}
+.el-panel .el-option-copy strong { font-size: 12px; font-weight: 500; }
+.el-panel .el-option-action { padding: 5px 9px; font-size: 10px; }
+@media(max-width:440px) {
+  .el-panel.fleed-customize-panel { padding: 13px; gap: 9px; }
+  .el-panel .el-options > button { min-height: 37px; padding: 7px 9px; }
+}
