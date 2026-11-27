@@ -120,8 +120,9 @@ export async function savePortfolio(
     // D1 batches are atomic. Duplicate usernames roll back the entire update.
     try {
       await db.batch(statements)
-    } catch {
-      throw new Error('The custom link could not be claimed. It may already be taken.')
+    } catch (error) {
+      console.error('[Fleedfolio] Existing portfolio D1 batch failed', error)
+      throw new Error('The existing portfolio could not be saved. Check the Worker logs for the database error and try again shortly.')
     }
     return { id, token, ...(slug ? { slug } : {}) }
   }
@@ -152,8 +153,9 @@ export async function savePortfolio(
   }
   try {
     await db.batch(statements)
-  } catch {
-    throw new Error('Publishing failed. The custom link may already be taken.')
+  } catch (error) {
+    console.error('[Fleedfolio] New portfolio D1 batch failed', error)
+    throw new Error('The new portfolio could not be published. Check the Worker logs for the database error and try again shortly.')
   }
   return { id: newId, token: newToken, ...(slug ? { slug } : {}) }
 }

@@ -10,6 +10,7 @@ import '../portfolio-delight.css'
 import '../portfolio-alignment.css'
 import '../portfolio-finishing.css'
 import '../portfolio-chrome.css'
+import '../liquid-glass.css'
 
 const siteName = 'fleed — make a portfolio that feels like you'
 const siteDescription =
